@@ -1,6 +1,9 @@
 🌍 AI-Powered Travel Planner
 A full-stack web application that generates personalized travel itineraries using Google's Gemini AI. This tool helps you manage your trips, track expenses, and keep a travel journal.
 
+🌐 Live Demo
+🚀 https://travel-planner-akyd.vercel.app/
+
 ✨ Features
 🤖 AI Itinerary Generation: Instantly create detailed travel plans for any destination.
 
