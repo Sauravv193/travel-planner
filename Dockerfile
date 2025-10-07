@@ -30,4 +30,4 @@ EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=production
 
 # Run the application - find and execute the JAR file
-CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -Dspring.profiles.active=production -jar target/travel-planner-backend-*.jar"]
+CMD ["sh", "-c", "java -Dserver.port=${PORT:-10000} -Dserver.address=0.0.0.0 -Dspring.profiles.active=production -jar target/travel-planner-backend-*.jar"]
