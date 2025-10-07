@@ -20,11 +20,14 @@ COPY backend/WarderGen/src ./src
 # Build the application
 RUN ./mvnw clean package -DskipTests
 
+# List files in target directory for debugging
+RUN ls -la target/
+
 # Expose port
 EXPOSE 8080
 
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=production
 
-# Run the application
-CMD ["java", "-Dserver.port=${PORT:-8080}", "-Dspring.profiles.active=production", "-jar", "target/*.jar"]
+# Run the application - find and execute the JAR file
+CMD ["sh", "-c", "java -Dserver.port=${PORT:-8080} -Dspring.profiles.active=production -jar target/travel-planner-backend-*.jar"]
