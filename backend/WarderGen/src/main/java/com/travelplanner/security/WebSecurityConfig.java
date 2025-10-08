@@ -79,13 +79,13 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll()
+                        auth
+                                // Public endpoints - no authentication required
                                 .requestMatchers("/api/health").permitAll()
                                 .requestMatchers("/api/debug/**").permitAll()
-                                // --- THIS IS THE FIX ---
-                                // Allow all OPTIONS requests to pass without authentication
+                                .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                // ----------------------
+                                // Protected endpoints - authentication required
                                 .requestMatchers("/api/trips/**").authenticated()
                                 .requestMatchers("/api/itineraries/**").authenticated()
                                 .requestMatchers("/api/journal/**").authenticated()
