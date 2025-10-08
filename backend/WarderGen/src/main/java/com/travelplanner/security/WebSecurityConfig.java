@@ -80,6 +80,8 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/health").permitAll()
+                                .requestMatchers("/api/debug/**").permitAll()
                                 // --- THIS IS THE FIX ---
                                 // Allow all OPTIONS requests to pass without authentication
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
