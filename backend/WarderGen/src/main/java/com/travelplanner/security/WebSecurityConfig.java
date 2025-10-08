@@ -91,6 +91,7 @@ public class WebSecurityConfig {
                                 .anyRequest().authenticated()
                 );
 
+        // Explicitly configure the authentication provider
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 

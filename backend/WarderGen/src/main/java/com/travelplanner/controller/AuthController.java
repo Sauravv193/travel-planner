@@ -12,16 +12,21 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -36,18 +41,35 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        try {
+            logger.info("Signin attempt for user: {}", loginRequest.getUsername());
+            logger.info("Creating authentication token for user: {} with password length: {}", 
+                    loginRequest.getUsername(), loginRequest.getPassword().length());
+            
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail()));
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            
+            logger.info("Successful signin for user: {}", loginRequest.getUsername());
+            return ResponseEntity.ok(new JwtResponse(jwt,
+                    userDetails.getId(),
+                    userDetails.getUsername(),
+                    userDetails.getEmail()));
+                    
+        } catch (BadCredentialsException e) {
+            logger.error("Bad credentials for user: {}", loginRequest.getUsername());
+            return ResponseEntity.status(401).body(new MessageResponse("Invalid username or password"));
+        } catch (AuthenticationException e) {
+            logger.error("Authentication failed for user: {} - Error: {}", loginRequest.getUsername(), e.getMessage());
+            return ResponseEntity.status(401).body(new MessageResponse("Authentication failed: " + e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Unexpected error during signin for user: {} - Error: {}", loginRequest.getUsername(), e.getMessage());
+            return ResponseEntity.status(500).body(new MessageResponse("An unexpected error occurred"));
+        }
     }
 
     @PostMapping("/signup")
