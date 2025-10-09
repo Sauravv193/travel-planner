@@ -1,6 +1,4 @@
-// API Keys and other constants
-// I've inserted the key you provided.
-export const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// API Keys moved to backend for security
 
 // Application constants
 export const APP_NAME = 'WanderGen';

@@ -46,4 +46,20 @@ public class JournalController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
+
+    // POST: Generate journal from photos using AI
+    @PostMapping("/generate/{tripId}")
+    public ResponseEntity<JournalEntry> generateJournal(@PathVariable Long tripId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            JournalEntry generatedJournal = journalService.generateJournalFromPhotos(tripId, userDetails.getId());
+            return ResponseEntity.ok(generatedJournal);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("user not authorized")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

@@ -28,8 +28,13 @@ const Journal = () => {
     fetchTrip();
   }, [tripId]);
 
-  const handlePhotoUpload = (uploadedPhotos) => {
-    addPhotos(uploadedPhotos);
+  const handlePhotoUpload = async (uploadedPhotos) => {
+    try {
+      await addPhotos(uploadedPhotos);
+    } catch (error) {
+      console.error('Photo upload failed:', error);
+      alert('Failed to upload photos. Please try again.');
+    }
   };
 
   const handleGenerateJournal = async () => {

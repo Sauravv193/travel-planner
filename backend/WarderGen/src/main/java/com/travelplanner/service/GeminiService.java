@@ -66,6 +66,33 @@ public class GeminiService {
         }
     }
 
+    public String callGeminiWithImages(Map<String, Object> requestBody) {
+        if (geminiApiKey == null || geminiApiKey.isEmpty() || "YOUR_API_KEY".equals(geminiApiKey)) {
+            logger.error("Gemini API key is not configured. Please set 'gemini.api.key' in your application.properties.");
+            throw new RuntimeException("AI service is not configured.");
+        }
+
+        RestTemplate restTemplate = new RestTemplate();
+        // Use gemini-1.5-flash for better image processing
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("User-Agent", "Travel-Planner/1.0");
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            return restTemplate.postForObject(apiUrl, entity, String.class);
+        } catch (HttpClientErrorException e) {
+            logger.error("Error from Gemini API: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            throw new RuntimeException("Failed to generate journal: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred while calling the Gemini API for journal generation", e);
+            throw new RuntimeException("An unexpected error occurred with the AI service.", e);
+        }
+    }
+
     /**
      * This method calls the Gemini API to get a list of all available models.
      */

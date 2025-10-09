@@ -1,18 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { GEMINI_API_KEY } from '../utils/constants';
-import { formatDate } from '../utils/helpers';
-import { getJournal, saveJournal, deleteJournal as deleteJournalAPI } from '../services/api';
+import { getJournal, saveJournal, deleteJournal as deleteJournalAPI, getPhotosForTrip, uploadPhotos, deletePhoto, getPhotoUrl, generateJournal as generateJournalAPI } from '../services/api';
 
-const fileToGenerativePart = async (file) => {
-  const base64EncodedDataPromise = new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result.split(',')[1]);
-    reader.readAsDataURL(file);
-  });
-  return {
-    inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
-  };
-};
+// Removed fileToGenerativePart as journal generation now happens on backend
 
 export const useJournal = (trip) => {
   const [photos, setPhotos] = useState([]);
@@ -25,47 +14,122 @@ export const useJournal = (trip) => {
 
   useEffect(() => {
     if (trip?.id) {
-      const fetchJournal = async () => {
+      const fetchData = async () => {
         setLoading(true);
         setError('');
         try {
-          const response = await getJournal(trip.id);
-          if (response.data?.content) {
-            const parsedJournal = JSON.parse(response.data.content);
+          // Load existing journal
+          const journalResponse = await getJournal(trip.id);
+          if (journalResponse.data?.content) {
+            const parsedJournal = JSON.parse(journalResponse.data.content);
             setJournal(parsedJournal);
+          }
+          
+          // Load existing photos
+          const photosResponse = await getPhotosForTrip(trip.id);
+          if (photosResponse.data) {
+            const serverPhotos = await Promise.all(
+              photosResponse.data.map(async (photo) => {
+                try {
+                  // For now, use direct URL - auth headers will be handled by axios interceptor
+                  const photoUrl = getPhotoUrl(photo.id);
+                  return {
+                    id: photo.id,
+                    name: photo.originalName,
+                    url: photoUrl,
+                    timestamp: photo.uploadTime,
+                    size: photo.fileSize,
+                    type: photo.mimeType,
+                    fileObject: null // Server photos don't have file objects
+                  };
+                } catch (error) {
+                  console.error('Failed to load photo:', photo.originalName, error);
+                  return null;
+                }
+              })
+            );
+            setPhotos(serverPhotos.filter(photo => photo !== null));
           }
         } catch (err) {
           if (err.response?.status !== 404) {
-            setError("Could not load your existing journal.");
+            setError("Could not load your existing data.");
           }
         } finally {
           setLoading(false);
         }
       };
-      fetchJournal();
+      fetchData();
     }
   }, [trip]);
 
-  const addPhotos = (newPhotos) => {
-    // Prevent duplicates
-    setPhotos(prev => {
-        const existingIds = new Set(prev.map(p => p.id));
-        const uniqueNewPhotos = newPhotos.filter(p => !existingIds.has(p.id));
-        return [...prev, ...uniqueNewPhotos];
-    });
+  const addPhotos = async (newPhotos) => {
+    if (!trip?.id || newPhotos.length === 0) return;
+    
+    try {
+      setLoading(true);
+      
+      // Extract file objects from newPhotos for upload
+      const filesToUpload = newPhotos.map(photo => photo.fileObject).filter(Boolean);
+      
+      if (filesToUpload.length > 0) {
+        // Upload to backend
+        const response = await uploadPhotos(trip.id, filesToUpload);
+        
+        if (response.data) {
+          // Convert server response to photo format
+          const serverPhotos = response.data.map(photo => ({
+            id: photo.id,
+            name: photo.originalName,
+            url: getPhotoUrl(photo.id),
+            timestamp: photo.uploadTime,
+            size: photo.fileSize,
+            type: photo.mimeType,
+            fileObject: null // Clear file object after upload
+          }));
+          
+          // Update state with uploaded photos
+          setPhotos(prev => {
+            const existingIds = new Set(prev.map(p => p.id));
+            const uniqueNewPhotos = serverPhotos.filter(p => !existingIds.has(p.id));
+            return [...prev, ...uniqueNewPhotos];
+          });
+        }
+      }
+    } catch (err) {
+      setError('Failed to upload photos. Please try again.');
+      console.error('Photo upload error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removePhoto = (photoId) => {
-    setPhotos(prev => prev.filter(p => p.id !== photoId));
-    // Also revoke the object URL to prevent memory leaks
-    const photoToRemove = photos.find(p => p.id === photoId);
-    if (photoToRemove && photoToRemove.url.startsWith('blob:')) {
-      URL.revokeObjectURL(photoToRemove.url);
+  const removePhoto = async (photoId) => {
+    try {
+      // If it's a server photo (numeric ID), delete from backend
+      if (typeof photoId === 'number') {
+        await deletePhoto(photoId);
+      }
+      
+      // Remove from local state
+      setPhotos(prev => prev.filter(p => p.id !== photoId));
+      
+      // Also revoke the object URL to prevent memory leaks for blob URLs
+      const photoToRemove = photos.find(p => p.id === photoId);
+      if (photoToRemove && photoToRemove.url && photoToRemove.url.startsWith('blob:')) {
+        URL.revokeObjectURL(photoToRemove.url);
+      }
+    } catch (err) {
+      setError('Failed to delete photo. Please try again.');
+      console.error('Photo deletion error:', err);
     }
   };
 
   const generateJournal = async () => {
-    if (!trip) { setError("Trip information is not available."); return; }
+    if (!trip) { 
+      setError("Trip information is not available."); 
+      return; 
+    }
+    
     setLoading(true);
     setError('');
     
@@ -77,41 +141,21 @@ export const useJournal = (trip) => {
     }
 
     try {
-      const prompt = `You are a travel blogger. A user went to ${trip.destination} from ${formatDate(trip.startDate)} to ${formatDate(trip.endDate)}. Analyze these photos to identify locations and activities. Write a creative journal for their trip within this date range. The response MUST be a valid JSON object with a 'title', a 'summary', and an 'entries' array. Each entry must have a 'date' and a 'content' field. Do not wrap the JSON in markdown backticks.`;
+      console.log('Starting journal generation with', currentPhotos.length, 'photos');
       
-      const imageParts = await Promise.all(currentPhotos.map(p => fileToGenerativePart(p.fileObject)));
-      const requestBody = { contents: [{ parts: [{ text: prompt }, ...imageParts] }] };
-
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate journal from the AI service.');
+      // Call backend API to generate journal
+      const response = await generateJournalAPI(trip.id);
+      
+      if (response.data?.content) {
+        const parsedJournal = JSON.parse(response.data.content);
+        setJournal(parsedJournal);
+        console.log('Journal generated successfully');
+      } else {
+        throw new Error('Invalid response from server');
       }
-
-      const data = await response.json();
-      const journalContentText = data.candidates[0].content.parts[0].text;
-      
-      let cleanJsonText = journalContentText.trim();
-      const startIndex = cleanJsonText.indexOf('{');
-      const endIndex = cleanJsonText.lastIndexOf('}');
-      if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-          cleanJsonText = cleanJsonText.substring(startIndex, endIndex + 1);
-      }
-
-      const parsedJournal = JSON.parse(cleanJsonText);
-      
-      await saveJournal(trip.id, {
-        title: parsedJournal.title,
-        content: JSON.stringify(parsedJournal)
-      });
-
-      setJournal(parsedJournal);
     } catch (err) {
-      setError(err.message || "An unexpected error occurred during journal generation.");
+      console.error('Journal generation error:', err);
+      setError(err.response?.data?.message || err.message || "An unexpected error occurred during journal generation.");
     } finally {
       setLoading(false);
     }

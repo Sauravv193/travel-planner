@@ -30,7 +30,7 @@ const PhotoUpload = ({ onUpload, onGenerate, photoCount = 0 }) => {
     }
   };
 
-  const handleFiles = (files) => {
+  const handleFiles = async (files) => {
     setUploading(true);
     
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
@@ -40,12 +40,11 @@ const PhotoUpload = ({ onUpload, onGenerate, photoCount = 0 }) => {
       return;
     }
 
-    // Validate file sizes (max 10MB each)
-    const oversizedFiles = imageFiles.filter(file => file.size > 10 * 1024 * 1024);
-    if (oversizedFiles.length > 0) {
-      alert(`The following files are too large (max 10MB): ${oversizedFiles.map(f => f.name).join(', ')}`);
-      setUploading(false);
-      return;
+    // Optional: Validate extremely large files (max 100MB each) to prevent browser crashes
+    const extremelyOversizedFiles = imageFiles.filter(file => file.size > 100 * 1024 * 1024);
+    if (extremelyOversizedFiles.length > 0) {
+      alert(`The following files are extremely large (>100MB) and may cause performance issues: ${extremelyOversizedFiles.map(f => f.name).join(', ')}. Consider compressing them.`);
+      // Continue processing instead of returning
     }
 
     try {
@@ -59,9 +58,10 @@ const PhotoUpload = ({ onUpload, onGenerate, photoCount = 0 }) => {
         fileObject: file
       }));
 
-      onUpload(uploadedPhotos);
+      await onUpload(uploadedPhotos);
     } catch (error) {
-      alert('Error processing photos. Please try again.');
+      alert('Error uploading photos. Please try again.');
+      console.error('Upload error:', error);
     } finally {
       setUploading(false);
     }
@@ -130,7 +130,7 @@ const PhotoUpload = ({ onUpload, onGenerate, photoCount = 0 }) => {
           </span>
           {!uploading && <p className="pl-1">or drag and drop</p>}
         </div>
-        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
+        <p className="text-xs text-gray-500">PNG, JPG, GIF (any size supported)</p>
       </div>
 
       <div className="flex justify-end">

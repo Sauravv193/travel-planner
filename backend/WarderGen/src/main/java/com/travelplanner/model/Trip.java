@@ -24,7 +24,17 @@ public class Trip {
 
     private Double budget;
 
-    private String interests; // --- NEW FIELD ---
+    private String interests;
+    
+    // New comprehensive fields
+    private Integer numberOfTravelers;
+    private String accommodationStyle;
+    private String budgetTier;
+    private String travelStyle;
+    private String dietaryNeeds;
+    
+    @Column(columnDefinition = "TEXT")
+    private String mustTryFoods;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -82,13 +92,61 @@ public class Trip {
         this.budget = budget;
     }
 
-    // --- GETTER AND SETTER FOR NEW FIELD ---
+    // Getters and setters for all fields
     public String getInterests() {
         return interests;
     }
 
     public void setInterests(String interests) {
         this.interests = interests;
+    }
+    
+    public Integer getNumberOfTravelers() {
+        return numberOfTravelers;
+    }
+    
+    public void setNumberOfTravelers(Integer numberOfTravelers) {
+        this.numberOfTravelers = numberOfTravelers;
+    }
+    
+    public String getAccommodationStyle() {
+        return accommodationStyle;
+    }
+    
+    public void setAccommodationStyle(String accommodationStyle) {
+        this.accommodationStyle = accommodationStyle;
+    }
+    
+    public String getBudgetTier() {
+        return budgetTier;
+    }
+    
+    public void setBudgetTier(String budgetTier) {
+        this.budgetTier = budgetTier;
+    }
+    
+    public String getTravelStyle() {
+        return travelStyle;
+    }
+    
+    public void setTravelStyle(String travelStyle) {
+        this.travelStyle = travelStyle;
+    }
+    
+    public String getDietaryNeeds() {
+        return dietaryNeeds;
+    }
+    
+    public void setDietaryNeeds(String dietaryNeeds) {
+        this.dietaryNeeds = dietaryNeeds;
+    }
+    
+    public String getMustTryFoods() {
+        return mustTryFoods;
+    }
+    
+    public void setMustTryFoods(String mustTryFoods) {
+        this.mustTryFoods = mustTryFoods;
     }
 
     public User getUser() {

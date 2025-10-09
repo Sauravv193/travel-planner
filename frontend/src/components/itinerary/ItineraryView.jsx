@@ -12,9 +12,24 @@ const ItineraryView = ({ itinerary }) => {
     // Handle different possible data structures
     let processed = itinerary
     
-    // If itinerary has a 'days' property that's an array
-    if (itinerary.days && Array.isArray(itinerary.days)) {
-      processed = itinerary
+    // If itinerary has comprehensive structure (new format)
+    if (itinerary.itinerary && Array.isArray(itinerary.itinerary)) {
+      processed = {
+        title: 'Your Travel Itinerary',
+        description: itinerary.trip_summary || 'Explore amazing destinations with this personalized plan.',
+        totalDays: itinerary.itinerary.length,
+        days: itinerary.itinerary,
+        budgetBreakdown: itinerary.overall_budget_breakdown,
+        essentialTips: itinerary.essential_travel_tips || []
+      }
+    }
+    // If itinerary has a 'days' property that's an array (old format)
+    else if (itinerary.days && Array.isArray(itinerary.days)) {
+      processed = {
+        ...itinerary,
+        days: itinerary.days,
+        essentialTips: itinerary.essential_travel_tips || []
+      }
     }
     // If the itinerary itself is an array (direct days)
     else if (Array.isArray(itinerary)) {
@@ -22,7 +37,8 @@ const ItineraryView = ({ itinerary }) => {
         title: 'Your Travel Itinerary',
         description: 'Explore amazing destinations with this personalized plan.',
         totalDays: itinerary.length,
-        days: itinerary
+        days: itinerary,
+        essentialTips: []
       }
     }
     
@@ -133,6 +149,49 @@ const ItineraryView = ({ itinerary }) => {
           </div>
         </div>
 
+        {/* Budget Breakdown Section */}
+        {processedItinerary.budgetBreakdown && (
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 shadow-lg">
+            <h3 className="font-bold text-green-800 mb-6 flex items-center text-xl">
+              <div className="w-8 h-8 bg-green-200 rounded-full flex items-center justify-center mr-3">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                </svg>
+              </div>
+              💰 Budget Breakdown (Total Estimates)
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-green-100">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-green-800 text-xs sm:text-sm uppercase tracking-wide">Accommodation</h4>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H3m2 0h2M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 8v-4a1 1 0 011-1h2a1 1 0 011 1v4M7 7h10" />
+                  </svg>
+                </div>
+                <p className="text-green-700 font-medium text-base sm:text-lg break-words">{processedItinerary.budgetBreakdown.accommodation_estimate}</p>
+              </div>
+              <div className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-green-100">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-green-800 text-xs sm:text-sm uppercase tracking-wide">Meals</h4>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h1a1 1 0 011 1v6.5a.5.5 0 01-.5.5H18V9.5A1.5 1.5 0 0016.5 8H17zM3 12v9h18v-9M3 12V7a4 4 0 717.5-2M12 5l8 4v3" />
+                  </svg>
+                </div>
+                <p className="text-green-700 font-medium text-base sm:text-lg break-words">{processedItinerary.budgetBreakdown.food_estimate}</p>
+              </div>
+              <div className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-green-100 sm:col-span-2 lg:col-span-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-green-800 text-xs sm:text-sm uppercase tracking-wide">Activities</h4>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-green-700 font-medium text-base sm:text-lg break-words">{processedItinerary.budgetBreakdown.activities_estimate}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Travel Tips Section */}
         {processedItinerary.tips && processedItinerary.tips.length > 0 && (
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 shadow-lg">
@@ -217,6 +276,46 @@ const ItineraryView = ({ itinerary }) => {
             ))}
           </div>
         </div>
+        
+        {/* Essential Travel Tips - Displayed after all days */}
+        {processedItinerary.essentialTips && processedItinerary.essentialTips.length > 0 && (
+          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-2xl p-8 shadow-lg">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-purple-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-purple-800 mb-2">✨ Essential Travel Tips</h3>
+              <p className="text-purple-600">Important insights to make your journey smoother and more enjoyable</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {processedItinerary.essentialTips.map((tip, index) => (
+                <div key={index} className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-purple-100 hover:shadow-md transition-shadow duration-200">
+                  <div className="flex items-start">
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3 sm:mr-4 flex-shrink-0 mt-1">
+                      <span className="text-purple-600 font-bold text-xs sm:text-sm">{index + 1}</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-purple-800 font-medium text-sm sm:text-base leading-relaxed">{tip}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="bg-purple-100 border border-purple-200 rounded-xl p-4 mt-6">
+              <div className="flex items-center mb-2">
+                <svg className="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                <span className="font-semibold text-purple-800">Pro Tip:</span>
+              </div>
+              <p className="text-purple-700 text-sm">Keep these tips handy during your trip and don't hesitate to ask locals for additional recommendations. Have a wonderful journey!</p>
+            </div>
+          </div>
+        )}
         
         {/* Journey Summary */}
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 text-center shadow-lg border border-gray-200">

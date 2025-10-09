@@ -14,6 +14,7 @@ import SignUp from './pages/SignUp';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -62,14 +63,15 @@ function AppRoutes() {
 
 function App() {
   return (
-    // --- WRAP WITH THEME PROVIDER ---
-    <ThemeProvider>
-      <AuthProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <Router>
+            <AppRoutes />
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

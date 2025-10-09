@@ -89,6 +89,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/trips/**").authenticated()
                                 .requestMatchers("/api/itineraries/**").authenticated()
                                 .requestMatchers("/api/journal/**").authenticated()
+                                .requestMatchers("/api/photos/**").authenticated()
                                 .requestMatchers("/api/user/**").authenticated()
                                 .anyRequest().authenticated()
                 );

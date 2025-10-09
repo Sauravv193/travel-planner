@@ -100,5 +100,43 @@ export const deleteJournal = (tripId) => {
   return api.delete(`/journal/${tripId}`);
 };
 
+export const generateJournal = (tripId) => {
+  return api.post(`/journal/generate/${tripId}`);
+};
+
+// Photo Management APIs
+export const uploadPhotos = (tripId, files) => {
+  const formData = new FormData();
+  files.forEach(file => {
+    formData.append('files', file);
+  });
+  return api.post(`/photos/upload/${tripId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+export const getPhotosForTrip = (tripId) => {
+  return api.get(`/photos/trip/${tripId}`);
+};
+
+export const deletePhoto = (photoId) => {
+  return api.delete(`/photos/${photoId}`);
+};
+
+export const getPhotoUrl = (photoId) => {
+  const token = getToken();
+  // Return URL with proper authorization header handling
+  return `${API_URL}/photos/serve/${photoId}`;
+};
+
+// Helper function to fetch photo with proper auth headers
+export const fetchPhotoBlob = async (photoId) => {
+  const response = await api.get(`/photos/serve/${photoId}`, {
+    responseType: 'blob'
+  });
+  return URL.createObjectURL(response.data);
+};
 
 export default api;
