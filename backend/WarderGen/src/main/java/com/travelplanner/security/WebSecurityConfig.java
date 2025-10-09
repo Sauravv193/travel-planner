@@ -38,7 +38,7 @@ public class WebSecurityConfig {
     @Autowired
     private AuthTokenFilter authTokenFilter;
 
-    @Value("${spring.web.cors.allowed-origins:http://localhost:5173}")
+    @Value("${CORS_ORIGINS:http://localhost:5173}")
     private String allowedOrigins;
 
     @Bean
@@ -78,13 +78,28 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // TEMPORARILY DISABLE ALL AUTHENTICATION FOR DEBUGGING
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+                .authorizeHttpRequests(auth ->
+                        auth
+                                // Public endpoints - no authentication required
+                                .requestMatchers("/").permitAll()
+                                .requestMatchers("/api/health").permitAll()
+                                .requestMatchers("/api/status").permitAll()
+                                .requestMatchers("/error").permitAll()
+                                .requestMatchers("/api/debug/**").permitAll()
+                                .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                // Protected endpoints - authentication required
+                                .requestMatchers("/api/trips/**").authenticated()
+                                .requestMatchers("/api/itineraries/**").authenticated()
+                                .requestMatchers("/api/journal/**").authenticated()
+                                .requestMatchers("/api/photos/**").authenticated()
+                                .requestMatchers("/api/user/**").authenticated()
+                                .anyRequest().authenticated()
+                );
 
         // Explicitly configure the authentication provider
         http.authenticationProvider(authenticationProvider());
-        // TEMPORARILY DISABLED FOR DEBUGGING
-        // http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
