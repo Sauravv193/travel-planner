@@ -12,13 +12,8 @@ api.interceptors.request.use(
     const token = getToken();
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
-    } else {
-        // For public endpoints (signin, signup), allow requests without token
-        if (config.url.includes('/auth/')) {
-          return config;
-        }
-        return Promise.reject(new Error("Authentication required"));
     }
+    // Always allow requests - let the server handle authentication
     return config;
   },
   (error) => {
