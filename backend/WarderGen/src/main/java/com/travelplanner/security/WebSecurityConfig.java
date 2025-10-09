@@ -78,24 +78,8 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth
-                                // Public endpoints - EXPLICITLY allow these
-                                .requestMatchers(HttpMethod.GET, "/").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/status").permitAll()
-                                .requestMatchers("/api/debug/**").permitAll()
-                                .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                // Protected endpoints - authentication required
-                                .requestMatchers("/api/trips/**").authenticated()
-                                .requestMatchers("/api/itineraries/**").authenticated()
-                                .requestMatchers("/api/journal/**").authenticated()
-                                .requestMatchers("/api/photos/**").authenticated()
-                                .requestMatchers("/api/user/**").authenticated()
-                                // Default: deny all other requests
-                                .anyRequest().denyAll()
-                );
+                // TEMPORARILY DISABLE ALL AUTHENTICATION FOR DEBUGGING
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
         // Explicitly configure the authentication provider
         http.authenticationProvider(authenticationProvider());
