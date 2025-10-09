@@ -84,6 +84,8 @@ public class WebSecurityConfig {
                                 .requestMatchers("/").permitAll()
                                 .requestMatchers("/api/health").permitAll()
                                 .requestMatchers("/api/status").permitAll()
+                                .requestMatchers("/api/test").permitAll()
+                                .requestMatchers("/api/simple").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/api/debug/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
