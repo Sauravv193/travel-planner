@@ -68,7 +68,7 @@ public class WebSecurityConfig {
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
@@ -80,8 +80,10 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth
-                                // Public endpoints - no authentication required
-                                .requestMatchers("/api/health").permitAll()
+                                // Public endpoints - EXPLICITLY allow these
+                                .requestMatchers(HttpMethod.GET, "/").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/status").permitAll()
                                 .requestMatchers("/api/debug/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -91,12 +93,14 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/journal/**").authenticated()
                                 .requestMatchers("/api/photos/**").authenticated()
                                 .requestMatchers("/api/user/**").authenticated()
-                                .anyRequest().authenticated()
+                                // Default: deny all other requests
+                                .anyRequest().denyAll()
                 );
 
         // Explicitly configure the authentication provider
         http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        // TEMPORARILY DISABLED FOR DEBUGGING
+        // http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
