@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.jsx';
 import { useState } from 'react';
-import ThemeToggle from './ThemeToggle'; // --- IMPORT ---
+import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const { user, logout } = useAuth();
@@ -50,7 +50,6 @@ const Header = () => {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-             {/* --- ADD THEME TOGGLE HERE --- */}
             <ThemeToggle />
             {user ? (
                 <div className="hidden sm:flex items-center space-x-4">

@@ -122,16 +122,22 @@ export const deletePhoto = (photoId) => {
 
 export const getPhotoUrl = (photoId) => {
   const token = getToken();
-  // Return URL with proper authorization header handling
+  if (token) {
+    return `${API_URL}/photos/serve/${photoId}?token=${encodeURIComponent(token)}`;
+  }
   return `${API_URL}/photos/serve/${photoId}`;
 };
 
-// Helper function to fetch photo with proper auth headers
 export const fetchPhotoBlob = async (photoId) => {
-  const response = await api.get(`/photos/serve/${photoId}`, {
-    responseType: 'blob'
-  });
-  return URL.createObjectURL(response.data);
+  try {
+    const response = await api.get(`/photos/serve/${photoId}`, {
+      responseType: 'blob'
+    });
+    return URL.createObjectURL(response.data);
+  } catch (error) {
+    console.error('Failed to fetch photo:', error);
+    throw error;
+  }
 };
 
 export default api;

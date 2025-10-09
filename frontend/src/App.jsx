@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
-import { ThemeProvider } from './contexts/ThemeProvider'; // --- IMPORT ---
+import { ThemeProvider } from './contexts/ThemeProvider';
 import { useAuth } from './hooks/useAuth';
 import Home from './pages/Home';
 import Planner from './pages/Planner';

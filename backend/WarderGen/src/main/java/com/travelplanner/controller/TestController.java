@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api")
 public class TestController {
@@ -25,5 +24,15 @@ public class TestController {
     @GetMapping("/simple")
     public ResponseEntity<String> simple() {
         return ResponseEntity.ok("Simple endpoint working");
+    }
+
+    @GetMapping("/ping")
+    public String ping() {
+        return "pong";
+    }
+
+    @GetMapping("/basic")
+    public String basic() {
+        return "OK";
     }
 }

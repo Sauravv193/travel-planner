@@ -104,12 +104,20 @@ public class PhotoService {
         photoRepository.delete(photo);
     }
 
-    public byte[] getPhotoData(Long photoId, Long userId) throws IOException {
-        Photo photo = photoRepository.findById(photoId)
+    public Photo getPhotoById(Long photoId, Long userId) {
+        return photoRepository.findById(photoId)
                 .filter(p -> p.getTrip().getUser().getId().equals(userId))
                 .orElseThrow(() -> new RuntimeException("Photo not found or user not authorized."));
+    }
+
+    public byte[] getPhotoData(Long photoId, Long userId) throws IOException {
+        Photo photo = getPhotoById(photoId, userId);
         
         Path filePath = Paths.get(photo.getFilePath());
+        if (!Files.exists(filePath)) {
+            throw new RuntimeException("Photo file not found on disk: " + photo.getOriginalName());
+        }
+        
         return Files.readAllBytes(filePath);
     }
 }

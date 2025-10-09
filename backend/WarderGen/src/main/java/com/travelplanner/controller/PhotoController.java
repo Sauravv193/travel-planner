@@ -16,7 +16,6 @@ import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/photos")
 public class PhotoController {
@@ -68,12 +67,18 @@ public class PhotoController {
             @PathVariable Long photoId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
+            Photo photo = photoService.getPhotoById(photoId, userDetails.getId());
             byte[] photoData = photoService.getPhotoData(photoId, userDetails.getId());
             ByteArrayResource resource = new ByteArrayResource(photoData);
             
+            MediaType contentType = photo.getMimeType() != null ? 
+                MediaType.parseMediaType(photo.getMimeType()) : 
+                MediaType.IMAGE_JPEG;
+            
             return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_JPEG) // Default, can be enhanced to detect actual type
+                    .contentType(contentType)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
+                    .header(HttpHeaders.CACHE_CONTROL, "max-age=86400")
                     .body(resource);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

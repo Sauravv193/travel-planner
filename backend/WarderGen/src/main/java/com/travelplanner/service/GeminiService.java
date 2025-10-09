@@ -23,7 +23,6 @@ public class GeminiService {
     @Value("${gemini.api.key}")
     private String geminiApiKey;
 
-    // --- FINAL UPDATE: Using the correct model name from your list ---
     private static final String GEMINI_GENERATE_URL =
             "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=";
 
@@ -73,8 +72,7 @@ public class GeminiService {
         }
 
         RestTemplate restTemplate = new RestTemplate();
-        // Use gemini-1.5-flash for better image processing
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + geminiApiKey;
+        String apiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=" + geminiApiKey;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

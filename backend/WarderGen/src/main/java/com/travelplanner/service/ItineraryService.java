@@ -28,7 +28,6 @@ public class ItineraryService {
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new RuntimeException("Error: Trip not found or user not authorized."));
 
-        // --- COMPREHENSIVE AI PROMPT WITH DETAILED INPUTS ---
         StringBuilder promptBuilder = new StringBuilder();
         
         // Main context
@@ -133,7 +132,6 @@ public class ItineraryService {
         );
 
         String prompt = promptBuilder.toString();
-        // --- END OF PROMPT BUILDING ---
 
         String aiResponse = geminiService.callGemini(prompt);
         String cleanJsonResponse = extractJson(aiResponse);
