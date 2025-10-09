@@ -29,7 +29,18 @@ public class DatabaseConfig {
                     port = 5432; // Default PostgreSQL port
                 }
                 
-                String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + port + dbUri.getPath() + "?sslmode=require";
+                String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + port + dbUri.getPath();
+                
+                // Add SSL mode if not already present in the URL
+                if (!databaseUrl.contains("sslmode=")) {
+                    dbUrl += "?sslmode=require";
+                } else {
+                    // Preserve existing query parameters
+                    String query = dbUri.getQuery();
+                    if (query != null && !query.isEmpty()) {
+                        dbUrl += "?" + query;
+                    }
+                }
                 
                 return DataSourceBuilder
                     .create()

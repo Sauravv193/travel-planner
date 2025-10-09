@@ -15,7 +15,5 @@ services:
         sync: false
       - key: CORS_ORIGINS
         value: "https://your-frontend-app.vercel.app,http://localhost:3000,http://localhost:5173"
-
-databases:
-  - name: travel-planner-db
-    plan: free
+      - key: DATABASE_URL
+        sync: false # You'll set this manually to your Neon connection string
