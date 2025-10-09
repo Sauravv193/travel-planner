@@ -1,25 +1,49 @@
 import DayCard from './DayCard'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
 
 const ItineraryView = ({ itinerary }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [visibleDays, setVisibleDays] = useState(new Set())
 
+  // Memoize processed itinerary to avoid recalculation
+  const processedItinerary = useMemo(() => {
+    if (!itinerary) return null;
+    
+    // Handle different possible data structures
+    let processed = itinerary
+    
+    // If itinerary has a 'days' property that's an array
+    if (itinerary.days && Array.isArray(itinerary.days)) {
+      processed = itinerary
+    }
+    // If the itinerary itself is an array (direct days)
+    else if (Array.isArray(itinerary)) {
+      processed = {
+        title: 'Your Travel Itinerary',
+        description: 'Explore amazing destinations with this personalized plan.',
+        totalDays: itinerary.length,
+        days: itinerary
+      }
+    }
+    
+    return processed;
+  }, [itinerary]);
+
   useEffect(() => {
     setIsVisible(true)
-    // Stagger the appearance of each day
-    if (itinerary?.days) {
-      itinerary.days.forEach((_, index) => {
+    // Reduce stagger delay for faster initial load
+    if (processedItinerary?.days) {
+      processedItinerary.days.forEach((_, index) => {
         setTimeout(() => {
           setVisibleDays(prev => new Set([...prev, index]))
-        }, index * 200)
+        }, index * 100) // Reduced from 200ms to 100ms
       })
     }
-  }, [itinerary])
+  }, [processedItinerary])
 
 
   // Enhanced validation and fallback
-  if (!itinerary) {
+  if (!processedItinerary) {
     return (
         <div className="text-center py-10 bg-white rounded-xl shadow-md transform transition-all duration-500 hover:shadow-lg">
             <div className="animate-pulse">
@@ -31,40 +55,13 @@ const ItineraryView = ({ itinerary }) => {
     );
   }
 
-  // Handle different possible data structures
-  let processedItinerary = itinerary
-  
-  // If itinerary has a 'days' property that's an array
-  if (itinerary.days && Array.isArray(itinerary.days)) {
-    processedItinerary = itinerary
-  }
-  // If the itinerary itself is an array (direct days)
-  else if (Array.isArray(itinerary)) {
-    processedItinerary = {
-      title: 'Your Travel Itinerary',
-      description: 'Explore amazing destinations with this personalized plan.',
-      totalDays: itinerary.length,
-      days: itinerary
-    }
-  }
-  // If it's a string, try to display it as raw content
-  else if (typeof itinerary === 'string') {
+  // Handle string or debug cases
+  if (typeof itinerary === 'string') {
     return (
       <div className="text-center py-10 bg-white rounded-xl shadow-md">
         <h3 className="text-lg font-medium text-gray-700 mb-4">Raw Itinerary Content</h3>
         <pre className="text-sm text-gray-600 whitespace-pre-wrap text-left max-w-4xl mx-auto p-4 bg-gray-50 rounded-lg overflow-auto">
           {itinerary}
-        </pre>
-      </div>
-    )
-  }
-  // If no recognizable structure
-  else {
-    return (
-      <div className="text-center py-10 bg-white rounded-xl shadow-md">
-        <h3 className="text-lg font-medium text-gray-700 mb-4">Debug: Itinerary Structure</h3>
-        <pre className="text-sm text-gray-600 whitespace-pre-wrap text-left max-w-4xl mx-auto p-4 bg-gray-50 rounded-lg overflow-auto">
-          {JSON.stringify(itinerary, null, 2)}
         </pre>
       </div>
     )

@@ -105,38 +105,25 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* New Enhanced Animations */
+/* Optimized Essential Animations */
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  25% { transform: translateY(-10px) rotate(1deg); }
-  50% { transform: translateY(-20px) rotate(0deg); }
-  75% { transform: translateY(-10px) rotate(-1deg); }
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.05); opacity: 0.8; }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.4); }
-  50% { box-shadow: 0 0 40px rgba(20, 184, 166, 0.6); }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
+  0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
 }
 
 /* Animation Classes */
@@ -160,15 +147,15 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Enhanced Auth Container */
+/* Optimized Auth Container */
 .auth-container-enhanced {
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea, #764ba2);
   overflow: hidden;
 }
 
 .dark .auth-container-enhanced {
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 50%, #0c0c0c 100%);
+  background: linear-gradient(135deg, #0c0c0c, #1a1a1a);
 }
 
 /* Floating Background Shapes */
@@ -513,6 +500,35 @@
   color: #14b8a6;
 }
 
+/* Performance Optimizations */
+* {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Enable hardware acceleration for animations */
+.auth-form-enhanced,
+.auth-icon,
+.floating-shapes .shape,
+.timeline-marker,
+.btn-enhanced {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Smooth Scrolling */
 html { scroll-behavior: smooth; }
-body { overflow-x: hidden; /* Prevent horizontal scroll */ }
+body { overflow-x: hidden; }

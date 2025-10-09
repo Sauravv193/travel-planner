@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 
-const DayCard = ({ day, dayNumber, isTimelineView = false }) => {
+const DayCard = memo(({ day, dayNumber, isTimelineView = false }) => {
   const [animatedActivities, setAnimatedActivities] = useState([])
 
   useEffect(() => {
@@ -218,6 +218,6 @@ const DayCard = ({ day, dayNumber, isTimelineView = false }) => {
       </div>
     </div>
   )
-}
+})
 
 export default DayCard
