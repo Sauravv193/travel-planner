@@ -39,7 +39,7 @@ public class Itinerary {
     private Long updatedBy;
 
     // Soft delete
-    @Column(name = "deleted", nullable = false)
+    @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean deleted = false;
 
     @Column(name = "deleted_at")
