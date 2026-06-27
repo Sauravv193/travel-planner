@@ -34,7 +34,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t travel-planner-backend:latest \
-            -f ../../Dockerfile ../../
+            -f Dockerfile .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
