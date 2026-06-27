@@ -1,7 +1,5 @@
-# Use OpenJDK 17 as base image
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk-slim
 
-# Set working directory
 WORKDIR /app
 
 # Copy Maven wrapper and pom.xml
@@ -20,14 +18,11 @@ COPY backend/WarderGen/src ./src
 # Build the application
 RUN ./mvnw clean package -DskipTests
 
-# List files in target directory for debugging
-RUN ls -la target/
-
 # Expose port
 EXPOSE 8080
 
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=production
 
-# Run the application - find and execute the JAR file
+# Run the application
 CMD ["sh", "-c", "java -Dserver.port=${PORT:-10000} -Dserver.address=0.0.0.0 -Dspring.profiles.active=production -jar target/travel-planner-backend-*.jar"]
