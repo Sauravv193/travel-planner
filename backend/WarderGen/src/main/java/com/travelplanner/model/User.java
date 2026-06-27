@@ -42,7 +42,7 @@ public class User {
     @Column(name = "verified", nullable = false)
     private boolean verified = false;
 
-    @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
+    @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
     private boolean deleted = false;
 
     @CreationTimestamp
