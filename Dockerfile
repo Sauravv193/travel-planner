@@ -1,4 +1,6 @@
-FROM eclipse/temurin:17-jdk-slim
+# Use the correct base image tag (no -slim suffix exists for this image)
+FROM eclipse-temurin:17-jdk-jammy
+
 WORKDIR /app
 
 # Copy Maven wrapper and pom.xml
