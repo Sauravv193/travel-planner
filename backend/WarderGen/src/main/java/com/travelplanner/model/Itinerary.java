@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Table(name = "itineraries",
        indexes = {
            @Index(name = "idx_itineraries_trip_id", columnList = "trip_id", unique = true),
-           @Index(name = "idx_itineraries_deleted", columnList = "deleted")
        })
 public class Itinerary {
     @Id

@@ -14,7 +14,6 @@ import java.util.Set;
            @Index(name = "idx_trips_user_id", columnList = "user_id"),
            @Index(name = "idx_trips_destination", columnList = "destination"),
            @Index(name = "idx_trips_start_date", columnList = "start_date"),
-           @Index(name = "idx_trips_deleted", columnList = "deleted")
        })
 public class Trip {
     @Id
