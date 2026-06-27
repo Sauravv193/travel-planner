@@ -83,4 +83,4 @@ uploads/
 
 # Test reports
 /test-reports/
-*.xml
+/test-reports/*.xml
