@@ -1,0 +1,7 @@
+fix: correct security endpoint patterns and CORS for production deployment
+
+- Fix WebSecurityConfig.java: add /api/v1/** patterns for all endpoints
+  (auth, trips, itineraries, journal, photos, user, conversations, jobs, cache)
+  - Previous /api/auth/** didn't match /api/v1/auth/** causing 401 on signup
+- Fix default CORS origins to include travel-planner-akyd.vercel.app
+- Update frontend .env with correct Render backend URL

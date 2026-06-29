@@ -51,7 +51,7 @@ public class WebSecurityConfig {
     @Autowired(required = false)
     private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
-    @Value("${CORS_ORIGINS:http://localhost:5173}")
+    @Value("${CORS_ORIGINS:http://localhost:5173,https://travel-planner-akyd.vercel.app}")
     private String allowedOrigins;
 
     @Value("${GOOGLE_CLIENT_ID:}")
@@ -124,6 +124,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/test").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/api/debug/**").permitAll()
+                                .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/oauth2/**").permitAll()
                                 .requestMatchers("/swagger-ui/**").permitAll()
@@ -132,13 +133,21 @@ public class WebSecurityConfig {
                                 .requestMatchers("/webjars/**").permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 // Protected endpoints - authentication required
+                                .requestMatchers("/api/v1/trips/**").authenticated()
                                 .requestMatchers("/api/trips/**").authenticated()
+                                .requestMatchers("/api/v1/itineraries/**").authenticated()
                                 .requestMatchers("/api/itineraries/**").authenticated()
+                                .requestMatchers("/api/v1/journal/**").authenticated()
                                 .requestMatchers("/api/journal/**").authenticated()
+                                .requestMatchers("/api/v1/photos/**").authenticated()
                                 .requestMatchers("/api/photos/**").authenticated()
+                                .requestMatchers("/api/v1/user/**").authenticated()
                                 .requestMatchers("/api/user/**").authenticated()
+                                .requestMatchers("/api/v1/conversations/**").authenticated()
                                 .requestMatchers("/api/conversations/**").authenticated()
+                                .requestMatchers("/api/v1/jobs/**").authenticated()
                                 .requestMatchers("/api/jobs/**").authenticated()
+                                .requestMatchers("/api/v1/cache/**").authenticated()
                                 .requestMatchers("/api/cache/**").authenticated()
                                 .anyRequest().authenticated()
                 );
