@@ -77,14 +77,14 @@ const EditProfile = () => {
 
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Profile</h1>
+      <div className="max-w-md mx-auto bg-white/80 dark:bg-night-card/80 backdrop-blur-sm border border-cream-100 dark:border-night-border rounded-2xl shadow-glass p-8">
+        <h1 className="text-2xl font-bold text-warm-dark dark:text-white mb-6">Edit Profile</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && <p className="error-message">{error}</p>}
           {message && <p className="success-message">{message}</p>}
           
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label htmlFor="username" className="block text-sm font-medium text-warm-dark dark:text-night-text">
               Username
             </label>
             <input
@@ -99,7 +99,7 @@ const EditProfile = () => {
           </div>
           
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium text-warm-dark dark:text-night-text">
               Email Address
             </label>
             <input
@@ -107,14 +107,14 @@ const EditProfile = () => {
               id="email"
               name="email"
               value={profile.email}
-              className="input-field bg-gray-100 dark:bg-gray-700 dark:border-gray-600"
+              className="input-field bg-cream-100 dark:bg-night-surface/50 dark:border-night-border"
               disabled
             />
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email address cannot be changed.</p>
+            <p className="text-xs text-cream-500 dark:text-night-muted mt-1">Email address cannot be changed.</p>
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label htmlFor="password" className="block text-sm font-medium text-warm-dark dark:text-night-text">
               New Password (optional)
             </label>
             <input
@@ -146,7 +146,7 @@ const EditProfile = () => {
           <div>
             <button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700"
+              className="w-full flex justify-center py-3 px-6 rounded-xl text-sm font-semibold text-white bg-maroon-500 hover:bg-maroon-600 hover:shadow-lg hover:shadow-maroon-500/20 transition-all duration-300"
               disabled={isUpdating}
             >
               {isUpdating ? 'Saving...' : 'Save Changes'}

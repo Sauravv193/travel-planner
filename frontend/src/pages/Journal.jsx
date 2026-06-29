@@ -1,21 +1,19 @@
-import { useState, useEffect } from 'react'; // Import useEffect
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PhotoUpload from '../components/journal/PhotoUpload';
 import JournalView from '../components/journal/JournalView';
 import PhotoGallery from '../components/journal/PhotoGallery';
 import { useJournal } from '../hooks/useJournal';
-import { getTripById } from '../services/api'; // Import the API function
-import LoadingSpinner from '../components/common/LoadingSpinner'; // Import spinner
+import { getTripById } from '../services/api';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const Journal = () => {
   const { tripId } = useParams();
   const [activeTab, setActiveTab] = useState('upload');
-  const [trip, setTrip] = useState(null); // --- NEW: State to hold trip data
+  const [trip, setTrip] = useState(null);
 
-  // --- UPDATED: Pass the entire 'trip' object to the useJournal hook
   const { photos, addPhotos, removePhoto, generateJournal, journal, loading, deleteJournal } = useJournal(trip);
 
-  // --- NEW: useEffect to fetch trip data when the component mounts ---
   useEffect(() => {
     const fetchTrip = async () => {
       try {
@@ -38,7 +36,6 @@ const Journal = () => {
   };
 
   const handleGenerateJournal = async () => {
-    // Ensure trip data is loaded before generating
     if (!trip) {
         alert("Trip data is still loading, please wait a moment.");
         return;
@@ -48,7 +45,6 @@ const Journal = () => {
   };
 
   const handleModifyJournal = async () => {
-    // Regenerate with current photos
     await generateJournal();
   };
 
@@ -56,7 +52,6 @@ const Journal = () => {
     await deleteJournal();
   };
   
-  // --- NEW: Loading state while fetching initial trip data ---
   if (!trip) {
     return (
         <div className="min-h-screen flex items-center justify-center">
@@ -69,21 +64,21 @@ const Journal = () => {
     <div className="py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Travel Journal for {trip.destination}</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-3xl font-bold text-warm-dark dark:text-white mb-2">Travel Journal for {trip.destination}</h1>
+          <p className="text-lg text-brown-600 dark:text-night-muted">
             Transform your travel memories into a beautiful story
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
-          <div className="border-b border-gray-200">
+        <div className="card overflow-hidden mb-8">
+          <div className="border-b border-cream-100 dark:border-night-border">
             <nav className="-mb-px flex">
               <button
                 onClick={() => setActiveTab('upload')}
                 className={`py-4 px-6 text-sm font-medium ${
                   activeTab === 'upload'
-                    ? 'border-b-2 border-pink-500 text-pink-600'
-                    : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-b-2 border-maroon-500 text-maroon-600'
+                    : 'text-brown-600 hover:text-warm-dark hover:border-cream-200 dark:text-night-muted dark:hover:text-white'
                 }`}
               >
                 Upload Photos
@@ -92,8 +87,8 @@ const Journal = () => {
                 onClick={() => setActiveTab('gallery')}
                 className={`py-4 px-6 text-sm font-medium ${
                   activeTab === 'gallery'
-                    ? 'border-b-2 border-pink-500 text-pink-600'
-                    : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-b-2 border-maroon-500 text-maroon-600'
+                    : 'text-brown-600 hover:text-warm-dark hover:border-cream-200 dark:text-night-muted dark:hover:text-white'
                 }`}
               >
                 Photo Gallery
@@ -102,8 +97,8 @@ const Journal = () => {
                 onClick={() => setActiveTab('journal')}
                 className={`py-4 px-6 text-sm font-medium ${
                   activeTab === 'journal'
-                    ? 'border-b-2 border-pink-500 text-pink-600'
-                    : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-b-2 border-maroon-500 text-maroon-600'
+                    : 'text-brown-600 hover:text-warm-dark hover:border-cream-200 dark:text-night-muted dark:hover:text-white'
                 }`}
               >
                 AI Journal

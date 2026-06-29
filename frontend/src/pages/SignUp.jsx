@@ -39,13 +39,13 @@ const SignUp = () => {
             <div className="flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className={`auth-glass-card transition-all duration-1000 transform ${showForm ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'}`}>
                     <div className="text-center mb-8">
-                        <div className="w-20 h-20 bg-gradient-to-br from-terracotta-400 to-terracotta-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-terracotta-500/20">
+                        <div className="w-20 h-20 bg-gradient-to-br from-maroon-500 to-maroon-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-maroon-500/20">
                             <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                             </svg>
                         </div>
-                        <h2 className="text-3xl font-bold text-forest-800 dark:text-white glow-text">Join Our Community</h2>
-                        <p className="mt-2 text-earth-600 dark:text-night-muted">Create your account to start planning amazing trips across India</p>
+                        <h2 className="text-3xl font-bold text-warm-dark dark:text-white glow-text">Join Our Community</h2>
+                        <p className="mt-2 text-brown-600 dark:text-night-muted">Create your account to start planning amazing trips across India</p>
                     </div>
 
                     <form className="space-y-5" onSubmit={handleSubmit}>
@@ -72,15 +72,15 @@ const SignUp = () => {
 
                         <div className="space-y-4">
                             <div className="animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                                <label htmlFor="signup-username" className="block text-sm font-medium text-forest-700 dark:text-night-text mb-2">Username</label>
+                                <label htmlFor="signup-username" className="block text-sm font-medium text-warm-dark dark:text-night-text mb-2">Username</label>
                                 <input type="text" id="signup-username" value={username} onChange={(e) => setUsername(e.target.value)} required disabled={isLoading} className="input-field" placeholder="Choose a username" autoComplete="username" />
                             </div>
                             <div className="animate-fade-in-up" style={{animationDelay: '0.15s'}}>
-                                <label htmlFor="signup-email" className="block text-sm font-medium text-forest-700 dark:text-night-text mb-2">Email</label>
+                                <label htmlFor="signup-email" className="block text-sm font-medium text-warm-dark dark:text-night-text mb-2">Email</label>
                                 <input type="email" id="signup-email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} className="input-field" placeholder="Enter your email address" autoComplete="email" />
                             </div>
                             <div className="animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-                                <label htmlFor="signup-password" className="block text-sm font-medium text-forest-700 dark:text-night-text mb-2">Password</label>
+                                <label htmlFor="signup-password" className="block text-sm font-medium text-warm-dark dark:text-night-text mb-2">Password</label>
                                 <input type="password" id="signup-password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={isLoading} className="input-field" placeholder="Create a secure password" autoComplete="new-password" />
                             </div>
                         </div>
@@ -102,9 +102,9 @@ const SignUp = () => {
                         <div className="divider-gradient" />
 
                         <div className="text-center animate-fade-in-up" style={{animationDelay: '0.3s'}}>
-                            <p className="text-sm text-earth-600 dark:text-night-muted">
+                            <p className="text-sm text-brown-600 dark:text-night-muted">
                                 Already have an account?{' '}
-                                <Link to="/signin" className="text-terracotta-600 dark:text-terracotta-400 font-semibold hover:text-terracotta-700 dark:hover:text-terracotta-300 transition-colors">
+                                <Link to="/signin" className="text-maroon-600 dark:text-maroon-400 font-semibold hover:text-maroon-700 dark:hover:text-maroon-300 transition-colors">
                                     Sign In <span className="inline-block ml-0.5">→</span>
                                 </Link>
                             </p>

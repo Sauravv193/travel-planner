@@ -36,8 +36,8 @@ const ProductDemo = () => {
   const Icon = currentDemo.icon;
 
   return (
-    <div className="relative bg-white/80 dark:bg-night-card/80 backdrop-blur-xl rounded-2xl shadow-glass-xl overflow-hidden border border-earth-100 dark:border-night-border">
-      <div className="bg-gradient-to-r from-forest-500 to-forest-600 px-6 py-4">
+    <div className="relative bg-white/80 dark:bg-night-card/80 backdrop-blur-xl rounded-2xl shadow-glass-xl overflow-hidden border border-cream-100 dark:border-night-border">
+      <div className="bg-gradient-to-r from-maroon-500 to-maroon-600 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-white/30 rounded-full"></div>
@@ -56,35 +56,35 @@ const ProductDemo = () => {
         {currentStep < 3 ? (
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-terracotta-400 to-terracotta-600 rounded-xl flex items-center justify-center shadow-lg shadow-terracotta-500/20">
+              <div className="w-12 h-12 bg-gradient-to-br from-maroon-500 to-maroon-600 rounded-xl flex items-center justify-center shadow-lg shadow-maroon-500/20">
                 <Icon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-forest-800 dark:text-white">{currentDemo.title}</h3>
-                <p className="text-earth-600 dark:text-night-muted text-sm">{currentDemo.description}</p>
+                <h3 className="text-xl font-bold text-warm-dark dark:text-white">{currentDemo.title}</h3>
+                <p className="text-brown-600 dark:text-night-muted text-sm">{currentDemo.description}</p>
               </div>
             </div>
-            <div className="bg-earth-50/80 dark:bg-night-surface/80 backdrop-blur-sm rounded-xl p-4 border border-terracotta-200 dark:border-terracotta-500/30">
-              <div className="flex items-center space-x-2 text-forest-800 dark:text-night-text font-mono">
-                {isTyping && <span className="animate-pulse text-terracotta-500">▌</span>}
+            <div className="bg-cream-50/80 dark:bg-night-surface/80 backdrop-blur-sm rounded-xl p-4 border border-maroon-200 dark:border-maroon-500/30">
+              <div className="flex items-center space-x-2 text-warm-dark dark:text-night-text font-mono">
+                {isTyping && <span className="animate-pulse text-maroon-500">▌</span>}
                 <span>{typedText}</span>
               </div>
             </div>
             <div className="flex justify-center space-x-2">
               {demoSteps.slice(0, 3).map((_, index) => (
-                <div key={index} className={`h-2 rounded-full transition-all duration-300 ${index === currentStep ? 'w-8 bg-terracotta-500' : index < currentStep ? 'w-2 bg-terracotta-400' : 'w-2 bg-earth-200 dark:bg-night-border'}`} />
+                <div key={index} className={`h-2 rounded-full transition-all duration-300 ${index === currentStep ? 'w-8 bg-maroon-500' : index < currentStep ? 'w-2 bg-maroon-400' : 'w-2 bg-cream-200 dark:bg-night-border'}`} />
               ))}
             </div>
           </div>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center space-x-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-terracotta-400 to-terracotta-600 rounded-xl flex items-center justify-center shadow-lg shadow-terracotta-500/20 animate-pulse">
+              <div className="w-12 h-12 bg-gradient-to-br from-maroon-500 to-maroon-600 rounded-xl flex items-center justify-center shadow-lg shadow-maroon-500/20 animate-pulse">
                 <Icon className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-forest-800 dark:text-white">Your Goa Adventure</h3>
-                <p className="text-earth-600 dark:text-night-muted text-sm">5-day personalized itinerary ready</p>
+                <h3 className="text-xl font-bold text-warm-dark dark:text-white">Your Goa Adventure</h3>
+                <p className="text-brown-600 dark:text-night-muted text-sm">5-day personalized itinerary ready</p>
               </div>
             </div>
             <div className="space-y-3">
@@ -93,22 +93,22 @@ const ProductDemo = () => {
                 { day: "Day 2", activity: "Old Goa Churches & Heritage", time: "8:30 AM" },
                 { day: "Day 3", activity: "Dudhsagar Waterfalls & Spice Plantation", time: "7:00 AM" }
               ].map((item, index) => (
-                <div key={index} className="flex items-center space-x-3 bg-earth-50/50 dark:bg-night-surface/50 backdrop-blur-sm rounded-lg p-3 border border-earth-100 dark:border-night-border transform transition-all duration-500"
+                <div key={index} className="flex items-center space-x-3 bg-cream-50/50 dark:bg-night-surface/50 backdrop-blur-sm rounded-lg p-3 border border-cream-100 dark:border-night-border transform transition-all duration-500"
                   style={{ opacity: index === 0 ? 1 : 0.5, transform: index === 0 ? 'translateX(0)' : 'translateX(-10px)' }}
                 >
-                  <div className="w-8 h-8 bg-terracotta-100 dark:bg-terracotta-900/30 rounded-lg flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-terracotta-600 dark:text-terracotta-400" />
+                  <div className="w-8 h-8 bg-maroon-100 dark:bg-maroon-900/30 rounded-lg flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-maroon-600 dark:text-maroon-400" />
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs text-earth-500 dark:text-night-muted">{item.day} • {item.time}</div>
-                    <div className="text-sm font-medium text-forest-700 dark:text-white">{item.activity}</div>
+                    <div className="text-xs text-cream-500 dark:text-night-muted">{item.day} • {item.time}</div>
+                    <div className="text-sm font-medium text-warm-dark dark:text-white">{item.activity}</div>
                   </div>
                   <CheckCircle className="w-5 h-5 text-green-500" />
                 </div>
               ))}
             </div>
             <div className="pt-4 flex justify-center">
-              <div className="flex items-center space-x-2 text-terracotta-600 dark:text-terracotta-400 font-medium text-sm">
+              <div className="flex items-center space-x-2 text-maroon-600 dark:text-maroon-400 font-medium text-sm">
                 <span>And much more...</span><ArrowRight className="w-4 h-4" />
               </div>
             </div>
@@ -116,8 +116,8 @@ const ProductDemo = () => {
         )}
       </div>
 
-      <div className="bg-earth-50/50 dark:bg-night-surface/50 backdrop-blur-sm px-6 py-3 border-t border-earth-100 dark:border-night-border">
-        <div className="flex items-center justify-between text-xs text-earth-500 dark:text-night-muted">
+      <div className="bg-cream-50/50 dark:bg-night-surface/50 backdrop-blur-sm px-6 py-3 border-t border-cream-100 dark:border-night-border">
+        <div className="flex items-center justify-between text-xs text-cream-500 dark:text-night-muted">
           <span>Step {currentStep + 1} of {demoSteps.length}</span>
           <div className="flex items-center space-x-1">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>

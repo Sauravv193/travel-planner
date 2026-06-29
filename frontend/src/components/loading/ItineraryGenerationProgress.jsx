@@ -30,11 +30,11 @@ const ItineraryGenerationProgress = ({ destination }) => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-gradient-to-br from-terracotta-500 to-terracotta-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
+        <div className="w-20 h-20 bg-gradient-to-br from-maroon-500 to-maroon-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
           <Sparkles className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-forest-800 dark:text-white mb-2">Creating Your Perfect Trip</h2>
-        <p className="text-earth-600 dark:text-night-muted">Our AI is crafting a personalized itinerary just for you</p>
+        <h2 className="text-2xl font-bold text-warm-dark dark:text-white mb-2">Creating Your Perfect Trip</h2>
+        <p className="text-brown-600 dark:text-night-muted">Our AI is crafting a personalized itinerary just for you</p>
       </div>
 
       <div className="space-y-4">
@@ -47,34 +47,34 @@ const ItineraryGenerationProgress = ({ destination }) => {
           return (
             <div key={index} className={`flex items-center space-x-4 p-4 rounded-xl transition-all duration-300 ${
               isCurrent
-                ? 'bg-gradient-to-r from-terracotta-50/80 to-terracotta-100/80 dark:from-terracotta-900/20 dark:to-terracotta-900/20 backdrop-blur-sm border-2 border-terracotta-300 dark:border-terracotta-600 shadow-glass'
+                ? 'bg-gradient-to-r from-maroon-50/80 to-maroon-100/80 dark:from-maroon-900/20 dark:to-maroon-900/20 backdrop-blur-sm border-2 border-maroon-300 dark:border-maroon-600 shadow-glass'
                 : isCompleted
-                ? 'bg-sage-50/80 dark:bg-sage-900/20 backdrop-blur-sm border border-sage-200 dark:border-sage-800'
-                : 'bg-earth-50/50 dark:bg-night-surface/50 backdrop-blur-sm border border-earth-100 dark:border-night-border opacity-50'
+                ? 'bg-beige-50/80 dark:bg-beige-900/20 backdrop-blur-sm border border-beige-200 dark:border-beige-800'
+                : 'bg-cream-50/50 dark:bg-night-surface/50 backdrop-blur-sm border border-cream-100 dark:border-night-border opacity-50'
             }`}>
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                isCurrent ? 'bg-gradient-to-br from-terracotta-500 to-terracotta-600 shadow-lg animate-pulse'
-                : isCompleted ? 'bg-sage-500'
-                : 'bg-earth-300 dark:bg-night-border'
+                isCurrent ? 'bg-gradient-to-br from-maroon-500 to-maroon-600 shadow-lg animate-pulse'
+                : isCompleted ? 'bg-brown-500'
+                : 'bg-cream-300 dark:bg-night-border'
               }`}>
-                {isPending ? <div className="w-4 h-4 rounded-full bg-earth-400 dark:bg-night-muted" />
+                {isPending ? <div className="w-4 h-4 rounded-full bg-cream-400 dark:text-night-muted" />
                 : isCompleted ? <CheckCircle className="w-6 h-6 text-white" />
                 : <Icon className="w-6 h-6 text-white" />}
               </div>
               <div className="flex-1">
-                <h3 className={`font-semibold ${isCurrent ? 'text-forest-800 dark:text-white' : isCompleted ? 'text-sage-700 dark:text-sage-400' : 'text-earth-500 dark:text-night-muted'}`}>{step.title}</h3>
-                <p className={`text-sm ${isCurrent ? 'text-earth-600 dark:text-night-muted' : isCompleted ? 'text-sage-600 dark:text-sage-500' : 'text-earth-400 dark:text-night-muted'}`}>{step.description}</p>
+                <h3 className={`font-semibold ${isCurrent ? 'text-warm-dark dark:text-white' : isCompleted ? 'text-brown-700 dark:text-beige-400' : 'text-cream-500 dark:text-night-muted'}`}>{step.title}</h3>
+                <p className={`text-sm ${isCurrent ? 'text-brown-600 dark:text-night-muted' : isCompleted ? 'text-brown-600 dark:text-beige-500' : 'text-cream-400 dark:text-night-muted'}`}>{step.description}</p>
               </div>
-              {isCurrent && <Loader2 className="w-5 h-5 text-terracotta-600 dark:text-terracotta-400 animate-spin" />}
+              {isCurrent && <Loader2 className="w-5 h-5 text-maroon-600 dark:text-maroon-400 animate-spin" />}
             </div>
           );
         })}
       </div>
 
       <div className="mt-8 text-center">
-        <div className="inline-flex items-center px-4 py-2 bg-earth-50/80 dark:bg-night-surface/80 backdrop-blur-sm rounded-full border border-earth-100 dark:border-night-border">
-          <Loader2 className="w-4 h-4 text-terracotta-600 dark:text-terracotta-400 animate-spin mr-2" />
-          <span className="text-sm text-earth-600 dark:text-night-muted">This usually takes 10-15 seconds</span>
+        <div className="inline-flex items-center px-4 py-2 bg-cream-50/80 dark:bg-night-surface/80 backdrop-blur-sm rounded-full border border-cream-100 dark:border-night-border">
+          <Loader2 className="w-4 h-4 text-maroon-600 dark:text-maroon-400 animate-spin mr-2" />
+          <span className="text-sm text-brown-600 dark:text-night-muted">This usually takes 10-15 seconds</span>
         </div>
       </div>
     </div>

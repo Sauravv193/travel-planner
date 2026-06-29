@@ -22,15 +22,15 @@ const Dashboard = ({ trips }) => {
 
   return (
     <div className="space-y-8">
-      <div ref={headerRef} className={`relative overflow-hidden bg-gradient-to-br from-forest-500 via-forest-600 to-forest-700 rounded-3xl p-8 sm:p-10 text-white shadow-glass-xl transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-terracotta-400 via-terracotta-500 to-terracotta-400" />
-        <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-terracotta-500/5 blur-3xl" />
-        <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-terracotta-400/5 blur-3xl" />
+      <div ref={headerRef} className={`relative overflow-hidden bg-gradient-to-br from-maroon-500 via-maroon-600 to-maroon-700 rounded-3xl p-8 sm:p-10 text-white shadow-glass-xl transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-beige-400 via-beige-300 to-beige-400" />
+        <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-beige-300/5 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-beige-300/5 blur-3xl" />
 
         <div className="relative z-10 flex items-center justify-between">
           <div className="space-y-4">
             <div className="inline-flex items-center space-x-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-              <Sparkles className="w-4 h-4 text-terracotta-300" />
+              <Sparkles className="w-4 h-4 text-beige-300" />
               <span className="text-sm font-medium text-white/80">{trips.length > 0 ? `${upcomingCount} upcoming trip${upcomingCount !== 1 ? 's' : ''}` : 'Start your journey'}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold leading-tight">Welcome back, {user?.username || 'Traveler'}</h1>
@@ -38,14 +38,14 @@ const Dashboard = ({ trips }) => {
               {trips.length > 0 ? 'Continue planning your adventures across India.' : 'Ready for your next adventure? Start planning your perfect trip today!'}
             </p>
             {trips.length === 0 && (
-              <Link to="/planner" className="inline-flex items-center space-x-2 px-6 py-3 bg-terracotta-500/20 backdrop-blur-sm border border-terracotta-400/30 rounded-xl text-white font-semibold hover:bg-terracotta-500/30 transition-all duration-300 group">
+              <Link to="/planner" className="inline-flex items-center space-x-2 px-6 py-3 bg-beige-300/20 backdrop-blur-sm border border-beige-300/30 rounded-xl text-white font-semibold hover:bg-beige-300/30 transition-all duration-300 group">
                 <Compass className="w-5 h-5" /><span>Plan Your First Trip</span><ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             )}
           </div>
           <div className="hidden sm:block">
-            <div className="w-20 h-20 bg-terracotta-500/15 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-terracotta-400/30 shadow-xl">
-              <span className="text-3xl font-bold text-terracotta-300">{user?.username?.charAt(0).toUpperCase() || 'T'}</span>
+            <div className="w-20 h-20 bg-beige-300/15 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-beige-300/30 shadow-xl">
+              <span className="text-3xl font-bold text-beige-300">{user?.username?.charAt(0).toUpperCase() || 'T'}</span>
             </div>
           </div>
         </div>
@@ -61,23 +61,23 @@ const Dashboard = ({ trips }) => {
         <div className="space-y-6">
           <QuickActions />
           <div className="card p-6">
-            <h3 className="text-lg font-bold text-forest-800 dark:text-white mb-4">Profile Completion</h3>
+            <h3 className="text-lg font-bold text-warm-dark dark:text-white mb-4">Profile Completion</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-earth-600 dark:text-night-muted">Profile Setup</span>
-                <span className="text-terracotta-600 dark:text-terracotta-400 font-semibold">75%</span>
+                <span className="text-brown-600 dark:text-night-muted">Profile Setup</span>
+                <span className="text-maroon-600 dark:text-maroon-400 font-semibold">75%</span>
               </div>
-              <div className="w-full h-2 bg-earth-100 dark:bg-night-border rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-terracotta-400 to-terracotta-600 rounded-full transition-all duration-1000" style={{ width: '75%' }} />
+              <div className="w-full h-2 bg-cream-100 dark:bg-night-border rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-maroon-500 to-brown-500 rounded-full transition-all duration-1000" style={{ width: '75%' }} />
               </div>
-              <p className="text-xs text-earth-500 dark:text-night-muted">Add travel preferences for better AI recommendations</p>
-              <button className="text-sm text-terracotta-600 dark:text-terracotta-400 font-medium hover:text-terracotta-700 dark:hover:text-terracotta-300 transition-colors">Complete Profile →</button>
+              <p className="text-xs text-cream-500 dark:text-night-muted">Add travel preferences for better AI recommendations</p>
+              <button className="text-sm text-maroon-600 dark:text-maroon-400 font-medium hover:text-maroon-700 dark:hover:text-maroon-300 transition-colors">Complete Profile →</button>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-terracotta-50 to-earth-50 dark:from-terracotta-900/10 dark:to-terracotta-900/5 rounded-2xl p-6 border border-terracotta-200/50 dark:border-terracotta-500/10">
-            <h3 className="text-lg font-bold text-forest-800 dark:text-white mb-3">💡 Travel Tip</h3>
-            <p className="text-sm text-earth-600 dark:text-night-muted leading-relaxed mb-4">AI can adapt your itinerary in real-time. If weather changes or plans shift, just describe the situation and get instant adjustments.</p>
-            <button className="text-sm font-medium text-terracotta-600 dark:text-terracotta-400 hover:text-terracotta-700 dark:hover:text-terracotta-300 transition-colors">Learn more →</button>
+          <div className="bg-gradient-to-br from-maroon-50 to-cream-50 dark:from-maroon-900/10 dark:to-maroon-900/5 rounded-2xl p-6 border border-maroon-200/50 dark:border-maroon-500/10">
+            <h3 className="text-lg font-bold text-warm-dark dark:text-white mb-3">💡 Travel Tip</h3>
+            <p className="text-sm text-brown-600 dark:text-night-muted leading-relaxed mb-4">AI can adapt your itinerary in real-time. If weather changes or plans shift, just describe the situation and get instant adjustments.</p>
+            <button className="text-sm font-medium text-maroon-600 dark:text-maroon-400 hover:text-maroon-700 dark:hover:text-maroon-300 transition-colors">Learn more →</button>
           </div>
         </div>
       </div>

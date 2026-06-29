@@ -162,10 +162,10 @@ const Trip = () => {
         {/* Trip Header with Actions */}
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-warm-dark dark:text-white">
               Trip to {trip.destination}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm text-brown-600 dark:text-night-muted mt-1">
               {new Date(trip.startDate).toLocaleDateString()} — {new Date(trip.endDate).toLocaleDateString()}
             </p>
           </div>
@@ -175,7 +175,7 @@ const Trip = () => {
             </Link>
             <button
               onClick={() => setShowMap(!showMap)}
-              className={`btn-secondary py-2 px-3 text-sm flex items-center space-x-1 ${showMap ? 'bg-pink-100 dark:bg-pink-900/30 border-pink-300' : ''}`}
+              className={`btn-secondary py-2 px-3 text-sm flex items-center space-x-1 ${showMap ? 'bg-maroon-50 dark:bg-maroon-900/30 border-maroon-300' : ''}`}
             >
               <MapPin className="w-4 h-4" />
               <span>Map</span>
@@ -190,7 +190,7 @@ const Trip = () => {
             </button>
             <button
               onClick={() => setShowAIChat(!showAIChat)}
-              className={`btn-primary py-2 px-3 text-sm flex items-center space-x-1 ${showAIChat ? 'bg-pink-700' : ''}`}
+              className={`btn-primary py-2 px-3 text-sm flex items-center space-x-1 ${showAIChat ? 'bg-maroon-700' : ''}`}
             >
               <MessageSquare className="w-4 h-4" />
               <span>AI</span>
@@ -208,17 +208,17 @@ const Trip = () => {
         </div>
 
         {/* Quick Adaptation Input */}
-        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 mb-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-cream-50/80 dark:bg-night-surface/50 backdrop-blur-sm rounded-xl p-4 mb-6 border border-cream-100 dark:border-night-border">
           <div className="flex items-center space-x-2 mb-2">
-            <MessageSquare className="w-4 h-4 text-pink-600" />
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Quick Adaptation</h3>
+            <MessageSquare className="w-4 h-4 text-maroon-500" />
+            <h3 className="text-sm font-semibold text-warm-dark dark:text-white">Quick Adaptation</h3>
           </div>
           <div className="flex space-x-2">
             <input
               type="text"
               value={adaptationContext}
               onChange={(e) => setAdaptationContext(e.target.value)}
-              className="input-field flex-grow dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="input-field flex-grow"
               placeholder="e.g., 'Add more museums' or 'Make it cheaper'"
               onKeyDown={(e) => e.key === 'Enter' && handleAdaptItinerary(adaptationContext)}
             />
@@ -256,9 +256,9 @@ const Trip = () => {
             <p className="text-red-600 dark:text-red-300 mt-2">Reason: {parseError}</p>
           </div>
         ) : (
-          <div className="text-center bg-white dark:bg-gray-800 p-10 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">No Itinerary Yet</h2>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">An itinerary has not been generated for this trip.</p>
+          <div className="text-center card p-10">
+            <h2 className="text-xl font-semibold text-warm-dark dark:text-white">No Itinerary Yet</h2>
+            <p className="text-brown-600 dark:text-night-muted mt-2">An itinerary has not been generated for this trip.</p>
           </div>
         )}
       </div>

@@ -60,15 +60,15 @@ const HeroSection = () => {
   return (
     <div
       ref={heroRef}
-      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-earth-50 via-white to-earth-100 dark:from-night-bg dark:via-night-surface dark:to-[#12101A]"
+      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-cream-50 via-white to-beige-100 dark:from-night-bg dark:via-night-surface dark:to-[#1C1816]"
     >
       <FloatingParticles />
 
-      {/* Terracotta Glass Orbs */}
+      {/* Maroon Glass Orbs */}
       <div
         className="absolute top-1/4 -right-32 w-96 h-96 rounded-full opacity-8 dark:opacity-5 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, #C66B4D, transparent)',
+          background: 'radial-gradient(circle, #6B2E2E, transparent)',
           transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`,
           transition: 'transform 0.3s ease-out',
         }}
@@ -76,7 +76,7 @@ const HeroSection = () => {
       <div
         className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full opacity-5 dark:opacity-3 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, #1B3A2D, transparent)',
+          background: 'radial-gradient(circle, #8A5A44, transparent)',
           transform: `translate(${mousePos.x * -0.3}px, ${mousePos.y * -0.3}px)`,
           transition: 'transform 0.5s ease-out',
         }}
@@ -87,14 +87,14 @@ const HeroSection = () => {
           <div className={`space-y-8 transition-all duration-1000 transform ${
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
           }`}>
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-forest-50/80 dark:bg-forest-500/10 backdrop-blur-sm border border-forest-200/50 dark:border-forest-500/20 rounded-full">
-              <Sparkles className="w-4 h-4 text-terracotta-500" />
-              <span className="text-sm font-medium text-forest-700 dark:text-forest-300">
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-maroon-50/80 dark:bg-maroon-500/10 backdrop-blur-sm border border-maroon-200/50 dark:border-maroon-500/20 rounded-full">
+              <Sparkles className="w-4 h-4 text-maroon-500" />
+              <span className="text-sm font-medium text-maroon-700 dark:text-maroon-300">
                 AI-Powered Travel Planning for India
               </span>
             </div>
 
-            <h1 className="text-hero-mobile sm:text-hero text-forest-800 dark:text-white leading-tight">
+            <h1 className="text-hero-mobile sm:text-hero text-warm-dark dark:text-white leading-tight">
               Plan Your
               <br />
               <span className="glow-text">Perfect Trip</span>
@@ -102,7 +102,7 @@ const HeroSection = () => {
               Across India
             </h1>
 
-            <p className="text-lg sm:text-xl text-earth-600 dark:text-night-muted max-w-xl leading-relaxed">
+            <p className="text-lg sm:text-xl text-brown-600 dark:text-night-muted max-w-xl leading-relaxed">
               Enter your destination, preferences, and budget. Watch as AI creates a personalized day-by-day itinerary with activities, restaurants, and recommendations across India.
             </p>
 
@@ -114,10 +114,10 @@ const HeroSection = () => {
                 { icon: IndianRupee, text: 'Budget optimization in INR' },
               ].map((feature, i) => (
                 <div key={i} className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-terracotta-400 to-terracotta-600 rounded-lg flex items-center justify-center shadow-md">
+                  <div className="w-8 h-8 bg-gradient-to-br from-maroon-500 to-brown-500 rounded-lg flex items-center justify-center shadow-md">
                     <feature.icon className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-forest-700 dark:text-night-text font-medium">{feature.text}</span>
+                  <span className="text-warm-dark dark:text-night-text font-medium">{feature.text}</span>
                 </div>
               ))}
             </div>
@@ -154,7 +154,7 @@ const HeroSection = () => {
       </div>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <ChevronDown className="w-6 h-6 text-earth-500 dark:text-night-muted" />
+        <ChevronDown className="w-6 h-6 text-brown-500 dark:text-night-muted" />
       </div>
     </div>
   );
@@ -174,10 +174,10 @@ const FeaturesSection = () => {
   }, []);
 
   const features = [
-    { icon: Sparkles, title: 'Smart Itineraries', description: 'Get personalized travel plans crafted by AI for your preferences, budget, and travel style across India.', color: 'from-terracotta-400 to-terracotta-600' },
-    { icon: Camera, title: 'Photo Journals', description: 'Transform your travel photos into beautiful, AI-generated narrative stories of your Indian adventures.', color: 'from-forest-500 to-forest-600' },
-    { icon: Globe, title: 'Real-Time Adaptation', description: 'Weather changed? Plans shifted? Describe the situation and get instant adjustments to your itinerary.', color: 'from-sage-500 to-sage-600' },
-    { icon: Map, title: 'Interactive Maps', description: 'View all your destinations, routes, and nearby recommendations on an interactive map.', color: 'from-terracotta-500 to-forest-500' },
+    { icon: Sparkles, title: 'Smart Itineraries', description: 'Get personalized travel plans crafted by AI for your preferences, budget, and travel style across India.', color: 'from-maroon-500 to-maroon-600' },
+    { icon: Camera, title: 'Photo Journals', description: 'Transform your travel photos into beautiful, AI-generated narrative stories of your Indian adventures.', color: 'from-brown-500 to-brown-600' },
+    { icon: Globe, title: 'Real-Time Adaptation', description: 'Weather changed? Plans shifted? Describe the situation and get instant adjustments to your itinerary.', color: 'from-beige-500 to-beige-600' },
+    { icon: Map, title: 'Interactive Maps', description: 'View all your destinations, routes, and nearby recommendations on an interactive map.', color: 'from-maroon-500 to-brown-500' },
   ];
 
   return (
@@ -185,15 +185,15 @@ const FeaturesSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-20 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="inline-flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-px bg-terracotta-400"></div>
-            <span className="text-sm font-medium uppercase tracking-widest text-terracotta-600">Features</span>
-            <div className="w-8 h-px bg-terracotta-400"></div>
+            <div className="w-8 h-px bg-maroon-400"></div>
+            <span className="text-sm font-medium uppercase tracking-widest text-maroon-600">Features</span>
+            <div className="w-8 h-px bg-maroon-400"></div>
           </div>
-          <h2 className="text-display text-forest-800 dark:text-white font-bold mb-6">
+          <h2 className="text-display text-warm-dark dark:text-white font-bold mb-6">
             Everything You Need for
             <span className="glow-text"> Perfect Travel</span>
           </h2>
-          <p className="text-xl text-earth-600 dark:text-night-muted max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-brown-600 dark:text-night-muted max-w-3xl mx-auto leading-relaxed">
             From planning to memories, WanderGen handles every aspect of your travel experience with intelligent automation.
           </p>
         </div>
@@ -209,8 +209,8 @@ const FeaturesSection = () => {
                 <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center shadow-lg mb-6`}>
                   <Icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-forest-800 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-earth-600 dark:text-night-muted leading-relaxed">{feature.description}</p>
+                <h3 className="text-2xl font-bold text-warm-dark dark:text-white mb-3">{feature.title}</h3>
+                <p className="text-brown-600 dark:text-night-muted leading-relaxed">{feature.description}</p>
               </div>
             );
           })}
@@ -242,16 +242,16 @@ const FAQSection = () => {
   ];
 
   return (
-    <div ref={sectionRef} className="relative py-24 sm:py-32 bg-earth-50 dark:bg-night-surface">
+    <div ref={sectionRef} className="relative py-24 sm:py-32 bg-cream-50 dark:bg-night-surface">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-16 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="inline-flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-px bg-terracotta-400"></div>
-            <span className="text-sm font-medium uppercase tracking-widest text-terracotta-600">Support</span>
-            <div className="w-8 h-px bg-terracotta-400"></div>
+            <div className="w-8 h-px bg-maroon-400"></div>
+            <span className="text-sm font-medium uppercase tracking-widest text-maroon-600">Support</span>
+            <div className="w-8 h-px bg-maroon-400"></div>
           </div>
-          <h2 className="text-display text-forest-800 dark:text-white font-bold mb-4">Frequently Asked Questions</h2>
-          <p className="text-lg text-earth-600 dark:text-night-muted">Everything you need to know about WanderGen</p>
+          <h2 className="text-display text-warm-dark dark:text-white font-bold mb-4">Frequently Asked Questions</h2>
+          <p className="text-lg text-brown-600 dark:text-night-muted">Everything you need to know about WanderGen</p>
         </div>
 
         <div className="space-y-4">
@@ -263,11 +263,11 @@ const FAQSection = () => {
               <button onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full flex items-center justify-between p-6 text-left"
               >
-                <span className="text-lg font-semibold text-forest-800 dark:text-white pr-4">{faq.q}</span>
-                <ChevronDown className={`w-5 h-5 text-earth-500 transition-transform duration-300 flex-shrink-0 ${openIndex === index ? 'rotate-180 text-terracotta-500' : ''}`} />
+                <span className="text-lg font-semibold text-warm-dark dark:text-white pr-4">{faq.q}</span>
+                <ChevronDown className={`w-5 h-5 text-brown-500 transition-transform duration-300 flex-shrink-0 ${openIndex === index ? 'rotate-180 text-maroon-500' : ''}`} />
               </button>
               <div className={`overflow-hidden transition-all duration-300 ${openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <p className="px-6 pb-6 text-earth-600 dark:text-night-muted leading-relaxed">{faq.a}</p>
+                <p className="px-6 pb-6 text-brown-600 dark:text-night-muted leading-relaxed">{faq.a}</p>
               </div>
             </div>
           ))}

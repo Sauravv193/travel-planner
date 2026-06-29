@@ -71,16 +71,16 @@ const Profile = () => {
         <Dashboard trips={trips} />
 
         {/* Travel Style Section */}
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Your Travel Style</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-4">Upload photos that inspire you (e.g., serene beaches, bustling cityscapes, ancient ruins). Our AI will learn your unique travel "vibe" to give you better recommendations in the future.</p>
+        <div className="mt-8 card p-6">
+          <h2 className="text-xl font-semibold text-warm-dark dark:text-white mb-4">Your Travel Style</h2>
+          <p className="text-brown-600 dark:text-night-muted mb-4">Upload photos that inspire you (e.g., serene beaches, bustling cityscapes, ancient ruins). Our AI will learn your unique travel "vibe" to give you better recommendations in the future.</p>
           <InspirationPhotoUpload />
         </div>
 
         {/* All Trips Section */}
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+        <div className="mt-8 card p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">All Your Trips</h2>
+            <h2 className="text-xl font-semibold text-warm-dark dark:text-white">All Your Trips</h2>
             <div className="flex items-center space-x-3">
               <button 
                 onClick={fetchTrips} 
@@ -96,8 +96,8 @@ const Profile = () => {
           </div>
           {trips.length === 0 ? (
             <div className="text-center py-12">
-              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No trips yet</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by planning your first trip!</p>
+              <h3 className="mt-2 text-sm font-medium text-warm-dark dark:text-white">No trips yet</h3>
+              <p className="mt-1 text-sm text-brown-600 dark:text-night-muted">Get started by planning your first trip!</p>
               <div className="mt-6">
                 <Link
                   to="/planner"
@@ -113,22 +113,22 @@ const Profile = () => {
                 <li key={trip.id} className="py-4">
                   <div className="flex items-center space-x-4">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-lg font-medium text-gray-900 dark:text-white">{trip.destination}</p>
-                      <p className="truncate text-gray-500 dark:text-gray-400">
+                      <p className="truncate text-lg font-medium text-warm-dark dark:text-white">{trip.destination}</p>
+                      <p className="truncate text-brown-600 dark:text-night-muted">
                         {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
                       </p>
                     </div>
                     <div className="flex space-x-2">
                       <Link
                         to={`/trip/${trip.id}`}
-                        className="inline-flex items-center shadow-sm px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm leading-5 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                        className="inline-flex items-center shadow-soft px-4 py-2 border border-cream-200 dark:border-night-border text-sm leading-5 font-medium rounded-xl text-warm-dark dark:text-night-text bg-white/80 dark:bg-night-card/80 hover:bg-cream-50 dark:hover:bg-night-surface transition-all"
                       >
                         View
                       </Link>
                       <button
                         onClick={() => handleDeleteClick(trip)}
                         disabled={deletingTripId === trip.id}
-                        className="inline-flex items-center shadow-sm px-4 py-2 border border-red-300 dark:border-red-600 text-sm leading-5 font-medium rounded-md text-red-700 dark:text-red-400 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center shadow-soft px-4 py-2 border border-red-300 dark:border-red-600 text-sm leading-5 font-medium rounded-xl text-red-700 dark:text-red-400 bg-white/80 dark:bg-night-card/80 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                       >
                         {deletingTripId === trip.id ? 'Deleting...' : 'Delete'}
                       </button>
@@ -144,17 +144,17 @@ const Profile = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && tripToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <div className="bg-white/90 dark:bg-night-card/90 backdrop-blur-xl border border-cream-100 dark:border-night-border rounded-2xl p-6 max-w-md w-full mx-4 shadow-glass-xl">
+            <h3 className="text-lg font-semibold text-warm-dark dark:text-white mb-2">
               Delete Trip
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className="text-brown-600 dark:text-night-muted mb-4">
               Are you sure you want to delete your trip to <strong>{tripToDelete.destination}</strong>? This action cannot be undone and will delete all associated itineraries and journal entries.
             </p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={handleDeleteCancel}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                className="px-4 py-2 border border-cream-200 dark:border-night-border rounded-xl text-sm font-medium text-warm-dark dark:text-night-text bg-white/80 dark:bg-night-card/80 hover:bg-cream-50 dark:hover:bg-night-surface transition-all"
               >
                 Cancel
               </button>

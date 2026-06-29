@@ -22,10 +22,10 @@ const DashboardStats = ({ trips }) => {
   const stats = calculateStats();
 
   const statCards = [
-    { icon: MapPin, label: 'Total Trips', value: stats.totalTrips, gradient: 'from-terracotta-400 to-terracotta-600', bgGlow: 'shadow-terracotta-500/20' },
-    { icon: Calendar, label: 'Upcoming', value: stats.upcomingTrips, gradient: 'from-forest-500 to-forest-600', bgGlow: 'shadow-forest-500/20' },
-    { icon: IndianRupee, label: 'Total Budget', value: `₹${(stats.totalBudget / 1000).toFixed(0)}k`, gradient: 'from-sage-500 to-sage-600', bgGlow: 'shadow-sage-500/20' },
-    { icon: TrendingUp, label: 'Destinations', value: stats.destinations, gradient: 'from-terracotta-500 to-forest-500', bgGlow: 'shadow-terracotta-500/20' },
+    { icon: MapPin, label: 'Total Trips', value: stats.totalTrips, gradient: 'from-maroon-500 to-maroon-600', bgGlow: 'shadow-maroon-500/20' },
+    { icon: Calendar, label: 'Upcoming', value: stats.upcomingTrips, gradient: 'from-brown-500 to-brown-600', bgGlow: 'shadow-brown-500/20' },
+    { icon: IndianRupee, label: 'Total Budget', value: `₹${(stats.totalBudget / 1000).toFixed(0)}k`, gradient: 'from-beige-500 to-beige-600', bgGlow: 'shadow-beige-500/20' },
+    { icon: TrendingUp, label: 'Destinations', value: stats.destinations, gradient: 'from-maroon-500 to-brown-500', bgGlow: 'shadow-maroon-500/20' },
   ];
 
   return (
@@ -38,10 +38,10 @@ const DashboardStats = ({ trips }) => {
               <div className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center shadow-lg ${stat.bgGlow}`}>
                 <Icon className="w-6 h-6 text-white" />
               </div>
-              <span className="text-3xl font-bold text-forest-800 dark:text-white tabular-nums">{stat.value}</span>
+              <span className="text-3xl font-bold text-warm-dark dark:text-white tabular-nums">{stat.value}</span>
             </div>
-            <span className="text-sm font-medium text-earth-600 dark:text-night-muted">{stat.label}</span>
-            <div className="mt-3 w-full h-1 bg-earth-100 dark:bg-night-border rounded-full overflow-hidden">
+            <span className="text-sm font-medium text-brown-600 dark:text-night-muted">{stat.label}</span>
+            <div className="mt-3 w-full h-1 bg-cream-100 dark:bg-night-border rounded-full overflow-hidden">
               <div className={`h-full bg-gradient-to-r ${stat.gradient} rounded-full transition-all duration-1000 delay-500`} style={{ width: visible ? `${Math.min((Number(stat.value) / (stats.totalTrips || 1)) * 100, 100)}%` : '0%' }} />
             </div>
           </div>

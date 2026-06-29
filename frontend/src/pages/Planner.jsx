@@ -89,8 +89,8 @@ const Planner = () => {
   return (
     <div className="py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-10">            <h1 className="text-3xl font-bold text-forest-800 dark:text-white mb-2">Plan Your Next Adventure</h1>
-          <p className="text-lg text-earth-600 dark:text-night-muted">
+        <div className="text-center mb-10">            <h1 className="text-3xl font-bold text-warm-dark dark:text-white mb-2">Plan Your Next Adventure</h1>
+          <p className="text-lg text-brown-600 dark:text-night-muted">
             Describe your trip, and our AI will create a personalized itinerary.
           </p>
         </div>
@@ -107,7 +107,7 @@ const Planner = () => {
         
         {itinerary && !isGenerating && (
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-center text-forest-800 dark:text-white mb-4">Here's Your Plan!</h2>
+            <h2 className="text-2xl font-bold text-center text-warm-dark dark:text-white mb-4">Here's Your Plan!</h2>
             <ItineraryView itinerary={itinerary} />
             <div className="mt-6 text-center">
               <button onClick={handleSaveAndNavigate} className="btn-primary py-3 px-6 text-lg">

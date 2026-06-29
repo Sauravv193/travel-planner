@@ -1,7 +1,6 @@
 import { Clock, MapPin, Plus, CheckCircle } from 'lucide-react';
 
 const RecentActivity = ({ trips }) => {
-  // Simulate recent activities based on trips
   const activities = [
     {
       type: 'trip_created',
@@ -14,7 +13,7 @@ const RecentActivity = ({ trips }) => {
     {
       type: 'itinerary_generated',
       icon: CheckCircle,
-      color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+      color: 'bg-brown-100 text-brown-600 dark:bg-brown-900/30 dark:text-brown-400',
       title: 'Itinerary generated',
       description: trips.length > 0 ? `${trips[0].destination} - 5 days` : 'No recent itineraries',
       time: '2 hours ago'
@@ -22,18 +21,18 @@ const RecentActivity = ({ trips }) => {
     {
       type: 'destination_viewed',
       icon: MapPin,
-      color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+      color: 'bg-beige-100 text-beige-600 dark:bg-beige-900/30 dark:text-beige-400',
       title: 'Destination explored',
-      description: trips.length > 1 ? `${trips[1]?.destination || 'Tokyo, Japan'}` : 'Kyoto, Japan',
+      description: trips.length > 1 ? `${trips[1]?.destination || 'Goa, India'}` : 'Goa, India',
       time: '1 day ago'
     }
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
+    <div className="card p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Activity</h3>
-        <Clock className="w-5 h-5 text-gray-400" />
+        <h3 className="text-lg font-semibold text-warm-dark dark:text-white">Recent Activity</h3>
+        <Clock className="w-5 h-5 text-brown-500" />
       </div>
       <div className="space-y-4">
         {activities.map((activity, index) => {
@@ -44,9 +43,9 @@ const RecentActivity = ({ trips }) => {
                 <Icon className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.title}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{activity.description}</p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{activity.time}</p>
+                <p className="text-sm font-medium text-warm-dark dark:text-white">{activity.title}</p>
+                <p className="text-sm text-brown-600 dark:text-night-muted truncate">{activity.description}</p>
+                <p className="text-xs text-cream-500 dark:text-night-muted mt-1">{activity.time}</p>
               </div>
             </div>
           );
