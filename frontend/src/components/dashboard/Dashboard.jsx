@@ -1,31 +1,83 @@
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useEffect, useRef, useState } from 'react';
 import DashboardStats from './DashboardStats';
 import UpcomingTrips from './UpcomingTrips';
 import QuickActions from './QuickActions';
 import RecentActivity from './RecentActivity';
+import { Sparkles, Compass, ArrowRight } from 'lucide-react';
 
 const Dashboard = ({ trips }) => {
   const { user } = useAuth();
+  const [visible, setVisible] = useState(false);
+  const headerRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (headerRef.current) observer.observe(headerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const upcomingCount = trips.filter(t => new Date(t.startDate) > new Date()).length;
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-2xl p-6 md:p-8 text-white shadow-lg">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-2">
-              Welcome back, {user?.username || 'Traveler'}! 👋
+    <div className="space-y-8">
+      {/* Welcome Header - Premium Gradient */}
+      <div
+        ref={headerRef}
+        className={`relative overflow-hidden bg-gradient-to-br from-pink-500 via-pink-600 to-pink-700 rounded-3xl p-8 sm:p-10 text-white shadow-2xl shadow-pink-500/20 transition-all duration-700 ${
+          visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}
+      >
+        {/* Decorative Orbs */}
+        <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute -bottom-16 -left-16 w-48 h-48 rounded-full bg-white/5 blur-3xl" />
+
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="space-y-4">
+            <div className="inline-flex items-center space-x-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full border border-white/20">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-medium text-white/90">
+                {trips.length > 0 ? `${upcomingCount} upcoming trip${upcomingCount !== 1 ? 's' : ''}` : 'Start your journey'}
+              </span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl font-bold leading-tight">
+              Welcome back, {user?.username || 'Traveler'}
             </h1>
-            <p className="text-pink-100">
-              {trips.length > 0 
-                ? `You have ${trips.filter(t => new Date(t.startDate) > new Date()).length} upcoming trip${trips.filter(t => new Date(t.startDate) > new Date()).length !== 1 ? 's' : ''} planned`
-                : 'Start planning your next adventure today!'
-              }
+
+            <p className="text-pink-100 text-lg max-w-xl leading-relaxed">
+              {trips.length > 0
+                ? 'Continue planning your adventures and exploring new destinations.'
+                : 'Ready for your next adventure? Start planning your perfect trip today!'}
             </p>
+
+            {trips.length === 0 && (
+              <Link
+                to="/planner"
+                className="inline-flex items-center space-x-2 px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl text-white font-semibold hover:bg-white/30 transition-all duration-300 group"
+              >
+                <Compass className="w-5 h-5" />
+                <span>Plan Your First Trip</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            )}
           </div>
-          <div className="hidden md:block">
-            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-              <span className="text-2xl font-bold">{user?.username?.charAt(0).toUpperCase() || 'T'}</span>
+
+          {/* Avatar */}
+          <div className="hidden sm:block">
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30 shadow-xl">
+              <span className="text-3xl font-bold">
+                {user?.username?.charAt(0).toUpperCase() || 'T'}
+              </span>
             </div>
           </div>
         </div>
@@ -35,46 +87,49 @@ const Dashboard = ({ trips }) => {
       <DashboardStats trips={trips} />
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Upcoming Trips */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left - Main Content */}
+        <div className="lg:col-span-2 space-y-8">
           <UpcomingTrips trips={trips} />
-          
-          {/* Recent Activity */}
           <RecentActivity trips={trips} />
         </div>
 
-        {/* Right Column - Quick Actions */}
+        {/* Right - Sidebar */}
         <div className="space-y-6">
           <QuickActions />
-          
-          {/* Profile Completion Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Profile Completion</h3>
+
+          {/* Profile Completion */}
+          <div className="card p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
+              Profile Completion
+            </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-400">Profile Setup</span>
-                <span className="text-green-600 dark:text-green-400 font-medium">75%</span>
+                <span className="text-gray-500 dark:text-night-muted">Profile Setup</span>
+                <span className="text-green-600 dark:text-green-400 font-semibold">75%</span>
               </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div className="bg-gradient-to-r from-pink-500 to-pink-600 h-2 rounded-full" style={{ width: '75%' }}></div>
+              <div className="w-full h-2.5 bg-gray-100 dark:bg-night-border rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-pink-500 to-pink-600 rounded-full transition-all duration-1000"
+                  style={{ width: '75%' }}
+                />
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-night-muted">
                 Add travel preferences to get better AI recommendations
               </p>
-              <button className="w-full mt-2 text-sm text-pink-600 dark:text-pink-400 font-medium hover:text-pink-700 dark:hover:text-pink-300">
+              <button className="text-sm text-pink-600 dark:text-pink-400 font-medium hover:text-pink-700 dark:hover:text-pink-300 transition-colors">
                 Complete Profile →
               </button>
             </div>
           </div>
 
-          {/* Travel Tips Card */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">💡 Travel Tip</h3>
-            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+          {/* Travel Tip */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-800/30">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">💡 Travel Tip</h3>
+            <p className="text-sm text-gray-600 dark:text-night-muted leading-relaxed mb-4">
               AI can adapt your itinerary in real-time. If weather changes or plans shift, just describe the situation and get instant adjustments.
             </p>
-            <button className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:text-blue-700 dark:hover:text-blue-300">
+            <button className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors">
               Learn more →
             </button>
           </div>

@@ -1,7 +1,13 @@
-fix: correct security endpoint patterns and CORS for production deployment
+feat: Trionn-inspired premium design overhaul with INR currency
 
-- Fix WebSecurityConfig.java: add /api/v1/** patterns for all endpoints
-  (auth, trips, itineraries, journal, photos, user, conversations, jobs, cache)
-  - Previous /api/auth/** didn't match /api/v1/auth/** causing 401 on signup
-- Fix default CORS origins to include travel-planner-akyd.vercel.app
-- Update frontend .env with correct Render backend URL
+- Redesign tailwind config with premium design tokens and animations
+- Rewrite index.css with premium button/card/input system and micro-interactions
+- Redesign Home.jsx with interactive mouse-parallax hero and scroll animations
+- Redesign Header.jsx with glass-blur scroll detection
+- Redesign Dashboard and DashboardStats with premium gradient cards
+- Redesign SignIn/SignUp with floating gradient shapes and premium auth cards
+- Fix FloatingParticles re-render bug with useMemo
+- Fix SignIn error messages to use new design system
+- Fix Dashboard navigation to use proper Link component
+- Remove unused imports across components
+- Fix SignUp page complete rewrite with new design system

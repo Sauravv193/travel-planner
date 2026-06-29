@@ -1,17 +1,28 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.jsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ThemeToggle from './ThemeToggle';
+import { Compass, Menu, X, LogOut } from 'lucide-react';
 
 const Header = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/');
+    setIsMenuOpen(false);
   };
 
   const navigation = [
@@ -19,104 +30,169 @@ const Header = () => {
     ...(user ? [
       { name: 'Plan Trip', href: '/planner', current: location.pathname === '/planner' },
       { name: 'My Trips', href: '/profile', current: location.pathname === '/profile' },
-    ] : [])
+    ] : []),
   ];
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-800">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled
+          ? 'bg-white/90 dark:bg-night-bg/90 backdrop-blur-2xl shadow-lg shadow-pink-500/5'
+          : 'bg-transparent'
+      }`}
+    >
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex w-full items-center justify-between py-4">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center group">
-              <div className="h-10 w-10 bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
-                <span className="text-white font-bold text-xl">W</span>
-              </div>
-              <span className="ml-3 text-2xl font-bold text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-200">WanderGen</span>
-            </Link>
-            <div className="ml-10 hidden space-x-8 lg:block">
-              {navigation.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  className={`text-base font-medium transition-colors relative ${
-                    link.current 
-                      ? 'text-pink-600 dark:text-pink-400' 
-                      : 'text-gray-900 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400'
-                  }`}
-                >
-                  {link.name}
-                  {link.current && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-pink-600 dark:bg-pink-400 rounded-full"></span>
-                  )}
-                </Link>
-              ))}
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-pink-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-pink-500/30 transition-all duration-300">
+              <Compass className="w-5 h-5 text-white" />
             </div>
+            <span className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-300">
+              WanderGen
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-1">
+            {navigation.map((link) => (
+              <Link
+                key={link.name}
+                to={link.href}
+                className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  link.current
+                    ? 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-500/10'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-night-surface'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
-          <div className="flex items-center space-x-4">
+
+          {/* Right Side */}
+          <div className="flex items-center space-x-3">
             <ThemeToggle />
+            
             {user ? (
-                <div className="hidden sm:flex items-center space-x-4">
-                    <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-full">
-                      <div className="w-6 h-6 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">{user.username.charAt(0).toUpperCase()}</span>
-                      </div>
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user.username}</span>
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        className="btn-secondary py-2 px-4 text-sm"
-                    >
-                        Sign out
-                    </button>
-                </div>
-            ) : (
               <div className="hidden sm:flex items-center space-x-3">
-                <Link to="/signin" className="text-gray-700 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 font-medium px-4 py-2 transition-colors duration-200">
+                <div className="flex items-center space-x-2.5 px-3 py-1.5 bg-pink-50 dark:bg-pink-500/10 border border-pink-200 dark:border-pink-500/20 rounded-full">
+                  <div className="w-7 h-7 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center shadow-sm">
+                    <span className="text-white text-xs font-bold">
+                      {user.username?.charAt(0).toUpperCase() || 'T'}
+                    </span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {user.username}
+                  </span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="btn-ghost text-sm"
+                  title="Sign out"
+                >
+                  <LogOut className="w-4 h-4 mr-1.5" />
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center space-x-2">
+                <Link
+                  to="/signin"
+                  className="btn-ghost px-4 py-2 text-sm"
+                >
                   Sign in
                 </Link>
-                <Link to="/signup" className="btn-primary py-2 px-4 text-sm">
+                <Link
+                  to="/signup"
+                  className="btn-primary py-2 px-4 text-sm"
+                >
                   Get Started
                 </Link>
               </div>
             )}
-            <div className="sm:hidden">
-                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                    <svg className="h-6 w-6 text-gray-900 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
-                    </svg>
-                </button>
-            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-night-surface transition-colors"
+              aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            >
+              {isMenuOpen ? (
+                <X className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              ) : (
+                <Menu className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              )}
+            </button>
           </div>
         </div>
-        {isMenuOpen && (
-            <div className="sm:hidden py-4 border-t border-gray-200 dark:border-gray-700 animate-slideDown">
-                 {user ? (
-                    <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex items-center px-5">
-                            <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold">{user.username.charAt(0).toUpperCase()}</span>
-                            </div>
-                            <div className="ml-3">
-                                <div className="text-base font-medium text-gray-800 dark:text-white">Hello, {user.username}</div>
-                            </div>
-                        </div>
-                        <div className="mt-3 space-y-1">
-                            <Link to="/profile" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">My Trips</Link>
-                            <Link to="/planner" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">Plan Trip</Link>
-                            <button onClick={handleLogout} className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700">
-                                Sign out
-                            </button>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-2">
-                        <Link to="/signin" className="block w-full bg-pink-600 text-white text-center py-3 px-4 border border-transparent rounded-lg font-medium hover:bg-pink-700 transition-colors">Sign in</Link>
-                        <Link to="/signup" className="block w-full bg-white text-gray-700 dark:bg-gray-800 dark:text-gray-200 text-center py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">Get Started</Link>
-                    </div>
-                )}
-            </div>
-        )}
       </nav>
+
+      {/* Mobile Menu */}
+      <div
+        className={`lg:hidden transition-all duration-300 overflow-hidden ${
+          isMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <div className="bg-white/95 dark:bg-night-card/95 backdrop-blur-2xl border-t border-gray-100 dark:border-night-border px-4 py-4 space-y-2">
+          {navigation.map((link) => (
+            <Link
+              key={link.name}
+              to={link.href}
+              onClick={() => setIsMenuOpen(false)}
+              className={`block px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                link.current
+                  ? 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-500/10'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-night-surface'
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
+
+          <div className="divider-gradient" />
+
+          {user ? (
+            <div className="space-y-2">
+              <div className="flex items-center space-x-3 px-4 py-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center shadow-md">
+                  <span className="text-white font-bold">
+                    {user.username?.charAt(0).toUpperCase() || 'T'}
+                  </span>
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white">{user.username}</p>
+                  <p className="text-sm text-gray-500 dark:text-night-muted">{user.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-base font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Sign out</span>
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2 pt-2">
+              <Link
+                to="/signin"
+                onClick={() => setIsMenuOpen(false)}
+                className="block w-full text-center px-4 py-3 rounded-xl text-base font-medium text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-night-border hover:border-pink-300 dark:hover:border-pink-500/50 transition-colors"
+              >
+                Sign in
+              </Link>
+              <Link
+                to="/signup"
+                onClick={() => setIsMenuOpen(false)}
+                className="block w-full text-center px-4 py-3 rounded-xl text-base font-medium text-white bg-gradient-to-r from-pink-500 to-pink-600 hover:shadow-lg hover:shadow-pink-500/30 transition-all"
+              >
+                Get Started
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
     </header>
   );
 };

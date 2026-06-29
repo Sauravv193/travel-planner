@@ -1,13 +1,31 @@
-import { MapPin, Calendar, DollarSign, TrendingUp } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { MapPin, Calendar, IndianRupee, TrendingUp } from 'lucide-react';
 
 const DashboardStats = ({ trips }) => {
+  const [visible, setVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
   const calculateStats = () => {
     const totalTrips = trips.length;
     const upcomingTrips = trips.filter(trip => new Date(trip.startDate) > new Date()).length;
     const totalBudget = trips.reduce((sum, trip) => sum + (trip.budget || 0), 0);
-    const countries = [...new Set(trips.map(trip => trip.destination.split(',').pop().trim()))].length;
-    
-    return { totalTrips, upcomingTrips, totalBudget, countries };
+    const destinations = [...new Set(trips.map(trip => trip.destination?.split(',').pop()?.trim() || trip.destination))].length;
+
+    return { totalTrips, upcomingTrips, totalBudget, destinations };
   };
 
   const stats = calculateStats();
@@ -17,48 +35,67 @@ const DashboardStats = ({ trips }) => {
       icon: MapPin,
       label: 'Total Trips',
       value: stats.totalTrips,
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-50 dark:bg-blue-900/20'
+      gradient: 'from-blue-500 to-indigo-600',
+      bgGlow: 'shadow-blue-500/20',
     },
     {
       icon: Calendar,
       label: 'Upcoming',
       value: stats.upcomingTrips,
-      color: 'from-green-500 to-green-600',
-      bgColor: 'bg-green-50 dark:bg-green-900/20'
+      gradient: 'from-green-500 to-emerald-600',
+      bgGlow: 'shadow-green-500/20',
     },
     {
-      icon: DollarSign,
+      icon: IndianRupee,
       label: 'Total Budget',
       value: `₹${(stats.totalBudget / 1000).toFixed(0)}k`,
-      color: 'from-purple-500 to-purple-600',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20'
+      gradient: 'from-purple-500 to-pink-600',
+      bgGlow: 'shadow-purple-500/20',
     },
     {
       icon: TrendingUp,
-      label: 'Countries',
-      value: stats.countries,
-      color: 'from-orange-500 to-orange-600',
-      bgColor: 'bg-orange-50 dark:bg-orange-900/20'
-    }
+      label: 'Destinations',
+      value: stats.destinations,
+      gradient: 'from-orange-500 to-red-600',
+      bgGlow: 'shadow-orange-500/20',
+    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div
+      ref={ref}
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+    >
       {statCards.map((stat, index) => {
         const Icon = stat.icon;
         return (
           <div
             key={index}
-            className={`${stat.bgColor} rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-200`}
+            className={`card p-6 transition-all duration-700 ${
+              visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+            }`}
+            style={{ transitionDelay: `${index * 100}ms` }}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center shadow-md`}>
+              <div
+                className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center shadow-lg ${stat.bgGlow}`}
+              >
                 <Icon className="w-6 h-6 text-white" />
               </div>
-              <div className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</div>
+              <span className="text-3xl font-bold text-gray-900 dark:text-white tabular-nums">
+                {stat.value}
+              </span>
             </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.label}</div>
+            <span className="text-sm font-medium text-gray-500 dark:text-night-muted">
+              {stat.label}
+            </span>
+            {/* Mini progress bar */}
+            <div className="mt-3 w-full h-1 bg-gray-100 dark:bg-night-border rounded-full overflow-hidden">
+              <div
+                className={`h-full bg-gradient-to-r ${stat.gradient} rounded-full transition-all duration-1000 delay-500`}
+                style={{ width: visible ? `${Math.min((Number(stat.value) / (stats.totalTrips || 1)) * 100, 100)}%` : '0%' }}
+              />
+            </div>
           </div>
         );
       })}
