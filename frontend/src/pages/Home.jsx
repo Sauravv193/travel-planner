@@ -44,7 +44,6 @@ const HeroSection = () => {
 
   useEffect(() => {
     setIsVisible(true);
-
     const handleMouseMove = (e) => {
       if (heroRef.current) {
         const rect = heroRef.current.getBoundingClientRect();
@@ -54,7 +53,6 @@ const HeroSection = () => {
         });
       }
     };
-
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
@@ -62,15 +60,15 @@ const HeroSection = () => {
   return (
     <div
       ref={heroRef}
-      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-cream-50 via-white to-cream-100 dark:from-night-bg dark:via-night-surface dark:to-[#12121E]"
+      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-earth-50 via-white to-earth-100 dark:from-night-bg dark:via-night-surface dark:to-[#12101A]"
     >
       <FloatingParticles />
 
-      {/* Gold Gradient Orbs */}
+      {/* Terracotta Glass Orbs */}
       <div
-        className="absolute top-1/4 -right-32 w-96 h-96 rounded-full opacity-10 dark:opacity-8 blur-3xl"
+        className="absolute top-1/4 -right-32 w-96 h-96 rounded-full opacity-8 dark:opacity-5 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, #D4AF37, transparent)',
+          background: 'radial-gradient(circle, #C66B4D, transparent)',
           transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`,
           transition: 'transform 0.3s ease-out',
         }}
@@ -78,7 +76,7 @@ const HeroSection = () => {
       <div
         className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full opacity-5 dark:opacity-3 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, #1B2A4A, transparent)',
+          background: 'radial-gradient(circle, #1B3A2D, transparent)',
           transform: `translate(${mousePos.x * -0.3}px, ${mousePos.y * -0.3}px)`,
           transition: 'transform 0.5s ease-out',
         }}
@@ -86,33 +84,28 @@ const HeroSection = () => {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left Side - Hero Content */}
           <div className={`space-y-8 transition-all duration-1000 transform ${
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
           }`}>
-            {/* Badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gold-50 dark:bg-gold-500/10 border border-gold-200 dark:border-gold-500/20 rounded-full">
-              <Sparkles className="w-4 h-4 text-gold-500" />
-              <span className="text-sm font-medium text-gold-700 dark:text-gold-300">
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-forest-50/80 dark:bg-forest-500/10 backdrop-blur-sm border border-forest-200/50 dark:border-forest-500/20 rounded-full">
+              <Sparkles className="w-4 h-4 text-terracotta-500" />
+              <span className="text-sm font-medium text-forest-700 dark:text-forest-300">
                 AI-Powered Travel Planning for India
               </span>
             </div>
 
-            {/* Main Heading */}
-            <h1 className="text-hero-mobile sm:text-hero text-lux-charcoal dark:text-white leading-tight">
+            <h1 className="text-hero-mobile sm:text-hero text-forest-800 dark:text-white leading-tight">
               Plan Your
               <br />
-              <span className="gradient-text-premium">Perfect Trip</span>
+              <span className="glow-text">Perfect Trip</span>
               <br />
               Across India
             </h1>
 
-            {/* Description */}
-            <p className="text-lg sm:text-xl text-lux-taupe dark:text-night-muted max-w-xl leading-relaxed">
+            <p className="text-lg sm:text-xl text-earth-600 dark:text-night-muted max-w-xl leading-relaxed">
               Enter your destination, preferences, and budget. Watch as AI creates a personalized day-by-day itinerary with activities, restaurants, and recommendations across India.
             </p>
 
-            {/* Feature List */}
             <div className="space-y-4 stagger-children">
               {[
                 { icon: Sparkles, text: 'Personalized itinerary generation' },
@@ -121,52 +114,31 @@ const HeroSection = () => {
                 { icon: IndianRupee, text: 'Budget optimization in INR' },
               ].map((feature, i) => (
                 <div key={i} className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-gold-400 to-gold-600 rounded-lg flex items-center justify-center shadow-md">
+                  <div className="w-8 h-8 bg-gradient-to-br from-terracotta-400 to-terracotta-600 rounded-lg flex items-center justify-center shadow-md">
                     <feature.icon className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-lux-charcoal dark:text-night-text font-medium">{feature.text}</span>
+                  <span className="text-forest-700 dark:text-night-text font-medium">{feature.text}</span>
                 </div>
               ))}
             </div>
 
-            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Link
-                to="/planner"
-                className="btn-primary text-lg py-4 px-8 group"
-              >
+              <Link to="/planner" className="btn-primary text-lg py-4 px-8 group">
                 <Compass className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
                 Start Planning
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
               </Link>
-
               {!user ? (
                 <>
-                  <Link
-                    to="/signup"
-                    className="btn-secondary text-lg py-4 px-8"
-                  >
-                    Get Started Free
-                  </Link>
-                  <Link
-                    to="/signin"
-                    className="btn-ghost text-lg py-4 px-6"
-                  >
-                    Sign In
-                  </Link>
+                  <Link to="/signup" className="btn-secondary text-lg py-4 px-8">Get Started Free</Link>
+                  <Link to="/signin" className="btn-ghost text-lg py-4 px-6">Sign In</Link>
                 </>
               ) : (
-                <Link
-                  to="/profile"
-                  className="btn-secondary text-lg py-4 px-8"
-                >
-                  My Dashboard
-                </Link>
+                <Link to="/profile" className="btn-secondary text-lg py-4 px-8">My Dashboard</Link>
               )}
             </div>
           </div>
 
-          {/* Right Side - Interactive Product Demo */}
           <div
             className={`transition-all duration-1000 delay-200 transform ${
               isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
@@ -181,9 +153,8 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <ChevronDown className="w-6 h-6 text-lux-taupe dark:text-night-muted" />
+        <ChevronDown className="w-6 h-6 text-earth-500 dark:text-night-muted" />
       </div>
     </div>
   );
@@ -195,87 +166,51 @@ const FeaturesSection = () => {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
       { threshold: 0.1 }
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   const features = [
-    {
-      icon: Sparkles,
-      title: 'Smart Itineraries',
-      description: 'Get personalized travel plans crafted by AI for your preferences, budget, and travel style across India.',
-      gradient: 'from-gold-500 to-gold-600',
-    },
-    {
-      icon: Camera,
-      title: 'Photo Journals',
-      description: 'Transform your travel photos into beautiful, AI-generated narrative stories of your Indian adventures.',
-      gradient: 'from-lux-navy to-gold-600',
-    },
-    {
-      icon: Globe,
-      title: 'Real-Time Adaptation',
-      description: 'Weather changed? Plans shifted? Describe the situation and get instant adjustments to your itinerary.',
-      gradient: 'from-lux-navy to-lux-navy',
-    },
-    {
-      icon: Map,
-      title: 'Interactive Maps',
-      description: 'View all your destinations, routes, and nearby recommendations on an interactive map of India.',
-      gradient: 'from-gold-600 to-gold-500',
-    },
+    { icon: Sparkles, title: 'Smart Itineraries', description: 'Get personalized travel plans crafted by AI for your preferences, budget, and travel style across India.', color: 'from-terracotta-400 to-terracotta-600' },
+    { icon: Camera, title: 'Photo Journals', description: 'Transform your travel photos into beautiful, AI-generated narrative stories of your Indian adventures.', color: 'from-forest-500 to-forest-600' },
+    { icon: Globe, title: 'Real-Time Adaptation', description: 'Weather changed? Plans shifted? Describe the situation and get instant adjustments to your itinerary.', color: 'from-sage-500 to-sage-600' },
+    { icon: Map, title: 'Interactive Maps', description: 'View all your destinations, routes, and nearby recommendations on an interactive map.', color: 'from-terracotta-500 to-forest-500' },
   ];
 
   return (
     <div ref={sectionRef} className="relative py-24 sm:py-32 overflow-hidden bg-white dark:bg-night-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className={`text-center mb-20 transition-all duration-700 ${
-          visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}>
+        <div className={`text-center mb-20 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="inline-flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-px bg-gold-400"></div>
-            <span className="text-sm font-medium uppercase tracking-widest text-gold-600">Features</span>
-            <div className="w-8 h-px bg-gold-400"></div>
+            <div className="w-8 h-px bg-terracotta-400"></div>
+            <span className="text-sm font-medium uppercase tracking-widest text-terracotta-600">Features</span>
+            <div className="w-8 h-px bg-terracotta-400"></div>
           </div>
-          <h2 className="text-display text-lux-charcoal dark:text-white font-bold mb-6">
+          <h2 className="text-display text-forest-800 dark:text-white font-bold mb-6">
             Everything You Need for
-            <span className="gradient-text-premium"> Perfect Travel</span>
+            <span className="glow-text"> Perfect Travel</span>
           </h2>
-          <p className="text-xl text-lux-taupe dark:text-night-muted max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-earth-600 dark:text-night-muted max-w-3xl mx-auto leading-relaxed">
             From planning to memories, WanderGen handles every aspect of your travel experience with intelligent automation.
           </p>
         </div>
 
-        {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <div
-                key={index}
-                className={`card-classic p-8 transition-all duration-700 ${
-                  visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
+              <div key={index}
+                className={`card p-8 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
                 style={{ transitionDelay: `${index * 150}ms` }}
               >
-                <div className={`w-14 h-14 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center shadow-lg mb-6`}>
+                <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center shadow-lg mb-6`}>
                   <Icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-lux-charcoal dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-lux-taupe dark:text-night-muted leading-relaxed">{feature.description}</p>
+                <h3 className="text-2xl font-bold text-forest-800 dark:text-white mb-3">{feature.title}</h3>
+                <p className="text-earth-600 dark:text-night-muted leading-relaxed">{feature.description}</p>
               </div>
             );
           })}
@@ -292,86 +227,47 @@ const FAQSection = () => {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
       { threshold: 0.1 }
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   const faqs = [
-    {
-      q: 'How does the AI itinerary generation work?',
-      a: 'WanderGen uses Google\'s Gemini AI to analyze your destination, travel dates, budget, and interests. It then creates a personalized day-by-day itinerary with specific activities, restaurants, and recommendations tailored to your preferences across India.',
-    },
-    {
-      q: 'Can I modify the AI-generated itinerary?',
-      a: 'Absolutely! You can adapt your itinerary by describing changes (like "make it cheaper" or "add more outdoor activities"), and the AI will adjust your plan accordingly. You can also use our conversational AI chat to make specific modifications.',
-    },
-    {
-      q: 'Is my travel data secure?',
-      a: 'Yes. We use industry-standard security practices including JWT authentication, encrypted connections, and secure data storage. Your travel plans and personal information are never shared with third parties.',
-    },
-    {
-      q: 'What makes the photo journal feature special?',
-      a: 'Upload your travel photos and our AI analyzes them to create a beautiful, narrative travel journal. It organizes your memories into a coherent story with descriptions and context, making your photos come alive.',
-    },
+    { q: 'How does the AI itinerary generation work?', a: 'WanderGen uses Google\'s Gemini AI to analyze your destination, travel dates, budget, and interests. It then creates a personalized day-by-day itinerary with specific activities, restaurants, and recommendations tailored to your preferences across India.' },
+    { q: 'Can I modify the AI-generated itinerary?', a: 'Absolutely! You can adapt your itinerary by describing changes (like "make it cheaper" or "add more outdoor activities"), and the AI will adjust your plan accordingly.' },
+    { q: 'Is my travel data secure?', a: 'Yes. We use industry-standard security practices including JWT authentication, encrypted connections, and secure data storage. Your travel plans and personal information are never shared with third parties.' },
+    { q: 'What makes the photo journal feature special?', a: 'Upload your travel photos and our AI analyzes them to create a beautiful, narrative travel journal. It organizes your memories into a coherent story with descriptions and context, making your photos come alive.' },
   ];
 
   return (
-    <div ref={sectionRef} className="relative py-24 sm:py-32 bg-cream-50 dark:bg-night-surface">
+    <div ref={sectionRef} className="relative py-24 sm:py-32 bg-earth-50 dark:bg-night-surface">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-16 transition-all duration-700 ${
-          visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}>
+        <div className={`text-center mb-16 transition-all duration-700 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           <div className="inline-flex items-center justify-center space-x-2 mb-4">
-            <div className="w-8 h-px bg-gold-400"></div>
-            <span className="text-sm font-medium uppercase tracking-widest text-gold-600">Support</span>
-            <div className="w-8 h-px bg-gold-400"></div>
+            <div className="w-8 h-px bg-terracotta-400"></div>
+            <span className="text-sm font-medium uppercase tracking-widest text-terracotta-600">Support</span>
+            <div className="w-8 h-px bg-terracotta-400"></div>
           </div>
-          <h2 className="text-display text-lux-charcoal dark:text-white font-bold mb-4">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-lg text-lux-taupe dark:text-night-muted">
-            Everything you need to know about WanderGen
-          </p>
+          <h2 className="text-display text-forest-800 dark:text-white font-bold mb-4">Frequently Asked Questions</h2>
+          <p className="text-lg text-earth-600 dark:text-night-muted">Everything you need to know about WanderGen</p>
         </div>
 
         <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className={`card-classic overflow-hidden transition-all duration-500 ${
-                visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-              }`}
+            <div key={index}
+              className={`card overflow-hidden transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <button
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+              <button onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full flex items-center justify-between p-6 text-left"
               >
-                <span className="text-lg font-semibold text-lux-charcoal dark:text-white pr-4">{faq.q}</span>
-                <ChevronDown
-                  className={`w-5 h-5 text-lux-taupe transition-transform duration-300 flex-shrink-0 ${
-                    openIndex === index ? 'rotate-180 text-gold-500' : ''
-                  }`}
-                />
+                <span className="text-lg font-semibold text-forest-800 dark:text-white pr-4">{faq.q}</span>
+                <ChevronDown className={`w-5 h-5 text-earth-500 transition-transform duration-300 flex-shrink-0 ${openIndex === index ? 'rotate-180 text-terracotta-500' : ''}`} />
               </button>
-              <div
-                className={`overflow-hidden transition-all duration-300 ${
-                  openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                }`}
-              >
-                <p className="px-6 pb-6 text-lux-taupe dark:text-night-muted leading-relaxed">{faq.a}</p>
+              <div className={`overflow-hidden transition-all duration-300 ${openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                <p className="px-6 pb-6 text-earth-600 dark:text-night-muted leading-relaxed">{faq.a}</p>
               </div>
             </div>
           ))}
@@ -381,14 +277,12 @@ const FAQSection = () => {
   );
 };
 
-const Home = () => {
-  return (
-    <div className="overflow-hidden">
-      <HeroSection />
-      <FeaturesSection />
-      <FAQSection />
-    </div>
-  );
-};
+const Home = () => (
+  <div className="overflow-hidden">
+    <HeroSection />
+    <FeaturesSection />
+    <FAQSection />
+  </div>
+);
 
 export default Home;

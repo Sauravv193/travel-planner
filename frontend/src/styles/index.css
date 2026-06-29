@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -11,7 +11,7 @@
   }
 
   body {
-    @apply bg-cream-50 text-lux-charcoal transition-colors duration-500 font-body;
+    @apply bg-earth-50 text-forest-800 transition-colors duration-500 font-body;
   }
 
   .dark body {
@@ -19,40 +19,39 @@
   }
 
   ::selection {
-    @apply bg-gold-200 text-lux-navy;
+    @apply bg-terracotta-200 text-forest-900;
   }
 
   .dark ::selection {
-    @apply bg-gold-600/40 text-white;
+    @apply bg-terracotta-600/40 text-white;
   }
 
-  /* Scrollbar Styling */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-cream-100 dark:bg-night-bg;
+    @apply bg-earth-100 dark:bg-night-bg;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-cream-300 dark:bg-night-border rounded-full;
+    @apply bg-earth-300 dark:bg-night-border rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gold-400 dark:bg-gold-600/50;
+    @apply bg-terracotta-400 dark:bg-terracotta-600/50;
   }
 }
 
 @layer components {
-  /* === Premium Button System === */
+  /* === Glass Button System === */
   .btn-primary {
     @apply inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white
-           bg-gradient-to-r from-lux-navy to-lux-navy rounded-xl
-           shadow-lg shadow-lux-navy/20
-           hover:shadow-xl hover:shadow-lux-navy/30 hover:-translate-y-0.5
-           focus:outline-none focus:ring-2 focus:ring-gold-400/50 focus:ring-offset-2 dark:focus:ring-offset-night-bg
+           bg-forest-500 rounded-xl
+           shadow-soft
+           hover:shadow-lg hover:shadow-forest-500/20 hover:-translate-y-0.5
+           focus:outline-none focus:ring-2 focus:ring-terracotta-400/50 focus:ring-offset-2 dark:focus:ring-offset-night-bg
            active:translate-y-0
            transition-all duration-300 ease-out
            disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
@@ -60,50 +59,50 @@
 
   .btn-secondary {
     @apply inline-flex items-center justify-center px-6 py-3 text-base font-semibold
-           border-2 border-cream-200 dark:border-night-border rounded-xl
-           text-lux-charcoal dark:text-night-text
-           bg-white dark:bg-night-card
-           hover:border-gold-400 dark:hover:border-gold-500/50
-           hover:text-gold-700 dark:hover:text-gold-400
-           hover:shadow-lg hover:shadow-gold-500/10
-           focus:outline-none focus:ring-2 focus:ring-gold-400/30
+           border border-earth-200 dark:border-night-border rounded-xl
+           text-forest-700 dark:text-night-text
+           bg-white/80 dark:bg-night-card/80 backdrop-blur-sm
+           hover:border-terracotta-300 dark:hover:border-terracotta-500/50
+           hover:text-terracotta-600 dark:hover:text-terracotta-400
+           hover:shadow-lg hover:shadow-terracotta-500/10
+           focus:outline-none focus:ring-2 focus:ring-terracotta-400/30
            active:scale-[0.98]
            transition-all duration-300 ease-out;
   }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium
-           text-lux-charcoal/70 dark:text-night-muted
-           hover:text-gold-700 dark:hover:text-gold-400
-           hover:bg-cream-100 dark:hover:bg-night-surface
+           text-forest-600/70 dark:text-night-muted
+           hover:text-terracotta-600 dark:hover:text-terracotta-400
+           hover:bg-earth-100/80 dark:hover:bg-night-surface/80 backdrop-blur-sm
            rounded-lg
            transition-all duration-200;
   }
 
   .btn-danger {
     @apply inline-flex items-center justify-center px-6 py-3 text-base font-semibold text-white
-           bg-lux-burgundy rounded-xl shadow-lg shadow-lux-burgundy/25
-           hover:bg-red-700 hover:shadow-xl hover:shadow-lux-burgundy/30 hover:-translate-y-0.5
+           bg-red-600 rounded-xl shadow-soft
+           hover:bg-red-700 hover:shadow-lg hover:shadow-red-500/20 hover:-translate-y-0.5
            active:translate-y-0
            transition-all duration-300 ease-out;
   }
 
-  /* === Premium Input System === */
+  /* === Glass Input System === */
   .input-field {
     @apply block w-full px-4 py-3.5
-           bg-white dark:bg-night-surface
-           border-2 border-cream-200 dark:border-night-border rounded-xl
-           text-lux-charcoal dark:text-night-text placeholder-cream-400 dark:placeholder-night-muted
-           focus:outline-none focus:border-gold-400 dark:focus:border-gold-500/50
-           focus:ring-2 focus:ring-gold-400/20 dark:focus:ring-gold-500/10
-           hover:border-cream-300 dark:hover:border-night-text/20
+           bg-white/80 dark:bg-night-surface/80 backdrop-blur-sm
+           border border-earth-200 dark:border-night-border rounded-xl
+           text-forest-800 dark:text-night-text placeholder-earth-400 dark:placeholder-night-muted
+           focus:outline-none focus:border-terracotta-400 dark:focus:border-terracotta-500/50
+           focus:ring-2 focus:ring-terracotta-400/15 dark:focus:ring-terracotta-500/10
+           hover:border-earth-300 dark:hover:border-night-text/20
            transition-all duration-300 ease-out
            sm:text-sm;
   }
 
   select.input-field {
     @apply appearance-none
-           bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238B8178%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E')]
+           bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238B6F5A%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22M6%209l6%206%206-6%22%2F%3E%3C%2Fsvg%3E')]
            bg-[length:12px] bg-[right_16px_center] bg-no-repeat
            pr-12;
   }
@@ -112,120 +111,102 @@
     @apply min-h-[100px] resize-y;
   }
 
-  /* === Card System === */
+  /* === Glass Card System === */
   .card {
-    @apply bg-white dark:bg-night-card
-           border border-cream-200 dark:border-night-border
-           rounded-2xl shadow-sm
-           hover:shadow-lg hover:border-cream-300 dark:hover:border-gold-500/20
+    @apply bg-white/80 dark:bg-night-card/80 backdrop-blur-sm
+           border border-earth-100 dark:border-night-border
+           rounded-2xl shadow-glass
+           hover:shadow-glass-lg hover:border-earth-200 dark:hover:border-terracotta-500/20
            transition-all duration-300 ease-out;
   }
 
   .card-hover {
-    @apply hover:-translate-y-1 hover:shadow-xl;
+    @apply hover:-translate-y-1 hover:shadow-glass-xl;
   }
 
   .card-glass {
-    @apply bg-white/80 dark:bg-night-card/80
+    @apply bg-white/70 dark:bg-night-card/70
            backdrop-blur-xl
-           border border-cream-200/50 dark:border-night-border/30
-           rounded-2xl shadow-lg;
+           border border-white/50 dark:border-night-border/30
+           rounded-2xl shadow-glass-lg;
+  }
+
+  .card-strong-glass {
+    @apply bg-white/90 dark:bg-night-card/90
+           backdrop-blur-2xl
+           border border-white/60 dark:border-night-border/40
+           rounded-2xl shadow-glass-xl;
   }
 
   .card-gradient {
-    @apply bg-gradient-to-br from-lux-navy to-lux-navy
-           rounded-2xl shadow-xl shadow-lux-navy/20
+    @apply bg-gradient-to-br from-forest-500 to-forest-600
+           rounded-2xl shadow-lg shadow-forest-500/20
            text-white;
   }
 
-  .card-classic {
-    @apply bg-white dark:bg-night-card
-           border border-cream-100 dark:border-night-border/40
-           rounded-2xl shadow-lg shadow-cream-200/20 dark:shadow-black/20
-           hover:shadow-xl hover:border-gold-200/50 dark:hover:border-gold-500/15
-           transition-all duration-500 ease-out;
-  }
-
-  /* === Premium Badge === */
+  /* === Glass Badge === */
   .badge {
     @apply inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full;
   }
 
-  .badge-gold {
-    @apply badge bg-gold-50 dark:bg-gold-500/10 text-gold-800 dark:text-gold-300 border border-gold-200/50 dark:border-gold-500/20;
+  .badge-forest {
+    @apply badge bg-forest-50 dark:bg-forest-500/10 text-forest-700 dark:text-forest-300 border border-forest-200/50 dark:border-forest-500/20;
   }
 
-  .badge-green {
-    @apply badge bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-300;
+  .badge-terracotta {
+    @apply badge bg-terracotta-50 dark:bg-terracotta-500/10 text-terracotta-700 dark:text-terracotta-300 border border-terracotta-200/50 dark:border-terracotta-500/20;
   }
 
-  .badge-navy {
-    @apply badge bg-blue-50 dark:bg-lux-navy/30 text-lux-navy dark:text-blue-300;
+  .badge-sage {
+    @apply badge bg-sage-50 dark:bg-sage-500/10 text-sage-700 dark:text-sage-300 border border-sage-200/50 dark:border-sage-500/20;
   }
 
-  /* === Section Wrapper === */
+  /* === Section === */
   .section-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24;
   }
 
   .section-title {
-    @apply text-display text-lux-charcoal dark:text-white font-bold mb-4;
+    @apply text-display text-forest-800 dark:text-white font-bold mb-4;
   }
 
   .section-subtitle {
-    @apply text-lg text-lux-taupe dark:text-night-muted max-w-2xl leading-relaxed;
+    @apply text-lg text-earth-600 dark:text-night-muted max-w-2xl leading-relaxed;
   }
 
-  /* === Glass Effect === */
+  /* === Glass Effects === */
   .glass {
-    @apply backdrop-blur-xl bg-cream-100/20 dark:bg-white/5
-           border border-cream-200/30 dark:border-white/10;
+    @apply backdrop-blur-xl bg-white/10 dark:bg-white/5
+           border border-white/20 dark:border-white/10;
   }
 
   .glass-strong {
-    @apply backdrop-blur-2xl bg-white/30 dark:bg-white/10
-           border border-white/40 dark:border-white/15;
+    @apply backdrop-blur-2xl bg-white/80 dark:bg-night-card/80
+           border border-white/60 dark:border-night-border/30;
   }
 }
 
-/* === Premium Animations === */
+/* === Glassmorphism Animations === */
 
-/* Cursor Follower */
-.cursor-follower {
-  @apply fixed pointer-events-none z-[9999] w-6 h-6 rounded-full
-         bg-gold-400/20 mix-blend-screen
-         -translate-x-1/2 -translate-y-1/2
-         transition-transform duration-300 ease-out;
-  transform: translate(-50%, -50%);
-  will-change: left, top;
-}
-
-.cursor-dot {
-  @apply fixed pointer-events-none z-[9999] w-2 h-2 rounded-full bg-gold-500
-         -translate-x-1/2 -translate-y-1/2
-         transition-none;
-}
-
-/* Shimmer Loading Effect */
-.shimmer {
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(212, 175, 55, 0.08) 50%,
-    transparent 100%
+.glass-shimmer {
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(198, 107, 77, 0.05) 50%,
+    transparent 70%
   );
   background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
+  animation: glassShimmer 4s ease-in-out infinite;
 }
 
-/* Text Gradient Animation - Luxury Gold */
-.gradient-text-premium {
-  @apply bg-gradient-to-r from-gold-500 via-gold-400 to-gold-600
+.glow-text {
+  @apply bg-gradient-to-r from-terracotta-500 via-terracotta-400 to-terracotta-600
          bg-clip-text text-transparent;
   background-size: 200% auto;
   animation: shimmer 3s linear infinite;
 }
 
-/* Section Reveal Animation */
+/* Section Reveal */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
@@ -237,7 +218,7 @@
   transform: translateY(0);
 }
 
-/* Stagger Children Animation */
+/* Stagger Children */
 .stagger-children > * {
   opacity: 0;
   transform: translateY(20px);
@@ -251,132 +232,49 @@
 .stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
 .stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
 
-/* === Auth Page Styles === */
-.auth-container-premium {
+/* === Auth Page === */
+.auth-container {
   @apply relative min-h-screen overflow-hidden
-         bg-gradient-to-br from-cream-50 to-white
+         bg-gradient-to-br from-earth-50 via-white to-earth-100
          dark:from-night-bg dark:to-night-surface;
 }
 
-.auth-shapes {
-  @apply fixed inset-0 pointer-events-none z-0;
-}
-
-.auth-shape {
-  @apply absolute rounded-full opacity-[0.03] dark:opacity-[0.05];
-  background: radial-gradient(circle, #D4AF37 0%, transparent 70%);
-}
-
-.auth-shape:nth-child(1) {
-  width: 400px;
-  height: 400px;
-  top: -10%;
-  right: -5%;
-  animation: float 8s ease-in-out infinite;
-}
-
-.auth-shape:nth-child(2) {
-  width: 300px;
-  height: 300px;
-  bottom: -10%;
-  left: -5%;
-  animation: float 10s ease-in-out infinite 2s;
-}
-
-.auth-shape:nth-child(3) {
-  width: 200px;
-  height: 200px;
-  top: 40%;
-  left: 50%;
-  animation: float 12s ease-in-out infinite 4s;
-}
-
-.auth-card {
+.auth-glass-card {
   @apply relative z-10 w-full max-w-md mx-auto
-         bg-white/95 dark:bg-night-card/95
+         bg-white/90 dark:bg-night-card/90
          backdrop-blur-2xl
-         border border-cream-200/50 dark:border-night-border/30
-         rounded-3xl shadow-2xl shadow-gold-500/5
+         border border-white/60 dark:border-night-border/30
+         rounded-3xl shadow-glass-xl
          p-8 sm:p-10;
 }
 
-/* === Premium Button with Glow === */
-.btn-premium {
-  @apply relative w-full py-3.5 px-6
-         bg-gradient-to-r from-lux-navy to-lux-navy
-         text-white font-semibold text-base
-         rounded-xl
-         overflow-hidden
-         transition-all duration-300
-         hover:shadow-lg hover:shadow-lux-navy/30
-         active:scale-[0.98];
-}
-
-.btn-premium::before {
-  content: '';
-  @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.15), transparent);
-}
-
-.btn-premium:hover::before {
-  @apply opacity-100;
-  animation: shimmer 1s linear infinite;
-}
-
-/* === Gold Button === */
-.btn-gold {
-  @apply relative w-full py-3.5 px-6
-         bg-gradient-to-r from-gold-500 to-gold-600
-         text-white font-semibold text-base
-         rounded-xl
-         overflow-hidden
-         transition-all duration-300
-         hover:shadow-lg hover:shadow-gold-500/30
-         active:scale-[0.98];
-}
-
-.btn-gold::before {
-  content: '';
-  @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-}
-
-.btn-gold:hover::before {
-  @apply opacity-100;
-  animation: shimmer 1s linear infinite;
+.auth-orb {
+  @apply absolute rounded-full opacity-10 dark:opacity-[0.08];
+  background: radial-gradient(circle, #C66B4D 0%, transparent 70%);
 }
 
 /* === Gradient Divider === */
 .divider-gradient {
   @apply h-px w-full my-6;
-  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(198, 107, 77, 0.2), transparent);
 }
 
-/* === Floating Particle Effect === */
+/* === Floating Particles === */
 .particles-container {
   @apply fixed inset-0 pointer-events-none z-0 overflow-hidden;
 }
 
 .particle {
   @apply absolute w-1 h-1 rounded-full;
-  background: linear-gradient(135deg, #D4AF37, #F2C889);
+  background: linear-gradient(135deg, #C66B4D, #E8BEAE);
   opacity: 0.15;
   animation: float linear infinite;
 }
 
-/* === Premium Typography === */
-.text-elegant-serif {
-  font-family: 'Playfair Display', Georgia, serif;
-}
-
-/* === Gold Border Accent === */
-.border-gold-accent {
-  @apply border-b-2 border-gold-400;
-}
-
-/* === Classic Decor Elements === */
-.gold-dot {
-  @apply w-2 h-2 bg-gold-500 rounded-full;
+/* === Divider === */
+.divider-gradient {
+  @apply h-px w-full my-6;
+  background: linear-gradient(90deg, transparent, rgba(198, 107, 77, 0.2), transparent);
 }
 
 /* === Smooth Scroll === */
@@ -388,19 +286,18 @@ body {
   @apply overflow-x-hidden;
 }
 
-/* === Focus Styles === */
 :focus-visible {
-  @apply outline-none ring-2 ring-gold-400/50 ring-offset-2 dark:ring-offset-night-bg;
+  @apply outline-none ring-2 ring-terracotta-400/50 ring-offset-2 dark:ring-offset-night-bg;
 }
 
 /* === Responsive === */
 @media (max-width: 640px) {
-  .btn-primary, .btn-secondary, .btn-premium, .btn-gold {
+  .btn-primary, .btn-secondary {
     @apply py-3 px-4 text-sm;
     min-height: 44px;
   }
 
-  .auth-card {
+  .auth-glass-card {
     @apply p-6 mx-4 rounded-2xl;
   }
 
@@ -410,11 +307,11 @@ body {
 }
 
 @media (hover: none) and (pointer: coarse) {
-  .hover\\:-translate-y-1:hover {
+  .hover\:-translate-y-1:hover {
     transform: none;
   }
 
-  .btn-primary, .btn-secondary, .btn-ghost, .btn-danger, .btn-premium, .btn-gold {
+  .btn-primary, .btn-secondary, .btn-ghost, .btn-danger {
     @apply active:scale-[0.98];
   }
 }
