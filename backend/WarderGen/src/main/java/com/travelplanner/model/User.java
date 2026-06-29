@@ -39,7 +39,7 @@ public class User {
     @Size(min = 6, max = 120, message = "Password must be between 6 and 120 characters")
     private String password;
 
-    @Column(name = "verified", nullable = false)
+    @Column(name = "verified", nullable = false, columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
     private boolean verified = false;
 
     @Column(name = "deleted", nullable = false, columnDefinition = "BOOLEAN NOT NULL DEFAULT false")
