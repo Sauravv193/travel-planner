@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Sparkles, Loader2, User, Bot, X } from 'lucide-react';
+import { createConversation, sendMessage as sendConversationMessage } from '../../services/api';
 
 const AIChatInterface = ({ tripId, onAdaptItinerary, isVisible, onClose }) => {
   const [messages, setMessages] = useState([
@@ -10,8 +11,30 @@ const AIChatInterface = ({ tripId, onAdaptItinerary, isVisible, onClose }) => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState(null);
+  const [initializing, setInitializing] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  const initializeConversation = useCallback(async () => {
+    if (!tripId) return;
+    setInitializing(true);
+    try {
+      const response = await createConversation(tripId);
+      setConversationId(response.data.conversationId);
+    } catch (error) {
+      console.warn('Could not create conversation on backend, using local mode:', error);
+    } finally {
+      setInitializing(false);
+    }
+  }, [tripId]);
+
+  // Initialize or fetch conversation when chat opens
+  useEffect(() => {
+    if (isVisible && tripId && !conversationId && !initializing) {
+      initializeConversation();
+    }
+  }, [isVisible, tripId, conversationId, initializing, initializeConversation]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,13 +68,45 @@ const AIChatInterface = ({ tripId, onAdaptItinerary, isVisible, onClose }) => {
     setIsLoading(true);
 
     try {
+      // First, try to save the message to the backend conversation
+      if (conversationId) {
+        try {
+          await sendConversationMessage(conversationId, userMessage);
+        } catch (convError) {
+          console.warn('Could not save message to backend conversation:', convError);
+        }
+      }
+
+      // Apply the itinerary adaptation (this is the main action)
       await onAdaptItinerary(userMessage);
+      
+      // Generate AI-like response based on the adaptation context
+      const responses = {
+        'adventure': "I've updated your itinerary with more adventure activities! The changes include: adding outdoor excursions, adventure sports, and nature trails. Check out the updated schedule above.",
+        'budget': "I've adjusted the itinerary to be more budget-friendly! The changes include: more free activities, budget dining options, and cost-effective transportation suggestions.",
+        'rain': "I've added indoor alternatives throughout your itinerary! The changes include: indoor attractions, rainy-day activities, and covered dining options. Your trip is now weather-proof!",
+        'food': "I've enhanced the food experiences in your itinerary! The changes include: local cuisine recommendations, food tours, and top-rated restaurants for each meal time.",
+        'family': "I've made your itinerary more family-friendly! The changes include: kid-friendly activities, family restaurants, and age-appropriate suggestions for everyone."
+      };
+      
+      let responseText = "I've updated your itinerary based on your request. The changes have been applied to optimize your travel experience. You can view the updated itinerary above. Is there anything else you'd like to adjust?";
+      
+      const lowerMsg = userMessage.toLowerCase();
+      if (lowerMsg.includes('adventure') || lowerMsg.includes('outdoor') || lowerMsg.includes('active')) {
+        responseText = responses.adventure;
+      } else if (lowerMsg.includes('budget') || lowerMsg.includes('cheap') || lowerMsg.includes('cheaper') || lowerMsg.includes('free') || lowerMsg.includes('cost')) {
+        responseText = responses.budget;
+      } else if (lowerMsg.includes('rain') || lowerMsg.includes('indoor') || lowerMsg.includes('weather')) {
+        responseText = responses.rain;
+      } else if (lowerMsg.includes('food') || lowerMsg.includes('restaurant') || lowerMsg.includes('cuisine') || lowerMsg.includes('eat') || lowerMsg.includes('dining') || lowerMsg.includes('vegetarian')) {
+        responseText = responses.food;
+      } else if (lowerMsg.includes('family') || lowerMsg.includes('kid') || lowerMsg.includes('children')) {
+        responseText = responses.family;
+      }
+      
       setMessages(prev => [
         ...prev,
-        {
-          role: 'assistant',
-          content: `I've updated your itinerary based on "${userMessage}". The changes include:\n\n• Adjusted activities to match your request\n• Updated budget estimates\n• Modified timing where needed\n\nYou can view the updated itinerary above. Would you like me to make any other adjustments?`
-        }
+        { role: 'assistant', content: responseText }
       ]);
     } catch (error) {
       setMessages(prev => [

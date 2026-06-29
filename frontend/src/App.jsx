@@ -18,6 +18,10 @@ const Profile = lazy(() => import('./pages/Profile'));
 const EditProfile = lazy(() => import('./pages/EditProfile'));
 const SignIn = lazy(() => import('./pages/SignIn'));
 const SignUp = lazy(() => import('./pages/SignUp'));
+const OAuthCallback = lazy(() => import('./pages/OAuthCallback'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'));
 
 // Loading fallback for lazy loaded routes
 const PageLoader = () => (
@@ -53,7 +57,12 @@ function AppRoutes() {
           <Route element={<PublicOnlyRoute />}>
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Route>
+          
+          <Route path="/oauth2/callback" element={<OAuthCallback />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/planner" element={<Planner />} />

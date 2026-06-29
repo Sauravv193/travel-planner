@@ -24,10 +24,13 @@ const SignUp = () => {
         setIsLoading(true);
         try {
             const response = await signup(username, email, password);
-            setSuccess(response.data.message + " Redirecting to sign in...");
+            // Show verification message - if email verification is enabled on backend,
+            // the user will need to check their email
+            const message = response.data.message || 'User registered successfully!';
+            setSuccess(message + " Please check your email to verify your account. Redirecting to sign in...");
             setTimeout(() => {
                 navigate('/signin');
-            }, 2000);
+            }, 3000);
         } catch (err) {
             const errorMessage = err.response?.data?.message || 'Failed to sign up. Please try again.';
             setError(errorMessage);

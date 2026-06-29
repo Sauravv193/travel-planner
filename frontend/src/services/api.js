@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken } from './storage';
+import { getToken, getRefreshToken, saveToken, saveRefreshToken, removeToken } from './storage';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
@@ -13,7 +13,6 @@ api.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    // Always allow requests - let the server handle authentication
     return config;
   },
   (error) => {
@@ -21,14 +20,99 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
+// Track if we're already refreshing to avoid infinite loops
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Response interceptor for error handling with auto-refresh
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // Don't retry refresh/auth endpoints to avoid loops
+    if (originalRequest.url?.includes('/auth/refreshtoken') || 
+        originalRequest.url?.includes('/auth/signin') ||
+        originalRequest.url?.includes('/auth/signup')) {
+      return Promise.reject(error);
+    }
+    
+    // Handle 401 - Token expired, try refresh
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      const refreshTokenValue = getRefreshToken();
+      
+      if (!refreshTokenValue) {
+        // No refresh token available, clear auth state
+        if (window.location.pathname !== '/signin') {
+          removeToken();
+          window.location.replace('/signin');
+        }
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        // Queue the request while refresh is in progress
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers['Authorization'] = `Bearer ${token}`;
+          return api(originalRequest);
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const response = await axios.post(`${API_URL}/v1/auth/refreshtoken`, {
+          refreshToken: refreshTokenValue
+        });
+        
+        const { token: newToken, refreshToken: newRefreshToken } = response.data;
+        
+        saveToken(newToken);
+        if (newRefreshToken) {
+          saveRefreshToken(newRefreshToken);
+        }
+        
+        processQueue(null, newToken);
+        
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        removeToken();
+        if (window.location.pathname !== '/signin') {
+          window.location.replace('/signin');
+        }
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    
+    // Handle 429 - Rate limited
+    if (error.response?.status === 429) {
+      console.warn('Rate limited. Please slow down your requests.');
+      // Could add custom notification logic here
+    }
+    
     // Only log in development
     if (process.env.NODE_ENV === 'development') {
       console.error('API Error:', error.response?.config?.url, error.response?.status);
     }
+    
     return Promise.reject(error);
   }
 );
@@ -138,6 +222,47 @@ export const fetchPhotoBlob = async (photoId) => {
     console.error('Failed to fetch photo:', error);
     throw error;
   }
+};
+
+export const forgotPassword = (email) => {
+  return api.post('/v1/auth/forgot-password', { email });
+};
+
+export const resetPassword = (token, password) => {
+  return api.post('/v1/auth/reset-password', { token, password });
+};
+
+export const verifyEmail = (token) => {
+  return api.post(`/v1/auth/verify-email?token=${encodeURIComponent(token)}`);
+};
+
+export const resendVerificationEmail = () => {
+  return api.post('/v1/auth/resend-verification');
+};
+
+export const refreshAuthToken = (refreshTokenValue) => {
+  return api.post('/v1/auth/refreshtoken', { refreshToken: refreshTokenValue });
+};
+
+// Conversation API
+export const createConversation = (tripId) => {
+  return api.post('/v1/conversations', { tripId });
+};
+
+export const sendMessage = (conversationId, content) => {
+  return api.post(`/v1/conversations/${conversationId}/message`, { content });
+};
+
+export const getConversation = (conversationId) => {
+  return api.get(`/v1/conversations/${conversationId}`);
+};
+
+export const getTripConversations = (tripId) => {
+  return api.get(`/v1/conversations/trip/${tripId}`);
+};
+
+export const deleteConversation = (conversationId) => {
+  return api.delete(`/v1/conversations/${conversationId}`);
 };
 
 export default api;

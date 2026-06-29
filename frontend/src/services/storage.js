@@ -1,5 +1,6 @@
 // A key to uniquely identify our token in the browser's local storage.
 const TOKEN_KEY = 'travel_planner_auth_token';
+const REFRESH_TOKEN_KEY = 'travel_planner_refresh_token';
 
 /**
  * Saves the user's authentication token to local storage.
@@ -24,4 +25,23 @@ export const getToken = () => {
  */
 export const removeToken = () => {
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+};
+
+/**
+ * Saves the refresh token to local storage.
+ * @param {string} refreshToken - The refresh token from the backend.
+ */
+export const saveRefreshToken = (refreshToken) => {
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  }
+};
+
+/**
+ * Retrieves the refresh token from local storage.
+ * @returns {string|null}
+ */
+export const getRefreshToken = () => {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
 };

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { signIn, signUp } from '../services/api';
-import { saveToken, getToken, removeToken } from '../services/storage';
+import { saveToken, getToken, removeToken, saveRefreshToken, getRefreshToken } from '../services/storage';
 import { jwtDecode } from 'jwt-decode';
 
 export const AuthContext = createContext();
@@ -42,9 +42,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     const response = await signIn(username, password);
-    const { token } = response.data;
+    const { token, refreshToken, id, username: responseUsername, email } = response.data;
     saveToken(token);
-    updateUserFromToken(token); // Use the centralized function to set user state
+    if (refreshToken) {
+      saveRefreshToken(refreshToken);
+    }
+    // Set user from response data directly (not from JWT decode, which may lack id/email)
+    setUser({
+      id,
+      username: responseUsername,
+      email,
+    });
   };
 
   const signup = async (username, email, password) => {
@@ -56,7 +64,7 @@ export const AuthProvider = ({ children }) => {
     removeToken();
   };
 
-  const value = { user, login, signup, logout, loading };
+  const value = { user, login, signup, logout, loading, setUser };
 
   return (
     <AuthContext.Provider value={value}>
