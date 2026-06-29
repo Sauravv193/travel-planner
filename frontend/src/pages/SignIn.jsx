@@ -37,7 +37,7 @@ const SignIn = () => {
 
   return (
     <div className="auth-container-premium">
-      {/* Animated Background Shapes */}
+      {/* Animated Background Shapes - Gold */}
       <div className="auth-shapes">
         <div className="auth-shape"></div>
         <div className="auth-shape"></div>
@@ -50,16 +50,16 @@ const SignIn = () => {
         }`}>
           {/* Header Section */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-pink-500/20">
+            <div className="w-20 h-20 bg-gradient-to-br from-gold-400 to-gold-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gold-500/20">
               <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white gradient-text-premium">
+            <h2 className="text-3xl font-bold text-lux-charcoal dark:text-white gradient-text-premium">
               Welcome Back
             </h2>
-            <p className="mt-2 text-gray-500 dark:text-night-muted">
-              Sign in to continue your journey
+            <p className="mt-2 text-lux-taupe dark:text-night-muted">
+              Sign in to continue your journey across India
             </p>
           </div>
 
@@ -77,7 +77,7 @@ const SignIn = () => {
             
             <div className="space-y-5">
               <div className="animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="username" className="block text-sm font-medium text-lux-charcoal dark:text-night-text mb-2">
                   Username
                 </label>
                 <input
@@ -94,7 +94,7 @@ const SignIn = () => {
               </div>
 
               <div className="animate-fade-in-up" style={{animationDelay: '0.15s'}}>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-lux-charcoal dark:text-night-text mb-2">
                   Password
                 </label>
                 <input
@@ -114,7 +114,7 @@ const SignIn = () => {
             <div className="animate-fade-in-up" style={{animationDelay: '0.2s'}}>
               <button
                 type="submit"
-                className="btn-premium"
+                className="btn-gold"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -135,7 +135,7 @@ const SignIn = () => {
             <div className="relative my-6">
               <div className="divider-gradient" />
               <div className="relative flex justify-center -mt-3">
-                <span className="px-3 text-xs text-gray-400 dark:text-night-muted bg-white dark:bg-night-card">
+                <span className="px-3 text-xs text-lux-taupe dark:text-night-muted bg-white dark:bg-night-card">
                   Or continue with
                 </span>
               </div>
@@ -144,7 +144,7 @@ const SignIn = () => {
             <div className="animate-fade-in-up" style={{animationDelay: '0.3s'}}>
               <a
                 href={`${BACKEND_URL}/oauth2/authorization/google`}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-gray-200 dark:border-night-border rounded-xl bg-white dark:bg-night-surface hover:border-pink-300 dark:hover:border-pink-500/50 hover:shadow-lg hover:shadow-pink-500/10 transition-all duration-300 group"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-cream-200 dark:border-night-border rounded-xl bg-white dark:bg-night-surface hover:border-gold-300 dark:hover:border-gold-500/50 hover:shadow-lg hover:shadow-gold-500/10 transition-all duration-300 group"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
@@ -152,14 +152,14 @@ const SignIn = () => {
                   <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                   <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                <span className="text-sm font-semibold text-lux-charcoal dark:text-night-text group-hover:text-gold-600 dark:group-hover:text-gold-400 transition-colors">
                   Sign in with Google
                 </span>
               </a>
             </div>
 
             <div className="text-center animate-fade-in-up" style={{animationDelay: '0.35s'}}>
-              <Link to="/forgot-password" className="text-sm text-gray-500 dark:text-night-muted hover:text-pink-600 dark:hover:text-pink-400 transition-colors font-medium">
+              <Link to="/forgot-password" className="text-sm text-lux-taupe dark:text-night-muted hover:text-gold-600 dark:hover:text-gold-400 transition-colors font-medium">
                 Forgot password?
               </Link>
             </div>
@@ -167,9 +167,9 @@ const SignIn = () => {
             <div className="divider-gradient" />
 
             <div className="text-center animate-fade-in-up" style={{animationDelay: '0.4s'}}>
-              <p className="text-sm text-gray-500 dark:text-night-muted">
+              <p className="text-sm text-lux-taupe dark:text-night-muted">
                 Don't have an account?{' '}
-                <Link to="/signup" className="text-pink-600 dark:text-pink-400 font-semibold hover:text-pink-700 dark:hover:text-pink-300 transition-colors">
+                <Link to="/signup" className="text-gold-600 dark:text-gold-400 font-semibold hover:text-gold-700 dark:hover:text-gold-300 transition-colors">
                   Sign Up <span className="inline-block ml-0.5">→</span>
                 </Link>
               </p>

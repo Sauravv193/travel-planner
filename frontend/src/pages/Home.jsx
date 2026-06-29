@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Compass, Sparkles, Camera, Map, Globe, ArrowRight, Star, ChevronDown } from 'lucide-react';
+import { Compass, Sparkles, Camera, Map, Globe, ArrowRight, ChevronDown, IndianRupee } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import ProductDemo from '../components/landing/ProductDemo';
 
@@ -62,23 +62,23 @@ const HeroSection = () => {
   return (
     <div
       ref={heroRef}
-      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-gray-50 via-white to-pink-50/30 dark:from-[#0A0A1A] dark:via-[#0E0E22] dark:to-[#12122A]"
+      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-cream-50 via-white to-cream-100 dark:from-night-bg dark:via-night-surface dark:to-[#12121E]"
     >
       <FloatingParticles />
 
-      {/* Gradient Orbs */}
+      {/* Gold Gradient Orbs */}
       <div
-        className="absolute top-1/4 -right-32 w-96 h-96 rounded-full opacity-20 dark:opacity-10 blur-3xl"
+        className="absolute top-1/4 -right-32 w-96 h-96 rounded-full opacity-10 dark:opacity-8 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, #FF6B8A, transparent)',
+          background: 'radial-gradient(circle, #D4AF37, transparent)',
           transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)`,
           transition: 'transform 0.3s ease-out',
         }}
       />
       <div
-        className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full opacity-10 dark:opacity-5 blur-3xl"
+        className="absolute -bottom-32 -left-32 w-80 h-80 rounded-full opacity-5 dark:opacity-3 blur-3xl"
         style={{
-          background: 'radial-gradient(circle, #8B5CF6, transparent)',
+          background: 'radial-gradient(circle, #1B2A4A, transparent)',
           transform: `translate(${mousePos.x * -0.3}px, ${mousePos.y * -0.3}px)`,
           transition: 'transform 0.5s ease-out',
         }}
@@ -91,25 +91,25 @@ const HeroSection = () => {
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
           }`}>
             {/* Badge */}
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-pink-50 dark:bg-pink-500/10 border border-pink-200 dark:border-pink-500/20 rounded-full">
-              <Sparkles className="w-4 h-4 text-pink-500" />
-              <span className="text-sm font-medium text-pink-700 dark:text-pink-300">
-                AI-Powered Travel Planning
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gold-50 dark:bg-gold-500/10 border border-gold-200 dark:border-gold-500/20 rounded-full">
+              <Sparkles className="w-4 h-4 text-gold-500" />
+              <span className="text-sm font-medium text-gold-700 dark:text-gold-300">
+                AI-Powered Travel Planning for India
               </span>
             </div>
 
             {/* Main Heading */}
-            <h1 className="text-hero-mobile sm:text-hero text-gray-900 dark:text-white leading-tight">
+            <h1 className="text-hero-mobile sm:text-hero text-lux-charcoal dark:text-white leading-tight">
               Plan Your
               <br />
               <span className="gradient-text-premium">Perfect Trip</span>
               <br />
-              in Minutes
+              Across India
             </h1>
 
             {/* Description */}
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-night-muted max-w-xl leading-relaxed">
-              Enter your destination, preferences, and budget. Watch as AI creates a personalized day-by-day itinerary with specific activities, restaurants, and recommendations.
+            <p className="text-lg sm:text-xl text-lux-taupe dark:text-night-muted max-w-xl leading-relaxed">
+              Enter your destination, preferences, and budget. Watch as AI creates a personalized day-by-day itinerary with activities, restaurants, and recommendations across India.
             </p>
 
             {/* Feature List */}
@@ -118,13 +118,13 @@ const HeroSection = () => {
                 { icon: Sparkles, text: 'Personalized itinerary generation' },
                 { icon: Camera, text: 'Smart photo travel journals' },
                 { icon: Globe, text: 'Real-time plan adaptation' },
-                { icon: Star, text: 'Budget optimization' },
+                { icon: IndianRupee, text: 'Budget optimization in INR' },
               ].map((feature, i) => (
                 <div key={i} className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg flex items-center justify-center shadow-md">
+                  <div className="w-8 h-8 bg-gradient-to-br from-gold-400 to-gold-600 rounded-lg flex items-center justify-center shadow-md">
                     <feature.icon className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-gray-700 dark:text-gray-300 font-medium">{feature.text}</span>
+                  <span className="text-lux-charcoal dark:text-night-text font-medium">{feature.text}</span>
                 </div>
               ))}
             </div>
@@ -183,7 +183,7 @@ const HeroSection = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <ChevronDown className="w-6 h-6 text-gray-400 dark:text-night-muted" />
+        <ChevronDown className="w-6 h-6 text-lux-taupe dark:text-night-muted" />
       </div>
     </div>
   );
@@ -215,41 +215,46 @@ const FeaturesSection = () => {
     {
       icon: Sparkles,
       title: 'Smart Itineraries',
-      description: 'Get personalized travel plans crafted by AI for your preferences, budget, and travel style.',
-      gradient: 'from-pink-500 to-rose-600',
+      description: 'Get personalized travel plans crafted by AI for your preferences, budget, and travel style across India.',
+      gradient: 'from-gold-500 to-gold-600',
     },
     {
       icon: Camera,
       title: 'Photo Journals',
-      description: 'Transform your travel photos into beautiful, AI-generated narrative stories.',
-      gradient: 'from-purple-500 to-pink-600',
+      description: 'Transform your travel photos into beautiful, AI-generated narrative stories of your Indian adventures.',
+      gradient: 'from-lux-navy to-gold-600',
     },
     {
       icon: Globe,
       title: 'Real-Time Adaptation',
-      description: 'Weather changed? Plans shifted? Describe the situation and get instant adjustments.',
-      gradient: 'from-teal-500 to-cyan-600',
+      description: 'Weather changed? Plans shifted? Describe the situation and get instant adjustments to your itinerary.',
+      gradient: 'from-lux-navy to-lux-navy',
     },
     {
       icon: Map,
       title: 'Interactive Maps',
-      description: 'View all your destinations, routes, and nearby recommendations on an interactive map.',
-      gradient: 'from-blue-500 to-indigo-600',
+      description: 'View all your destinations, routes, and nearby recommendations on an interactive map of India.',
+      gradient: 'from-gold-600 to-gold-500',
     },
   ];
 
   return (
-    <div ref={sectionRef} className="relative py-24 sm:py-32 overflow-hidden bg-white dark:bg-[#0A0A1A]">
+    <div ref={sectionRef} className="relative py-24 sm:py-32 overflow-hidden bg-white dark:bg-night-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className={`text-center mb-20 transition-all duration-700 ${
           visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
-          <h2 className="text-display text-gray-900 dark:text-white font-bold mb-6">
+          <div className="inline-flex items-center justify-center space-x-2 mb-4">
+            <div className="w-8 h-px bg-gold-400"></div>
+            <span className="text-sm font-medium uppercase tracking-widest text-gold-600">Features</span>
+            <div className="w-8 h-px bg-gold-400"></div>
+          </div>
+          <h2 className="text-display text-lux-charcoal dark:text-white font-bold mb-6">
             Everything You Need for
             <span className="gradient-text-premium"> Perfect Travel</span>
           </h2>
-          <p className="text-xl text-gray-500 dark:text-night-muted max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-lux-taupe dark:text-night-muted max-w-3xl mx-auto leading-relaxed">
             From planning to memories, WanderGen handles every aspect of your travel experience with intelligent automation.
           </p>
         </div>
@@ -261,7 +266,7 @@ const FeaturesSection = () => {
             return (
               <div
                 key={index}
-                className={`card card-hover p-8 transition-all duration-700 ${
+                className={`card-classic p-8 transition-all duration-700 ${
                   visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
                 style={{ transitionDelay: `${index * 150}ms` }}
@@ -269,8 +274,8 @@ const FeaturesSection = () => {
                 <div className={`w-14 h-14 bg-gradient-to-br ${feature.gradient} rounded-2xl flex items-center justify-center shadow-lg mb-6`}>
                   <Icon className="w-7 h-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-night-muted leading-relaxed">{feature.description}</p>
+                <h3 className="text-2xl font-bold text-lux-charcoal dark:text-white mb-3">{feature.title}</h3>
+                <p className="text-lux-taupe dark:text-night-muted leading-relaxed">{feature.description}</p>
               </div>
             );
           })}
@@ -306,7 +311,7 @@ const FAQSection = () => {
   const faqs = [
     {
       q: 'How does the AI itinerary generation work?',
-      a: 'WanderGen uses Google\'s Gemini AI to analyze your destination, travel dates, budget, and interests. It then creates a personalized day-by-day itinerary with specific activities, restaurants, and recommendations tailored to your preferences.',
+      a: 'WanderGen uses Google\'s Gemini AI to analyze your destination, travel dates, budget, and interests. It then creates a personalized day-by-day itinerary with specific activities, restaurants, and recommendations tailored to your preferences across India.',
     },
     {
       q: 'Can I modify the AI-generated itinerary?',
@@ -323,15 +328,20 @@ const FAQSection = () => {
   ];
 
   return (
-    <div ref={sectionRef} className="relative py-24 sm:py-32 bg-gray-50 dark:bg-[#0E0E22]">
+    <div ref={sectionRef} className="relative py-24 sm:py-32 bg-cream-50 dark:bg-night-surface">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-16 transition-all duration-700 ${
           visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
-          <h2 className="text-display text-gray-900 dark:text-white font-bold mb-4">
+          <div className="inline-flex items-center justify-center space-x-2 mb-4">
+            <div className="w-8 h-px bg-gold-400"></div>
+            <span className="text-sm font-medium uppercase tracking-widest text-gold-600">Support</span>
+            <div className="w-8 h-px bg-gold-400"></div>
+          </div>
+          <h2 className="text-display text-lux-charcoal dark:text-white font-bold mb-4">
             Frequently Asked Questions
           </h2>
-          <p className="text-lg text-gray-500 dark:text-night-muted">
+          <p className="text-lg text-lux-taupe dark:text-night-muted">
             Everything you need to know about WanderGen
           </p>
         </div>
@@ -340,7 +350,7 @@ const FAQSection = () => {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className={`card overflow-hidden transition-all duration-500 ${
+              className={`card-classic overflow-hidden transition-all duration-500 ${
                 visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
               style={{ transitionDelay: `${index * 100}ms` }}
@@ -349,10 +359,10 @@ const FAQSection = () => {
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full flex items-center justify-between p-6 text-left"
               >
-                <span className="text-lg font-semibold text-gray-900 dark:text-white pr-4">{faq.q}</span>
+                <span className="text-lg font-semibold text-lux-charcoal dark:text-white pr-4">{faq.q}</span>
                 <ChevronDown
-                  className={`w-5 h-5 text-gray-400 transition-transform duration-300 flex-shrink-0 ${
-                    openIndex === index ? 'rotate-180' : ''
+                  className={`w-5 h-5 text-lux-taupe transition-transform duration-300 flex-shrink-0 ${
+                    openIndex === index ? 'rotate-180 text-gold-500' : ''
                   }`}
                 />
               </button>
@@ -361,7 +371,7 @@ const FAQSection = () => {
                   openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                 }`}
               >
-                <p className="px-6 pb-6 text-gray-600 dark:text-night-muted leading-relaxed">{faq.a}</p>
+                <p className="px-6 pb-6 text-lux-taupe dark:text-night-muted leading-relaxed">{faq.a}</p>
               </div>
             </div>
           ))}

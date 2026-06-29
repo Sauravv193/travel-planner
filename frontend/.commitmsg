@@ -1,13 +1,10 @@
-feat: Trionn-inspired premium design overhaul with INR currency
+feat: luxury classic design overhaul - gold/navy palette, Indian focus, GitHub removal
 
-- Redesign tailwind config with premium design tokens and animations
-- Rewrite index.css with premium button/card/input system and micro-interactions
-- Redesign Home.jsx with interactive mouse-parallax hero and scroll animations
-- Redesign Header.jsx with glass-blur scroll detection
-- Redesign Dashboard and DashboardStats with premium gradient cards
-- Redesign SignIn/SignUp with floating gradient shapes and premium auth cards
-- Fix FloatingParticles re-render bug with useMemo
-- Fix SignIn error messages to use new design system
-- Fix Dashboard navigation to use proper Link component
-- Remove unused imports across components
-- Fix SignUp page complete rewrite with new design system
+- Replace pink/rose with gold (#D4AF37), cream, lux-navy (#1B2A4A) palette
+- Add Playfair Display font, card-classic component, btn-gold styling
+- Change ProductDemo from Tokyo to Goa, India with INR pricing
+- Remove all GitHub links from Footer, add 'Made in India'
+- Redesign Home with gold gradient orbs, Indian-focused copy
+- Update Header, Dashboard, QuickActions with gold/navy styling
+- Refine ItineraryView, SignIn, SignUp with luxury color scheme
+- Clean up unused Star import in Home.jsx

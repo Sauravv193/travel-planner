@@ -39,7 +39,7 @@ const SignUp = () => {
 
     return (
         <div className="auth-container-premium">
-            {/* Animated Background Shapes */}
+            {/* Animated Background Shapes - Gold */}
             <div className="auth-shapes">
                 <div className="auth-shape"></div>
                 <div className="auth-shape"></div>
@@ -52,16 +52,16 @@ const SignUp = () => {
                 }`}>
                     {/* Header Section */}
                     <div className="text-center mb-8">
-                        <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-pink-500/20">
+                        <div className="w-20 h-20 bg-gradient-to-br from-gold-400 to-gold-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gold-500/20">
                             <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                             </svg>
                         </div>
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white gradient-text-premium">
+                        <h2 className="text-3xl font-bold text-lux-charcoal dark:text-white gradient-text-premium">
                             Join Our Community
                         </h2>
-                        <p className="mt-2 text-gray-500 dark:text-night-muted">
-                            Create your account to start planning amazing trips
+                        <p className="mt-2 text-lux-taupe dark:text-night-muted">
+                            Create your account to start planning amazing trips across India
                         </p>
                     </div>
 
@@ -89,7 +89,7 @@ const SignUp = () => {
 
                         <div className="space-y-4">
                             <div className="animate-fade-in-up" style={{animationDelay: '0.1s'}}>
-                                <label htmlFor="signup-username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label htmlFor="signup-username" className="block text-sm font-medium text-lux-charcoal dark:text-night-text mb-2">
                                     Username
                                 </label>
                                 <input
@@ -106,7 +106,7 @@ const SignUp = () => {
                             </div>
 
                             <div className="animate-fade-in-up" style={{animationDelay: '0.15s'}}>
-                                <label htmlFor="signup-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label htmlFor="signup-email" className="block text-sm font-medium text-lux-charcoal dark:text-night-text mb-2">
                                     Email
                                 </label>
                                 <input
@@ -123,7 +123,7 @@ const SignUp = () => {
                             </div>
 
                             <div className="animate-fade-in-up" style={{animationDelay: '0.2s'}}>
-                                <label htmlFor="signup-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                <label htmlFor="signup-password" className="block text-sm font-medium text-lux-charcoal dark:text-night-text mb-2">
                                     Password
                                 </label>
                                 <input
@@ -143,7 +143,7 @@ const SignUp = () => {
                         <div className="animate-fade-in-up" style={{animationDelay: '0.25s'}}>
                             <button
                                 type="submit"
-                                className="btn-premium"
+                                className="btn-gold"
                                 disabled={isLoading}
                             >
                                 {isLoading ? (
@@ -163,9 +163,9 @@ const SignUp = () => {
                         <div className="divider-gradient" />
 
                         <div className="text-center animate-fade-in-up" style={{animationDelay: '0.3s'}}>
-                            <p className="text-sm text-gray-500 dark:text-night-muted">
+                            <p className="text-sm text-lux-taupe dark:text-night-muted">
                                 Already have an account?{' '}
-                                <Link to="/signin" className="text-pink-600 dark:text-pink-400 font-semibold hover:text-pink-700 dark:hover:text-pink-300 transition-colors">
+                                <Link to="/signin" className="text-gold-600 dark:text-gold-400 font-semibold hover:text-gold-700 dark:hover:text-gold-300 transition-colors">
                                     Sign In <span className="inline-block ml-0.5">→</span>
                                 </Link>
                             </p>
