@@ -78,40 +78,7 @@ const Footer = () => {
                 </ul>
               </div>
             </div>
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-widest text-lux-charcoal dark:text-white">
-                  Tech Stack
-                </h3>
-                <ul className="mt-4 space-y-3">
-                  <li>
-                    <span className="text-base text-lux-taupe dark:text-night-muted">React 18 + Vite</span>
-                  </li>
-                  <li>
-                    <span className="text-base text-lux-taupe dark:text-night-muted">Spring Boot 3</span>
-                  </li>
-                  <li>
-                    <span className="text-base text-lux-taupe dark:text-night-muted">PostgreSQL + Redis</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="mt-12 md:mt-0">
-                <h3 className="text-sm font-semibold uppercase tracking-widest text-lux-charcoal dark:text-white">
-                  Deployment
-                </h3>
-                <ul className="mt-4 space-y-3">
-                  <li>
-                    <span className="text-base text-lux-taupe dark:text-night-muted">Vercel (Frontend)</span>
-                  </li>
-                  <li>
-                    <span className="text-base text-lux-taupe dark:text-night-muted">Render (Backend)</span>
-                  </li>
-                  <li>
-                    <span className="text-base text-lux-taupe dark:text-night-muted">Neon (Database)</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+
           </div>
         </div>
         <div className="mt-12 border-t border-cream-200 dark:border-night-border pt-8">
