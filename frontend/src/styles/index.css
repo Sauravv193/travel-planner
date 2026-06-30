@@ -108,7 +108,8 @@
   }
 
   textarea.input-field {
-    @apply min-h-[100px] resize-y;
+    @apply min-h-[100px];
+    resize: vertical;
   }
 
   /* === Card System === */

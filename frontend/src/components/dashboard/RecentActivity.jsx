@@ -1,32 +1,74 @@
 import { Clock, MapPin, Plus, CheckCircle } from 'lucide-react';
 
 const RecentActivity = ({ trips }) => {
-  const activities = [
-    {
-      type: 'trip_created',
-      icon: Plus,
-      color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-      title: 'New trip planned',
-      description: trips.length > 0 ? `${trips[0].destination}` : 'No recent trips',
-      time: '2 hours ago'
-    },
-    {
-      type: 'itinerary_generated',
-      icon: CheckCircle,
-      color: 'bg-brown-100 text-brown-600 dark:bg-brown-900/30 dark:text-brown-400',
-      title: 'Itinerary generated',
-      description: trips.length > 0 ? `${trips[0].destination} - 5 days` : 'No recent itineraries',
-      time: '2 hours ago'
-    },
-    {
-      type: 'destination_viewed',
-      icon: MapPin,
-      color: 'bg-beige-100 text-beige-600 dark:bg-beige-900/30 dark:text-beige-400',
-      title: 'Destination explored',
-      description: trips.length > 1 ? `${trips[1]?.destination || 'Goa, India'}` : 'Goa, India',
-      time: '1 day ago'
+  // Build real activity entries from the trips data
+  const buildActivities = () => {
+    const activities = [];
+    
+    if (trips.length > 0) {
+      // Most recent trip creation
+      const latestTrip = trips[0];
+      activities.push({
+        icon: Plus,
+        color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+        title: 'New trip planned',
+        description: latestTrip.destination || 'New destination',
+        time: latestTrip.createdAt 
+          ? formatRelativeTime(new Date(latestTrip.createdAt)) 
+          : 'Recently'
+      });
+      
+      // Trip with itinerary
+      if (latestTrip.itinerary) {
+        activities.push({
+          icon: CheckCircle,
+          color: 'bg-brown-100 text-brown-600 dark:bg-brown-900/30 dark:text-brown-400',
+          title: 'Itinerary generated',
+          description: `${latestTrip.destination}`,
+          time: 'Recently'
+        });
+      }
+      
+      // Second trip if exists
+      if (trips.length > 1) {
+        activities.push({
+          icon: MapPin,
+          color: 'bg-beige-100 text-beige-600 dark:bg-beige-900/30 dark:text-beige-400',
+          title: 'Destination explored',
+          description: trips[1].destination || 'Another destination',
+          time: 'Earlier'
+        });
+      }
     }
-  ];
+    
+    if (activities.length === 0) {
+      activities.push({
+        icon: MapPin,
+        color: 'bg-beige-100 text-beige-600 dark:bg-beige-900/30 dark:text-beige-400',
+        title: 'Welcome to WanderGen!',
+        description: 'Plan your first trip to get started',
+        time: 'Just now'
+      });
+    }
+    
+    return activities;
+  };
+
+  const formatRelativeTime = (date) => {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+    return date.toLocaleDateString();
+  };
+
+  const activities = buildActivities();
 
   return (
     <div className="card p-6">

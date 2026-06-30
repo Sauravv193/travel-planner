@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class WarderGenApplicationTests {
+class WanderGenApplicationTests {
 
 	@Test
 	void contextLoads() {

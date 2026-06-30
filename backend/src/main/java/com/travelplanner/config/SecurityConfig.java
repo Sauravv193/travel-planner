@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class SecurityConfig {
 
-    @Value("${cors.origins:http://localhost:3000,http://localhost:5173,https://travel-planner-frontend.vercel.app,https://travel-planner-akyd.vercel.app}")
+    @Value("${CORS_ORIGINS:http://localhost:5173,https://travel-planner-akyd.vercel.app}")
     private String corsOrigins;
 
     @Value("${cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS,PATCH}")

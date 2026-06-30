@@ -3,8 +3,8 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copy Maven wrapper and pom.xml
-COPY backend/WarderGen/mvnw backend/WarderGen/mvnw.cmd backend/WarderGen/pom.xml ./
-COPY backend/WarderGen/.mvn ./.mvn
+COPY backend/mvnw backend/mvnw.cmd backend/pom.xml ./
+COPY backend/.mvn ./.mvn
 
 # Make mvnw executable
 RUN chmod +x mvnw
@@ -13,7 +13,7 @@ RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline -B
 
 # Copy source code
-COPY backend/WarderGen/src ./src
+COPY backend/src ./src
 
 # Build the application
 RUN ./mvnw clean package -DskipTests

@@ -31,7 +31,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: backend/WarderGen
+        working-directory: backend
 
     steps:
       - name: Checkout code
@@ -48,7 +48,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('backend/WarderGen/pom.xml') }}
+          key: ${{ runner.os }}-m2-${{ hashFiles('backend/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-m2-
 
@@ -66,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend-jar
-          path: backend/WarderGen/target/*.jar
+          path: backend/target/*.jar
           retention-days: 7
 
   frontend-lint-and-build:

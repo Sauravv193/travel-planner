@@ -244,6 +244,11 @@ export const refreshAuthToken = (refreshTokenValue) => {
   return api.post('/v1/auth/refreshtoken', { refreshToken: refreshTokenValue });
 };
 
+// Job API (for polling async operations)
+export const getJobStatus = (jobId) => {
+  return api.get(`/v1/jobs/${jobId}`);
+};
+
 // Conversation API
 export const createConversation = (tripId) => {
   return api.post('/v1/conversations', { tripId });

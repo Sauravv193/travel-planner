@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import com.travelplanner.security.services.UserDetailsImpl;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -50,10 +50,10 @@ public class JobController {
     @PostMapping("/itinerary/generate")
     public ResponseEntity<Map<String, Object>> createItineraryGenerationJob(
             @RequestBody Map<String, Long> request,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         
         Long tripId = request.get("tripId");
-        Long userId = getUserIdFromPrincipal(userDetails);
+        Long userId = userDetails.getId();
         
         logger.info("Creating itinerary generation job for trip: {}, user: {}", tripId, userId);
         
@@ -83,11 +83,11 @@ public class JobController {
     @PostMapping("/itinerary/adapt")
     public ResponseEntity<Map<String, Object>> createItineraryAdaptationJob(
             @RequestBody Map<String, Object> request,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         
         Long tripId = ((Number) request.get("tripId")).longValue();
         String context = (String) request.get("context");
-        Long userId = getUserIdFromPrincipal(userDetails);
+        Long userId = userDetails.getId();
         
         logger.info("Creating itinerary adaptation job for trip: {}, user: {}, context: {}", tripId, userId, context);
         
@@ -153,15 +153,5 @@ public class JobController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Extract user ID from UserDetails
-     * In production, this would come from the JWT token
-     */
-    private Long getUserIdFromPrincipal(UserDetails userDetails) {
-        // This is a simplified implementation
-        // In production, extract from JWT claims or user entity
-        String username = userDetails.getUsername();
-        // For now, return a placeholder - in real app, query UserRepository
-        return 1L; // TODO: Implement proper user ID extraction
-    }
+
 }

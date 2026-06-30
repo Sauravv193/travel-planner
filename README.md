@@ -24,7 +24,7 @@ A travel planner that uses Google Gemini to generate itineraries. Spring Boot ba
 ```
 travel-planner/
 ├── .github/workflows/       CI/CD pipelines
-├── backend/WarderGen/        Spring Boot app
+├── backend/        Spring Boot app
 │   ├── src/main/java/...     controllers, services, models, config
 │   ├── src/main/resources/   application.properties
 │   └── src/test/             unit and integration tests
@@ -70,7 +70,7 @@ Optional: `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` for Google sign-in, `SMTP_
 # Prerequisites: Java 17+, Node 16+, PostgreSQL, Redis
 
 # Backend
-cd backend/WarderGen
+cd backend
 cp .env.example .env     # edit with your database creds and API key
 ./mvnw spring-boot:run
 # Runs on http://localhost:8080
@@ -105,7 +105,7 @@ Main endpoints:
 ## Tests
 
 ```bash
-cd backend/WarderGen
+cd backend
 ./mvnw test
 ```
 

@@ -24,6 +24,7 @@ public class TripResponse {
     private String mustTryFoods;
     private Long userId;
     private String username;
+    private ItineraryResponse itinerary;
 
     // Getters and Setters
     public Long getId() {
@@ -136,5 +137,13 @@ public class TripResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public ItineraryResponse getItinerary() {
+        return itinerary;
+    }
+
+    public void setItinerary(ItineraryResponse itinerary) {
+        this.itinerary = itinerary;
     }
 }

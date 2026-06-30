@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ItineraryGenerator from '../components/itinerary/ItineraryGenerator';
 import ItineraryView from '../components/itinerary/ItineraryView';
-import { createTrip, generateItinerary, getTripById } from '../services/api';
+import { createTrip, generateItinerary, getTripById, getJobStatus } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ItineraryGenerationProgress from '../components/loading/ItineraryGenerationProgress';
 
@@ -13,6 +13,8 @@ const Planner = () => {
   const [error, setError] = useState('');
   const [currentDestination, setCurrentDestination] = useState('');
   const navigate = useNavigate();
+  const pollingRef = useRef(null);
+  const isMountedRef = useRef(true);
 
   const parseItineraryContent = (rawContent) => {
     if (!rawContent) {
@@ -42,26 +44,95 @@ const Planner = () => {
     }
   };
 
+  // Poll job status until completed, then fetch trip for itinerary content
+  const pollJobAndFetchTrip = useCallback(async (jobId, tripId) => {
+    const pollInterval = 2000; // poll every 2 seconds
+    const maxAttempts = 60; // max 2 minutes of polling
+    let attempts = 0;
+
+    return new Promise((resolve, reject) => {
+      const poll = async () => {
+        attempts++;
+        try {
+          const jobResponse = await getJobStatus(jobId);
+          const jobStatus = jobResponse.data.status;
+
+          if (jobStatus === 'COMPLETED') {
+            // Job completed — fetch the trip to get the generated itinerary
+            const tripResponse = await getTripById(tripId);
+            resolve(tripResponse);
+          } else if (jobStatus === 'FAILED') {
+            reject(new Error(jobResponse.data.errorMessage || 'Itinerary generation failed.'));
+          } else if (attempts >= maxAttempts) {
+            reject(new Error('Itinerary generation timed out. Please try again.'));
+          } else {
+            // Still processing — poll again
+            pollingRef.current = setTimeout(poll, pollInterval);
+          }
+        } catch (err) {
+          reject(new Error('Failed to check generation status: ' + (err.message || 'Unknown error')));
+        }
+      };
+      poll();
+    });
+  }, []);
+
+  // Prevent state updates after unmount
+  const safeSetState = useCallback((setter, value) => {
+    if (isMountedRef.current) {
+      setter(value);
+    }
+  }, []);
+
   const handleGenerate = async (planDetails) => {
     setIsGenerating(true);
     setError('');
     setItinerary(null);
     setCurrentDestination(planDetails.destination);
     try {
+      // Step 1: Create the trip
       const tripResponse = await createTrip({
         destination: planDetails.destination,
         startDate: planDetails.startDate,
         endDate: planDetails.endDate,
         budget: planDetails.budget,
         interests: planDetails.interests,
+        numberOfTravelers: planDetails.numberOfTravelers,
+        accommodationStyle: planDetails.accommodationStyle,
+        budgetTier: planDetails.budgetTier,
+        travelStyle: planDetails.travelStyle,
+        dietaryNeeds: planDetails.dietaryNeeds,
+        mustTryFoods: planDetails.mustTryFoods,
       });
       const generatedTripId = tripResponse.data.id;
       setNewTripId(generatedTripId);
 
-      const itineraryResponse = await generateItinerary(generatedTripId);
-      
-      const parsedItinerary = parseItineraryContent(itineraryResponse.data.content);
-      setItinerary(parsedItinerary);
+      // Step 2: Start async itinerary generation (returns jobId)
+      const genResponse = await generateItinerary(generatedTripId);
+      const jobId = genResponse.data.jobId;
+
+      if (!jobId) {
+        throw new Error('No job ID returned from itinerary generation.');
+      }
+
+      // Step 3: Poll job status until completed, then fetch trip
+      const tripDataResponse = await pollJobAndFetchTrip(jobId, generatedTripId);
+
+      // Step 4: Parse and display the itinerary from the trip data
+      const tripData = tripDataResponse.data;
+      if (tripData.itinerary && tripData.itinerary.content) {
+        const parsedItinerary = parseItineraryContent(tripData.itinerary.content);
+        setItinerary(parsedItinerary);
+      } else {
+        // Itinerary content wasn't in the trip response yet — fetch again
+        const retryResponse = await getTripById(generatedTripId);
+        if (retryResponse.data.itinerary && retryResponse.data.itinerary.content) {
+          const parsedItinerary = parseItineraryContent(retryResponse.data.itinerary.content);
+          setItinerary(parsedItinerary);
+        } else {
+          throw new Error('Itinerary was generated but content could not be retrieved.');
+        }
+      }
 
     } catch (err) {
       if (err.response && err.response.status >= 500) {
@@ -70,9 +141,22 @@ const Planner = () => {
         setError(err.message || 'Sorry, something went wrong while planning your trip. Please try again.');
       }
     } finally {
-      setIsGenerating(false);
+      if (isMountedRef.current) {
+        setIsGenerating(false);
+      }
     }
   };
+  
+  // Cleanup polling and mark unmounted on unmount
+  React.useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      if (pollingRef.current) {
+        clearTimeout(pollingRef.current);
+      }
+    };
+  }, []);
   
   const handleSaveAndNavigate = async () => {
     if (newTripId) {

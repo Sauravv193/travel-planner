@@ -1,6 +1,7 @@
 package com.travelplanner.mapper;
 
 import com.travelplanner.dto.request.TripRequest;
+import com.travelplanner.dto.response.ItineraryResponse;
 import com.travelplanner.dto.response.TripResponse;
 import com.travelplanner.model.Trip;
 
@@ -39,6 +40,13 @@ public class TripMapper {
         if (trip.getUser() != null) {
             response.setUserId(trip.getUser().getId());
             response.setUsername(trip.getUser().getUsername());
+        }
+        // Map itinerary if present
+        if (trip.getItinerary() != null) {
+            response.setItinerary(new ItineraryResponse(
+                trip.getItinerary().getId(),
+                trip.getItinerary().getContent()
+            ));
         }
         return response;
     }

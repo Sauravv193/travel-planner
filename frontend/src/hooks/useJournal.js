@@ -141,15 +141,12 @@ export const useJournal = (trip) => {
     }
 
     try {
-      console.log('Starting journal generation with', currentPhotos.length, 'photos');
-      
       // Call backend API to generate journal
       const response = await generateJournalAPI(trip.id);
       
       if (response.data?.content) {
         const parsedJournal = JSON.parse(response.data.content);
         setJournal(parsedJournal);
-        console.log('Journal generated successfully');
       } else {
         throw new Error('Invalid response from server');
       }

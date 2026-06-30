@@ -11,13 +11,15 @@ const ItineraryGenerator = ({ onGenerate }) => {
   const [travelStyle, setTravelStyle] = useState('');
   const [dietaryNeeds, setDietaryNeeds] = useState('');
   const [mustTryFoods, setMustTryFoods] = useState('');
+  const [budget, setBudget] = useState('');
+  const [budgetError, setBudgetError] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (destination.trim() && startDate && endDate) {
-      onGenerate({ destination, numberOfTravelers, startDate, endDate, interests, accommodationStyle, budgetTier, travelStyle, dietaryNeeds, mustTryFoods });
+      onGenerate({ destination, numberOfTravelers, startDate, endDate, budget: budget ? parseFloat(budget) : null, interests, accommodationStyle, budgetTier, travelStyle, dietaryNeeds, mustTryFoods });
     }
   };
 
@@ -104,9 +106,33 @@ const ItineraryGenerator = ({ onGenerate }) => {
                 Preferences
               </h3>
               <p className="text-brown-600 text-sm">Help us customize your experience</p>
+            </div>              <div>
+              <label htmlFor="budget" className="block text-sm font-medium text-warm-dark mb-2">Budget (₹) *</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-brown-500 dark:text-night-muted font-medium">₹</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  id="budget"
+                  className="input-field pl-8"
+                  placeholder="e.g., 50000"
+                  value={budget}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9]/g, '');
+                    setBudget(val);
+                    if (val && parseInt(val, 10) <= 0) {
+                      setBudgetError('Budget must be greater than 0');
+                    } else {
+                      setBudgetError('');
+                    }
+                  }}
+                  required
+                />
+              </div>
+              {budgetError && <p className="text-red-500 text-xs mt-1">{budgetError}</p>}
             </div>
             <div>
-              <label htmlFor="budget-tier" className="block text-sm font-medium text-warm-dark mb-2">Budget Tier</label>
+              <label htmlFor="budget-tier" className="block text-sm font-medium text-warm-dark mb-2">Budget Tier (Optional)</label>
               <select id="budget-tier" className="input-field" value={budgetTier} onChange={(e) => setBudgetTier(e.target.value)}>
                 <option value="">Select budget range</option>
                 <option value="Budget (₹2k-5k/day)">Budget (₹2k-5k/day)</option>
