@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { saveToken, removeToken } from '../services/storage';
+import { saveToken, saveRefreshToken, removeToken } from '../services/storage';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../hooks/useAuth';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -13,6 +13,7 @@ const OAuthCallback = () => {
 
   useEffect(() => {
     const token = searchParams.get('token');
+    const refreshToken = searchParams.get('refreshToken');
     const errorParam = searchParams.get('error');
 
     if (errorParam) {
@@ -29,6 +30,9 @@ const OAuthCallback = () => {
       const decoded = jwtDecode(token);
       if (decoded.exp * 1000 > Date.now()) {
         saveToken(token);
+        if (refreshToken) {
+          saveRefreshToken(refreshToken);
+        }
         setUser({
           id: decoded.id,
           username: decoded.sub,

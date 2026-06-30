@@ -3,7 +3,8 @@ import { useAuth } from "../hooks/useAuth";
 import { useNavigate, Link } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
-const BACKEND_URL = API_URL.replace('/api', '');
+// Derive the backend origin from the API URL (strip trailing /api if present)
+const BACKEND_URL = API_URL.endsWith('/api') ? API_URL.slice(0, -4) : API_URL;
 
 const SignIn = () => {
   const [username, setUsername] = useState("");

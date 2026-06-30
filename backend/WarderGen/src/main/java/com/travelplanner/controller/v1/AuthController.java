@@ -102,10 +102,11 @@ public class AuthController {
                     // Rotate refresh token
                     RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(requestRefreshToken);
                     
-                    // Generate new access token
+                    // Generate new access token - build a UserDetailsImpl from the user
                     User user = refreshToken.getUser();
+                    UserDetailsImpl userDetails = UserDetailsImpl.build(user);
                     Authentication authentication = new UsernamePasswordAuthenticationToken(
-                            user.getUsername(), null, null);
+                            userDetails, null, userDetails.getAuthorities());
                     String newAccessToken = jwtUtils.generateJwtToken(authentication);
                     
                     logger.info("Token refresh successful for user: {}", user.getId());

@@ -27,17 +27,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
         logger.info("Attempting to load user with identifier: {}", identifier);
         
-        User user = null;
-        
         // First try to find by username (including deleted users for security)
-        if (userRepository.findByUsername(identifier).isPresent()) {
-            user = userRepository.findByUsername(identifier).get();
+        User user = userRepository.findByUsername(identifier)
+                .orElse(null);
+        
+        if (user != null) {
             logger.info("User found by username: {} with id: {}", user.getUsername(), user.getId());
-        } 
-        // If not found by username, try to find by email
-        else if (userRepository.findByEmail(identifier).isPresent()) {
-            user = userRepository.findByEmail(identifier).get();
-            logger.info("User found by email: {} with id: {}", user.getEmail(), user.getId());
+        } else {
+            // If not found by username, try to find by email
+            user = userRepository.findByEmail(identifier)
+                    .orElse(null);
+            if (user != null) {
+                logger.info("User found by email: {} with id: {}", user.getEmail(), user.getId());
+            }
         }
         
         // If user not found by either username or email

@@ -1,6 +1,7 @@
 package com.travelplanner.security.oauth2;
 
 import com.travelplanner.security.jwt.JwtUtils;
+import com.travelplanner.security.services.RefreshTokenService;
 import com.travelplanner.security.services.UserDetailsImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Autowired
     private JwtUtils jwtUtils;
 
-    @Value("${app.frontend.url:http://localhost:3000}")
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
     @Override
@@ -35,10 +39,24 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         
         String token = jwtUtils.generateJwtToken(authentication);
         
+        // Create a refresh token for the OAuth user as well
+        String refreshToken = "";
+        try {
+            refreshToken = refreshTokenService.createRefreshToken(userDetails.getId()).getToken();
+        } catch (Exception e) {
+            logger.warn("Could not create refresh token for OAuth user: {}", e.getMessage());
+        }
+        
         logger.info("OAuth2 authentication successful for user: {}", userDetails.getUsername());
         
-        // Redirect to frontend with JWT token
-        String redirectUrl = String.format("%s/oauth2/callback?token=%s", frontendUrl, token);
+        // Redirect to frontend with JWT token and refresh token (if available)
+        String redirectUrl;
+        if (!refreshToken.isEmpty()) {
+            redirectUrl = String.format("%s/oauth2/callback?token=%s&refreshToken=%s", 
+                    frontendUrl, token, refreshToken);
+        } else {
+            redirectUrl = String.format("%s/oauth2/callback?token=%s", frontendUrl, token);
+        }
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }
