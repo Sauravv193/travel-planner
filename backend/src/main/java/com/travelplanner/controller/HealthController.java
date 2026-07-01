@@ -61,6 +61,7 @@ public class HealthController {
             envInfo.put("JWT_SECRET_SET", System.getenv("JWT_SECRET") != null ? "YES" : "NO");
             envInfo.put("GEMINI_API_KEY_SET", System.getenv("GEMINI_API_KEY") != null ? "YES" : "NO");
             envInfo.put("PORT", System.getenv("PORT"));
+            envInfo.put("BUILD", "2026-07-01-fdca330");
             response.put("environment", envInfo);
             
             return ResponseEntity.ok(response);
