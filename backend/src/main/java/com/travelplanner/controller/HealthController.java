@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.travelplanner.service.GeminiService;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.time.LocalDateTime;
@@ -19,6 +20,9 @@ public class HealthController {
 
     @Autowired(required = false)
     private DataSource dataSource;
+
+    @Autowired(required = false)
+    private GeminiService geminiService;
 
     @Value("${spring.profiles.active:default}")
     private String activeProfile;
@@ -81,5 +85,23 @@ public class HealthController {
         response.put("service", "Travel Planner Backend");
         response.put("timestamp", LocalDateTime.now().toString());
         return ResponseEntity.ok(response);
+    }
+
+    // Test Gemini API connectivity - lists available models
+    @GetMapping("/test-gemini")
+    public ResponseEntity<Map<String, Object>> testGemini() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (geminiService == null) {
+                response.put("error", "GeminiService not injected");
+                return ResponseEntity.ok(response);
+            }
+            String modelsRaw = geminiService.listModels();
+            response.put("raw_response", modelsRaw);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.ok(response);
+        }
     }
 }
