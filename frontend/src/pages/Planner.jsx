@@ -135,8 +135,19 @@ const Planner = () => {
       }
 
     } catch (err) {
-      if (err.response && err.response.status >= 500) {
-        setError('The AI service seems to be overloaded. Please wait a moment and try again.');
+      const status = err.response?.status;
+      const backendMessage = err.response?.data?.message;
+
+      if (status === 400) {
+        setError(backendMessage || 'Invalid trip details. Please check your inputs and try again.');
+      } else if (status === 401 || status === 403) {
+        setError('Your session has expired. Please sign in again.');
+      } else if (status === 429) {
+        setError('Too many requests. Please wait a moment and try again.');
+      } else if (status === 500 && backendMessage) {
+        setError(backendMessage);
+      } else if (status >= 500) {
+        setError('Something went wrong on the server. Please try again in a moment.');
       } else {
         setError(err.message || 'Sorry, something went wrong while planning your trip. Please try again.');
       }
