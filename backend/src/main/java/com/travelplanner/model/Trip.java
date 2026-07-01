@@ -53,7 +53,6 @@ public class Trip {
     @Column(name = "accommodation_style")
     private String accommodationStyle;
     
-    @Pattern(regexp = "BUDGET|STANDARD|LUXURY", message = "Budget tier must be BUDGET, STANDARD, or LUXURY")
     @Column(name = "budget_tier")
     private String budgetTier;
     
