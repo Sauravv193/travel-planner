@@ -122,7 +122,6 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/health").permitAll()
                                 .requestMatchers("/api/status").permitAll()
                                 .requestMatchers("/api/test").permitAll()
-                                .requestMatchers("/api/migrate").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/api/debug/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
