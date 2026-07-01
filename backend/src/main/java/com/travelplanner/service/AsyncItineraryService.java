@@ -132,8 +132,18 @@ public class AsyncItineraryService {
         }
 
         job.setRetryCount(attempt);
-        String errorDetail = lastException != null ? (lastException.getClass().getSimpleName() + ": " + lastException.toString()) : "Unknown";
-        throw new RuntimeException("Failed to generate itinerary after " + MAX_RETRIES + " attempts. Error: " + errorDetail, lastException);
+        // Capture stack trace from lastException for diagnosis
+        String errorDetail = "Unknown";
+        if (lastException != null) {
+            java.io.StringWriter sw = new java.io.StringWriter();
+            java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+            lastException.printStackTrace(pw);
+            pw.flush();
+            String fullTrace = sw.toString();
+            // First 2000 chars of stack trace
+            errorDetail = lastException.getClass().getName() + ": " + lastException.getMessage() + " | STACK: " + fullTrace.substring(0, Math.min(fullTrace.length(), 2000));
+        }
+        throw new RuntimeException("Failed to generate itinerary after " + MAX_RETRIES + " attempts. Full error: " + errorDetail, lastException);
     }
 
     /**
