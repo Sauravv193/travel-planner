@@ -1,5 +1,6 @@
 package com.travelplanner.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import java.util.Date;
 
@@ -10,9 +11,11 @@ public class TripRequest {
     private String destination;
     
     @NotNull(message = "Start date is required")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date startDate;
     
     @NotNull(message = "End date is required")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
     
     @DecimalMin(value = "0.0", inclusive = false, message = "Budget must be greater than 0")
