@@ -34,7 +34,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://travel-planner-backend.onrender.com/api' }}
+          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://travel-planner-backend-qaym.onrender.com/api' }}
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
