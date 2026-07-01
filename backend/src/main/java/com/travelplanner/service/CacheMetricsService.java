@@ -114,11 +114,12 @@ public class CacheMetricsService {
     public void logMetrics() {
         logger.info("=== Cache Metrics ===");
         getAllMetrics().forEach((cacheName, metrics) -> {
-            logger.info("Cache: {} | Hits: {} | Misses: {} | Hit Ratio: {:.2f}% | Size: {}",
+            String hitRatioStr = String.format("%.2f%%", metrics.getHitRatio() * 100);
+            logger.info("Cache: {} | Hits: {} | Misses: {} | Hit Ratio: {} | Size: {}",
                 cacheName,
                 metrics.getHits(),
                 metrics.getMisses(),
-                metrics.getHitRatio() * 100,
+                hitRatioStr,
                 metrics.getSize()
             );
         });
