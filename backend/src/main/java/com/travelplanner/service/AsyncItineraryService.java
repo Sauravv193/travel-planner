@@ -132,10 +132,8 @@ public class AsyncItineraryService {
         }
 
         job.setRetryCount(attempt);
-        String causeMsg = lastException != null && lastException.getCause() != null 
-            ? lastException.getCause().getMessage() 
-            : (lastException != null ? lastException.getMessage() : "Unknown");
-        throw new RuntimeException("Failed to generate itinerary after " + MAX_RETRIES + " attempts. Last error: " + causeMsg, lastException);
+        String errorDetail = lastException != null ? (lastException.getClass().getSimpleName() + ": " + lastException.toString()) : "Unknown";
+        throw new RuntimeException("Failed to generate itinerary after " + MAX_RETRIES + " attempts. Error: " + errorDetail, lastException);
     }
 
     /**
