@@ -28,8 +28,7 @@ public class TripRequest {
     @Size(max = 50, message = "Accommodation style must not exceed 50 characters")
     private String accommodationStyle;
     
-    // Free-text field — stored as-is in DB. Frontend sends values like "Budget (₹2k-5k/day)",
-    // so no restrictive pattern is enforced here.
+    @Pattern(regexp = "|BUDGET|STANDARD|PREMIUM|LUXURY", message = "Budget tier must be BUDGET, STANDARD, PREMIUM, or LUXURY")
     private String budgetTier;
     
     @Size(max = 50, message = "Travel style must not exceed 50 characters")

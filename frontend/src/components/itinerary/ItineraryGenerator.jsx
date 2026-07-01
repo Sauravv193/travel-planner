@@ -135,10 +135,10 @@ const ItineraryGenerator = ({ onGenerate }) => {
               <label htmlFor="budget-tier" className="block text-sm font-medium text-warm-dark mb-2">Budget Tier (Optional)</label>
               <select id="budget-tier" className="input-field" value={budgetTier} onChange={(e) => setBudgetTier(e.target.value)}>
                 <option value="">Select budget range</option>
-                <option value="Budget (₹2k-5k/day)">Budget (₹2k-5k/day)</option>
-                <option value="Standard (₹10k-20k/day)">Standard (₹10k-20k/day)</option>
-                <option value="Premium (₹20k-50k/day)">Premium (₹20k-50k/day)</option>
-                <option value="Luxury (₹50k+/day)">Luxury (₹50k+/day)</option>
+                <option value="BUDGET">Budget (₹2k-5k/day)</option>
+                <option value="STANDARD">Standard (₹10k-20k/day)</option>
+                <option value="PREMIUM">Premium (₹20k-50k/day)</option>
+                <option value="LUXURY">Luxury (₹50k+/day)</option>
               </select>
             </div>
             <div>
