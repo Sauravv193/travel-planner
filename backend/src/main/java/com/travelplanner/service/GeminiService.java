@@ -57,11 +57,12 @@ public class GeminiService {
         try {
             return restTemplate.postForObject(apiUrl, entity, String.class);
         } catch (HttpClientErrorException e) {
-            logger.error("Error from Gemini API: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw new RuntimeException("Failed to call AI service due to a client error.", e);
+            String body = e.getResponseBodyAsString();
+            logger.error("Error from Gemini API: {} - {}", e.getStatusCode(), body);
+            throw new RuntimeException("Gemini API error (" + e.getStatusCode() + "): " + body, e);
         } catch (Exception e) {
             logger.error("An unexpected error occurred while calling the Gemini API", e);
-            throw new RuntimeException("An unexpected error occurred with the AI service.", e);
+            throw new RuntimeException("Gemini API unexpected error: " + e.getMessage(), e);
         }
     }
 
