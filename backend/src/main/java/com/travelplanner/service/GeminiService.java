@@ -3,16 +3,14 @@ package com.travelplanner.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Service
@@ -26,83 +24,154 @@ public class GeminiService {
     private static final String GEMINI_GENERATE_URL =
             "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=";
 
-    // URL to list available models (can be removed later)
     private static final String GEMINI_LIST_MODELS_URL =
             "https://generativelanguage.googleapis.com/v1/models?key=";
 
 
     public String callGemini(String prompt) {
         if (geminiApiKey == null || geminiApiKey.isEmpty() || "YOUR_API_KEY".equals(geminiApiKey)) {
-            logger.error("Gemini API key is not configured. Please set 'gemini.api.key' in your application.properties.");
+            logger.error("Gemini API key is not configured.");
             throw new RuntimeException("AI service is not configured.");
         }
 
-        RestTemplate restTemplate = new RestTemplate();
         String apiUrl = GEMINI_GENERATE_URL + geminiApiKey;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        Map<String, Object> textPart = new HashMap<>();
-        textPart.put("text", prompt);
-
-        Map<String, Object> content = new HashMap<>();
-        content.put("parts", Collections.singletonList(textPart));
-
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("contents", Collections.singletonList(content));
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+        // Build request body as JSON string directly
+        String jsonBody = "{\"contents\":[{\"parts\":[{\"text\":" + jsonEscape(prompt) + "}]}]}";
 
         try {
-            return restTemplate.postForObject(apiUrl, entity, String.class);
-        } catch (HttpClientErrorException e) {
-            String body = e.getResponseBodyAsString();
-            logger.error("Error from Gemini API: {} - {}", e.getStatusCode(), body);
-            throw new RuntimeException("Gemini API error (" + e.getStatusCode() + "): " + body, e);
+            URI uri = new URI(apiUrl);
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(30000);
+            conn.setReadTimeout(60000);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int status = conn.getResponseCode();
+            logger.info("Gemini API responded with status: {}", status);
+
+            // Read response body
+            StringBuilder response = new StringBuilder();
+            String line;
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(
+                            status >= 400 ? conn.getErrorStream() : conn.getInputStream(),
+                            StandardCharsets.UTF_8))) {
+                while ((line = br.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+
+            if (status >= 400) {
+                String errorBody = response.toString();
+                logger.error("Gemini API error {}: {}", status, errorBody);
+                throw new RuntimeException("Gemini API error (" + status + "): " + errorBody);
+            }
+
+            return response.toString();
+
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            logger.error("An unexpected error occurred while calling the Gemini API", e);
-            throw new RuntimeException("Gemini API unexpected error: " + e.getMessage(), e);
+            logger.error("Error calling Gemini API", e);
+            throw new RuntimeException("Gemini API call failed: " + e.getClass().getSimpleName() + " - " + e.getMessage(), e);
         }
     }
 
     public String callGeminiWithImages(Map<String, Object> requestBody) {
+        String requestBodyJson;
+        try {
+            requestBodyJson = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(requestBody);
+        } catch (Exception e) {
+            logger.error("Failed to serialize request body", e);
+            throw new RuntimeException("Failed to serialize request body: " + e.getMessage(), e);
+        }
         if (geminiApiKey == null || geminiApiKey.isEmpty() || "YOUR_API_KEY".equals(geminiApiKey)) {
-            logger.error("Gemini API key is not configured. Please set 'gemini.api.key' in your application.properties.");
+            logger.error("Gemini API key is not configured.");
             throw new RuntimeException("AI service is not configured.");
         }
 
-        RestTemplate restTemplate = new RestTemplate();
         String apiUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + geminiApiKey;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("User-Agent", "Travel-Planner/1.0");
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-
         try {
-            return restTemplate.postForObject(apiUrl, entity, String.class);
-        } catch (HttpClientErrorException e) {
-            logger.error("Error from Gemini API: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw new RuntimeException("Failed to generate journal: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
+            URI uri = new URI(apiUrl);
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(30000);
+            conn.setReadTimeout(60000);
+
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = requestBodyJson.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int status = conn.getResponseCode();
+
+            StringBuilder response = new StringBuilder();
+            String line;
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(
+                            status >= 400 ? conn.getErrorStream() : conn.getInputStream(),
+                            StandardCharsets.UTF_8))) {
+                while ((line = br.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+
+            if (status >= 400) {
+                String errorBody = response.toString();
+                logger.error("Gemini API error {}: {}", status, errorBody);
+                throw new RuntimeException("Gemini API error (" + status + "): " + errorBody);
+            }
+
+            return response.toString();
+
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            logger.error("An unexpected error occurred while calling the Gemini API for journal generation", e);
-            throw new RuntimeException("An unexpected error occurred with the AI service.", e);
+            logger.error("Error calling Gemini API for journal", e);
+            throw new RuntimeException("Gemini API journal call failed: " + e.getClass().getSimpleName() + " - " + e.getMessage(), e);
         }
     }
 
-    /**
-     * This method calls the Gemini API to get a list of all available models.
-     */
     public String listModels() {
-        RestTemplate restTemplate = new RestTemplate();
         String apiUrl = GEMINI_LIST_MODELS_URL + geminiApiKey;
         try {
-            return restTemplate.getForObject(apiUrl, String.class);
+            URI uri = new URI(apiUrl);
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(10000);
+
+            StringBuilder response = new StringBuilder();
+            String line;
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
+                while ((line = br.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+            return response.toString();
         } catch (Exception e) {
-            logger.error("An unexpected error occurred while listing the Gemini models", e);
+            logger.error("Error listing Gemini models", e);
             return "{\"error\": \"Failed to retrieve models.\"}";
         }
+    }
+
+    private String jsonEscape(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 }
