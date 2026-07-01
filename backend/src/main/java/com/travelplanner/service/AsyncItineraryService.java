@@ -56,7 +56,7 @@ public class AsyncItineraryService {
      * @param userId The user ID for authorization
      */
     @Async("taskExecutor")
-    @Transactional
+    // @Transactional removed to prevent DB connection exhaustion during long AI calls
     public void generateItineraryAsync(String jobId, Long tripId, Long userId) {
         logger.info("Starting async itinerary generation for job: {}, trip: {}, user: {}", jobId, tripId, userId);
 
@@ -140,7 +140,7 @@ public class AsyncItineraryService {
      * Adapt itinerary asynchronously
      */
     @Async("taskExecutor")
-    @Transactional
+    // @Transactional removed to prevent DB connection exhaustion during long AI calls
     public void adaptItineraryAsync(String jobId, Long tripId, Long userId, String context) {
         logger.info("Starting async itinerary adaptation for job: {}, trip: {}, user: {}", jobId, tripId, userId);
 

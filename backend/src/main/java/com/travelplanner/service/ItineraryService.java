@@ -31,7 +31,7 @@ public class ItineraryService {
     @Autowired
     private PromptBuilderService promptBuilderService;
 
-    @Cacheable(value = "itineraries", key = "#tripId", unless = "#result == null")
+    // @Cacheable removed to allow regeneration - caching prevents new AI calls for same tripId
     public Itinerary generateItinerary(Long tripId, Long userId) {
         Trip trip = tripRepository.findById(tripId)
                 .filter(t -> t.getUser().getId().equals(userId))
@@ -100,18 +100,24 @@ public class ItineraryService {
     }
 
     private String extractJson(String aiResponse) {
-        Pattern pattern = Pattern.compile("```json\\s*(\\{.*\\})\\s*```", Pattern.DOTALL);
+        Pattern pattern = Pattern.compile("```json\\s*([\\s\\S]*?)\\s*```");
         Matcher matcher = pattern.matcher(aiResponse);
 
         if (matcher.find()) {
             return matcher.group(1).trim();
         }
 
+        // Fallback: Find the first { or [ and the last } or ]
         int firstBrace = aiResponse.indexOf('{');
         int lastBrace = aiResponse.lastIndexOf('}');
+        int firstBracket = aiResponse.indexOf('[');
+        int lastBracket = aiResponse.lastIndexOf(']');
 
-        if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
-            return aiResponse.substring(firstBrace, lastBrace + 1).trim();
+        int start = firstBrace != -1 && (firstBracket == -1 || firstBrace < firstBracket) ? firstBrace : firstBracket;
+        int end = lastBrace != -1 && (lastBracket == -1 || lastBrace > lastBracket) ? lastBrace : lastBracket;
+
+        if (start != -1 && end != -1 && end > start) {
+            return aiResponse.substring(start, end + 1).trim();
         }
 
         throw new RuntimeException("No valid JSON found in the AI response.");
