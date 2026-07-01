@@ -49,7 +49,8 @@ public class RedisConfig {
     private static final long POPULAR_TTL = Duration.ofMinutes(30).toMillis();
 
     @Bean
-    public RedisCacheConfiguration cacheConfiguration(ObjectMapper objectMapper) {
+    public RedisCacheConfiguration cacheConfiguration() {
+        ObjectMapper objectMapper = redisObjectMapper();
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofHours(1)) // Default TTL
                 .disableCachingNullValues() // Don't cache nulls to save memory
@@ -91,15 +92,19 @@ public class RedisConfig {
     }
 
     /**
-     * ObjectMapper for JSON serialization
-     * Configured to handle Java 8 time types and polymorphic types
+     * Creates an ObjectMapper for Redis JSON serialization.
+     * <p>
+     * NOT a @Bean — this mapper is used exclusively for Redis caching and must not
+     * leak into global Jackson configuration. If registered as a &#064;Bean, its
+     * activateDefaultTyping(NON_FINAL) pollutes HTTP request/response handling,
+     * forcing every JSON object to include a &#064;class type identifier, which
+     * breaks deserialization of plain DTOs like LoginRequest.
      */
-    @Bean
-    public ObjectMapper redisObjectMapper() {
+    private ObjectMapper redisObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         
-        // Configure for polymorphic type handling
+        // Configure for polymorphic type handling (Redis cache needs type info)
         mapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.NON_FINAL,
