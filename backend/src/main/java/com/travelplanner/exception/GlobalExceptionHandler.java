@@ -164,14 +164,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, WebRequest request) {
         
-        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);
-        
-        ErrorResponse errorResponse = new ErrorResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Internal Server Error",
-            "An unexpected error occurred. Please try again later.",
-            request.getDescription(false).replace("uri=", "")
-        );
+        logger.error("Unexpected error occurred: {}", ex.getMessage(), ex);            String errorMsg = ex.getMessage() != null ? ex.getMessage() : "Unknown error";
+            logger.error("FULL STACK TRACE for 500:", ex);
+            
+            ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Internal Server Error",
+                errorMsg,
+                request.getDescription(false).replace("uri=", "")
+            );
         
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
