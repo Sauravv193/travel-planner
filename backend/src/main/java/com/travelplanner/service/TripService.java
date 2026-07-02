@@ -92,6 +92,7 @@ public class TripService {
         return tripOpt;
     }
 
+    @Transactional
     @Caching(evict = {
         @CacheEvict(value = "trips", key = "#tripId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),

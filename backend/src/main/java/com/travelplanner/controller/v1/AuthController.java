@@ -103,7 +103,8 @@ public class AuthController {
                     RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(requestRefreshToken);
                     
                     // Generate new access token - build a UserDetailsImpl from the user
-                    User user = refreshToken.getUser();
+                    // Use newRefreshToken.getUser() (loaded inside @Transactional) instead of refreshToken.getUser() (lazy proxy)
+                    User user = newRefreshToken.getUser();
                     UserDetailsImpl userDetails = UserDetailsImpl.build(user);
                     Authentication authentication = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
