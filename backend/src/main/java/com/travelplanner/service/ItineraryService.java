@@ -11,7 +11,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,7 +95,7 @@ public class ItineraryService {
         if (date == null) {
             return null;
         }
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return new java.sql.Date(date.getTime()).toLocalDate();
     }
 
     private String extractJson(String aiResponse) {
