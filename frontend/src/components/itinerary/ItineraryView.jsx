@@ -9,9 +9,36 @@ const ItineraryView = ({ itinerary }) => {
     if (!itinerary) return null;
     let processed = itinerary
     if (itinerary.itinerary && Array.isArray(itinerary.itinerary)) {
-      processed = { title: 'Your Travel Itinerary', description: itinerary.trip_summary || 'Explore amazing destinations with this personalized plan.', totalDays: itinerary.itinerary.length, days: itinerary.itinerary, budgetBreakdown: itinerary.overall_budget_breakdown, essentialTips: itinerary.essential_travel_tips || [] }
+      // Map backend field names (from AI prompt) to frontend expectations
+      const mappedDays = itinerary.itinerary.map(day => ({
+        ...day,
+        title: day.title || day.theme || `Day`,
+        overview: day.overview || day.daily_overview || '',
+        activities: (day.activities || []).map(act => ({
+          ...act,
+          location: act.location || act.location_address || '',
+          tips: act.tips || (act.practical_tips ? [
+            act.practical_tips.transport_tip,
+            act.practical_tips.cultural_etiquette
+          ].filter(Boolean) : [])
+        }))
+      }))
+      processed = { title: 'Your Travel Itinerary', description: itinerary.trip_summary || 'Explore amazing destinations with this personalized plan.', totalDays: mappedDays.length, days: mappedDays, budgetBreakdown: itinerary.overall_budget_breakdown, essentialTips: itinerary.essential_travel_tips || [] }
     } else if (itinerary.days && Array.isArray(itinerary.days)) {
-      processed = { ...itinerary, days: itinerary.days, essentialTips: itinerary.essential_travel_tips || [] }
+      const mappedDays = itinerary.days.map(day => ({
+        ...day,
+        title: day.title || day.theme || `Day`,
+        overview: day.overview || day.daily_overview || '',
+        activities: (day.activities || []).map(act => ({
+          ...act,
+          location: act.location || act.location_address || '',
+          tips: act.tips || (act.practical_tips ? [
+            act.practical_tips.transport_tip,
+            act.practical_tips.cultural_etiquette
+          ].filter(Boolean) : [])
+        }))
+      }))
+      processed = { ...itinerary, days: mappedDays, essentialTips: itinerary.essential_travel_tips || [] }
     } else if (Array.isArray(itinerary)) {
       processed = { title: 'Your Travel Itinerary', description: 'Explore amazing destinations with this personalized plan.', totalDays: itinerary.length, days: itinerary, essentialTips: [] }
     }

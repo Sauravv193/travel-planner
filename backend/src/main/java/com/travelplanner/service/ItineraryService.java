@@ -99,6 +99,32 @@ public class ItineraryService {
     }
 
     private String extractJson(String aiResponse) {
+        // First, try to extract from Gemini API response envelope
+        // Gemini returns: {"candidates":[{"content":{"parts":[{"text":"{...itinerary...}"}]}}]}
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            com.fasterxml.jackson.databind.JsonNode root = mapper.readTree(aiResponse);
+            
+            // Navigate to candidates[0].content.parts[0].text
+            com.fasterxml.jackson.databind.JsonNode candidates = root.get("candidates");
+            if (candidates != null && candidates.isArray() && candidates.size() > 0) {
+                com.fasterxml.jackson.databind.JsonNode parts = candidates.get(0)
+                    .get("content").get("parts");
+                if (parts != null && parts.isArray() && parts.size() > 0) {
+                    com.fasterxml.jackson.databind.JsonNode textNode = parts.get(0).get("text");
+                    if (textNode != null && textNode.isTextual()) {
+                        String text = textNode.asText();
+                        // The text itself is a JSON string, clean it up
+                        return text.trim();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Not a Gemini envelope response; fall through to legacy parsing
+            logger.debug("Response is not a Gemini envelope, using legacy extraction: {}", e.getMessage());
+        }
+
+        // Legacy fallback: Try markdown code block first
         Pattern pattern = Pattern.compile("```json\\s*([\\s\\S]*?)\\s*```");
         Matcher matcher = pattern.matcher(aiResponse);
 

@@ -12,16 +12,37 @@ const DayCard = memo(({ day, dayNumber, isTimelineView = false }) => {
     return () => setAnimatedActivities([])
   }, [day])
 
-  if (!day) {
+  // Map backend field names to frontend expectations
+  const normalizedDay = day ? {
+    ...day,
+    title: day.title || day.theme || `Day ${dayNumber}`,
+    overview: day.overview || day.daily_overview || '',
+    activities: (day.activities || []).map(act => ({
+      title: act.title || (act.time_of_day ? act.time_of_day.split('(')[0].trim() : 'Activity'),
+      time: act.time || act.time_of_day || '',
+      time_of_day: act.time_of_day || act.time || '',
+      description: act.description || '',
+      location: act.location || act.location_address || '',
+      estimated_cost: act.estimated_cost || '',
+      booking_info: act.booking_info || '',
+      travel_details: act.travel_details || '',
+      tips: act.tips || (act.practical_tips ? [
+        act.practical_tips.transport_tip,
+        act.practical_tips.cultural_etiquette
+      ].filter(Boolean) : [])
+    }))
+  } : null
+
+  if (!normalizedDay) {
     return (<div className="text-center py-10 animate-pulse"><div className="w-16 h-16 bg-cream-200 dark:bg-night-border rounded-full mx-auto mb-4"></div><p className="text-cream-500">No activities planned.</p></div>)
   }
 
   if (isTimelineView) {
     return (
       <div className="transform transition-all duration-500">
-        {day.activities && day.activities.length > 0 ? (
+        {normalizedDay.activities && normalizedDay.activities.length > 0 ? (
           <div className="space-y-6">
-            {day.activities.map((activity, index) => (
+            {normalizedDay.activities.map((activity, index) => (
               <div key={index} className={`flex items-start relative transform transition-all duration-500 ${animatedActivities.includes(index) ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`} style={{ transitionDelay: `${index * 100}ms` }}>
                 <div className="flex-shrink-0 mr-4 relative">
                   <div className="w-14 h-14 bg-gradient-to-br from-maroon-500 to-maroon-600 rounded-xl flex items-center justify-center text-white font-semibold text-xs shadow-md border-2 border-white dark:border-night-card">
@@ -31,7 +52,7 @@ const DayCard = memo(({ day, dayNumber, isTimelineView = false }) => {
                 <div className="bg-gradient-to-br from-cream-50/50 to-white/80 dark:from-night-surface/50 dark:to-night-card/80 backdrop-blur-sm p-5 rounded-xl border border-cream-100 dark:border-night-border hover:shadow-lg transition-all duration-300 flex-1">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h4 className="text-lg font-bold text-warm-dark dark:text-white leading-tight mb-1">{activity.title || 'Activity'}</h4>
+                      <h4 className="text-lg font-bold text-warm-dark dark:text-white leading-tight mb-1">{activity.title}</h4>
                       <p className="text-brown-600 dark:text-night-muted text-sm leading-relaxed">{activity.description}</p>
                     </div>
                     {activity.time_of_day && (
@@ -73,15 +94,15 @@ const DayCard = memo(({ day, dayNumber, isTimelineView = false }) => {
             <p className="text-cream-500 text-sm">No activities planned for this day.</p>
           </div>
         )}
-        {day.food_suggestions && (
+        {normalizedDay.food_suggestions && (
           <div className="mt-6 bg-gradient-to-br from-beige-50 to-cream-50 dark:from-beige-900/10 dark:to-beige-900/5 border border-beige-200 dark:border-beige-500/20 rounded-xl p-4">
             <h4 className="font-semibold text-beige-800 dark:text-beige-300 mb-3 flex items-center text-sm">
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h1a1 1 0 011 1v6.5a.5.5 0 01-.5.5H18V9.5A1.5 1.5 0 0016.5 8H17z" /></svg>
               Food Recommendations
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {day.food_suggestions.lunch && <div className="bg-white/80 dark:bg-night-surface/80 backdrop-blur-sm p-3 rounded-lg border border-beige-100 dark:border-beige-500/10"><h5 className="font-medium text-beige-800 text-xs mb-1">LUNCH</h5><p className="font-semibold text-beige-900 text-sm mb-1">{day.food_suggestions.lunch.recommendation}</p><p className="text-beige-700 text-xs">{day.food_suggestions.lunch.notes}</p></div>}
-              {day.food_suggestions.dinner && <div className="bg-white/80 dark:bg-night-surface/80 backdrop-blur-sm p-3 rounded-lg border border-beige-100 dark:border-beige-500/10"><h5 className="font-medium text-beige-800 text-xs mb-1">DINNER</h5><p className="font-semibold text-beige-900 text-sm mb-1">{day.food_suggestions.dinner.recommendation}</p><p className="text-beige-700 text-xs">{day.food_suggestions.dinner.notes}</p></div>}
+              {normalizedDay.food_suggestions.lunch && <div className="bg-white/80 dark:bg-night-surface/80 backdrop-blur-sm p-3 rounded-lg border border-beige-100 dark:border-beige-500/10"><h5 className="font-medium text-beige-800 text-xs mb-1">LUNCH</h5><p className="font-semibold text-beige-900 text-sm mb-1">{normalizedDay.food_suggestions.lunch.recommendation}</p><p className="text-beige-700 text-xs">{normalizedDay.food_suggestions.lunch.notes}</p></div>}
+              {normalizedDay.food_suggestions.dinner && <div className="bg-white/80 dark:bg-night-surface/80 backdrop-blur-sm p-3 rounded-lg border border-beige-100 dark:border-beige-500/10"><h5 className="font-medium text-beige-800 text-xs mb-1">DINNER</h5><p className="font-semibold text-beige-900 text-sm mb-1">{normalizedDay.food_suggestions.dinner.recommendation}</p><p className="text-beige-700 text-xs">{normalizedDay.food_suggestions.dinner.notes}</p></div>}
             </div>
           </div>
         )}
@@ -92,12 +113,12 @@ const DayCard = memo(({ day, dayNumber, isTimelineView = false }) => {
   return (
     <div className="transform transition-all duration-500">
       <div className="mb-8">
-        <h3 className="text-3xl font-bold text-warm-dark dark:text-white mb-2 tracking-tight">Day {dayNumber}: {day.title}</h3>
-        {day.overview && <p className="text-brown-600 text-lg leading-relaxed bg-cream-50/80 dark:bg-night-surface/80 backdrop-blur-sm p-4 rounded-lg border-l-4 border-maroon-500">{day.overview}</p>}
+        <h3 className="text-3xl font-bold text-warm-dark dark:text-white mb-2 tracking-tight">Day {dayNumber}: {normalizedDay.title}</h3>
+        {normalizedDay.overview && <p className="text-brown-600 text-lg leading-relaxed bg-cream-50/80 dark:bg-night-surface/80 backdrop-blur-sm p-4 rounded-lg border-l-4 border-maroon-500">{normalizedDay.overview}</p>}
       </div>
       <div className="space-y-8 relative">
         <div className="absolute left-8 top-0 bottom-0 w-1 bg-gradient-to-b from-maroon-500 to-maroon-600 rounded-full opacity-30"></div>
-        {day.activities && day.activities.map((activity, index) => (
+        {normalizedDay.activities && normalizedDay.activities.map((activity, index) => (
           <div key={index} className={`flex items-start relative transform transition-all duration-500 ${animatedActivities.includes(index) ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'}`} style={{ transitionDelay: `${index * 100}ms` }}>
             <div className="flex-shrink-0 mr-6 relative">
               <div className="h-16 w-16 bg-gradient-to-br from-maroon-500 to-maroon-600 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg z-10 border-4 border-white dark:border-night-card transform hover:scale-110 transition-transform">
