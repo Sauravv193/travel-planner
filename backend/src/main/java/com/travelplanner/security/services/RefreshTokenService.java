@@ -30,6 +30,7 @@ public class RefreshTokenService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }

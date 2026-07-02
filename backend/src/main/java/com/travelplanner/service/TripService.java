@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
@@ -71,7 +72,7 @@ public class TripService {
         return trips;
     }
 
-    @Cacheable(value = "trips", key = "#tripId", unless = "#result.isEmpty()")
+    @Cacheable(value = "trips", key = "#tripId")
     public Optional<Trip> getTripById(Long tripId, Long userId) {
         logger.info("Fetching trip with ID: {} for user ID: {}", tripId, userId);
         Optional<Trip> tripOpt = tripRepository.findByIdWithItinerary(tripId)
@@ -91,6 +92,7 @@ public class TripService {
         return tripOpt;
     }
 
+    @Transactional
     @Caching(evict = {
         @CacheEvict(value = "trips", key = "#tripId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),

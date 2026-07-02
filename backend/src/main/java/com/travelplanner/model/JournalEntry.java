@@ -27,6 +27,7 @@ public class JournalEntry {
     private Trip trip;
 
     @OneToMany(mappedBy = "journalEntry", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore
     private Set<Photo> photos = new HashSet<>();
 
     public JournalEntry() {
