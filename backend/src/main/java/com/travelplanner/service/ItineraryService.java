@@ -5,6 +5,8 @@ import com.travelplanner.model.Itinerary;
 import com.travelplanner.model.Trip;
 import com.travelplanner.repository.ItineraryRepository;
 import com.travelplanner.repository.TripRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +19,8 @@ import java.util.regex.Pattern;
 
 @Service
 public class ItineraryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ItineraryService.class);
 
     @Autowired
     private ItineraryRepository itineraryRepository;
