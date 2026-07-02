@@ -2,6 +2,8 @@ package com.travelplanner.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.boot.info.GitProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,12 @@ public class HealthController {
 
     @Value("${spring.profiles.active:default}")
     private String activeProfile;
+
+    @Autowired(required = false)
+    private GitProperties gitProperties;
+
+    @Autowired(required = false)
+    private BuildProperties buildProperties;
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
@@ -64,7 +72,15 @@ public class HealthController {
             envInfo.put("JWT_SECRET_SET", System.getenv("JWT_SECRET") != null ? "YES" : "NO");
             envInfo.put("GEMINI_API_KEY_SET", System.getenv("GEMINI_API_KEY") != null ? "YES" : "NO");
             envInfo.put("PORT", System.getenv("PORT"));
-            envInfo.put("BUILD", "2026-07-01-fdca330");
+            if (gitProperties != null) {
+                String commitId = gitProperties.getShortCommitId();
+                String commitTime = gitProperties.get("commit.time");
+                envInfo.put("BUILD", (commitTime != null ? commitTime.substring(0, 10) : "") + "-" + commitId);
+            } else if (buildProperties != null) {
+                envInfo.put("BUILD", buildProperties.getTime().toString().substring(0, 10) + "-local");
+            } else {
+                envInfo.put("BUILD", "dev-local");
+            }
             response.put("environment", envInfo);
             
             return ResponseEntity.ok(response);
