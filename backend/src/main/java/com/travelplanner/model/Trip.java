@@ -78,6 +78,7 @@ public class Trip {
     private Itinerary itinerary;
 
     @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonIgnore
     private Set<JournalEntry> journalEntries = new HashSet<>();
 
     // Audit fields

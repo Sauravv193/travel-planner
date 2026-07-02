@@ -165,7 +165,7 @@ class TripServiceTest {
         updatedDetails.setDietaryNeeds("Halal");
         updatedDetails.setMustTryFoods("Fish and Chips");
 
-        when(tripRepository.findById(1L)).thenReturn(Optional.of(testTrip));
+        when(tripRepository.findByIdWithItinerary(1L)).thenReturn(Optional.of(testTrip));
         when(tripRepository.save(any(Trip.class))).thenReturn(testTrip);
 
         Trip result = tripService.updateTrip(1L, updatedDetails, 1L);
@@ -180,7 +180,7 @@ class TripServiceTest {
 
     @Test
     void updateTrip_NotAuthorized_ThrowsException() {
-        when(tripRepository.findById(1L)).thenReturn(Optional.of(testTrip));
+        when(tripRepository.findByIdWithItinerary(1L)).thenReturn(Optional.of(testTrip));
 
         assertThrows(UnauthorizedException.class, () -> tripService.updateTrip(1L, testTrip, 999L));
         verify(tripRepository, never()).save(any(Trip.class));
@@ -188,7 +188,7 @@ class TripServiceTest {
 
     @Test
     void updateTrip_NotFound_ThrowsException() {
-        when(tripRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tripRepository.findByIdWithItinerary(1L)).thenReturn(Optional.empty());
 
         assertThrows(UnauthorizedException.class, () -> tripService.updateTrip(1L, testTrip, 1L));
         verify(tripRepository, never()).save(any(Trip.class));

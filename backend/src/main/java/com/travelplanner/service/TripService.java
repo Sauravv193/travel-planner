@@ -92,14 +92,13 @@ public class TripService {
         return tripOpt;
     }
 
-    @Transactional
     @Caching(evict = {
         @CacheEvict(value = "trips", key = "#tripId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),
         @CacheEvict(value = "popular", allEntries = true)
     })
     public Trip updateTrip(Long tripId, Trip tripDetails, Long userId) {
-        Trip trip = tripRepository.findById(tripId)
+        Trip trip = tripRepository.findByIdWithItinerary(tripId)
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new UnauthorizedException("You don't have permission to modify this trip"));
 
