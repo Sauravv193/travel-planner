@@ -1,7 +1,7 @@
 package com.travelplanner.service;
 
 import com.travelplanner.model.Conversation;
-import com.travelplanner.model.ConversationMessage;
+import com.travelplanner.model.ConversationMessage;\nimport com.travelplanner.exception.UnauthorizedException;\nimport com.travelplanner.repository.TripRepository;
 import com.travelplanner.repository.ConversationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class ConversationService {
      */
     @Transactional
     public Conversation createConversation(Long tripId, Long userId) {
-        String conversationId = UUID.randomUUID().toString();
+        tripRepository.findByIdWithItinerary(tripId)\n                .filter(trip -> trip.getUser().getId().equals(userId))\n                .orElseThrow(() -> new UnauthorizedException("You do not have access to this trip"));\n\n        String conversationId = UUID.randomUUID().toString();
         Conversation conversation = new Conversation(conversationId, tripId, userId);
         conversation = conversationRepository.save(conversation);
         
