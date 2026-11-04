@@ -2,7 +2,10 @@ package com.travelplanner.controller.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelplanner.model.Job;
+import com.travelplanner.model.Trip;
+import com.travelplanner.model.User;
 import com.travelplanner.repository.JobRepository;
+import com.travelplanner.repository.TripRepository;
 import com.travelplanner.security.services.UserDetailsImpl;
 import com.travelplanner.service.AsyncItineraryService;
 import com.travelplanner.service.ItineraryService;
@@ -38,6 +41,9 @@ class ItineraryControllerTest {
     @Mock
     private JobRepository jobRepository;
 
+    @Mock
+    private TripRepository tripRepository;
+
     @InjectMocks
     private ItineraryController itineraryController;
 
@@ -50,6 +56,13 @@ class ItineraryControllerTest {
     @BeforeEach
     void setUp() {
         userDetails = new UserDetailsImpl(1L, "testuser", "test@example.com", "password");
+        User owner = new User("testuser", "test@example.com", "password");
+        owner.setId(1L);
+        Trip ownedTrip = new Trip();
+        ownedTrip.setId(1L);
+        ownedTrip.setUser(owner);
+        lenient().when(tripRepository.findByIdWithItinerary(1L)).thenReturn(java.util.Optional.of(ownedTrip));
+
         mockMvc = MockMvcBuilders.standaloneSetup(itineraryController)
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver(userDetails))
                 .build();
@@ -130,8 +143,13 @@ class ItineraryControllerTest {
     }
 
     @Test
-    void generateItinerary_WithoutAuth_ReturnsInternalServerError() throws Exception {
+    void generateItinerary_RejectsTripNotOwnedByUser() throws Exception {
+        when(tripRepository.findByIdWithItinerary(1L)).thenReturn(java.util.Optional.empty());
+
         mockMvc.perform(post("/api/v1/itineraries/generate/1"))
-                .andExpect(status().isAccepted()); // With the resolver, it defaults to the userDetails
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(asyncItineraryService);
+        verify(jobRepository, never()).save(any(Job.class));
     }
 }
