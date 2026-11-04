@@ -4,140 +4,77 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.cache.RedisCache;
+import org.springframework.data.redis.cache.CacheStatistics;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Cache Metrics Service
- * 
- * Tracks cache performance metrics including:
- * - Cache hits and misses per cache
- * - Hit ratio calculation
- * - Periodic logging of metrics
- * 
- * This helps monitor the effectiveness of caching and identify
- * opportunities for optimization.
+ * Reports cache statistics captured by Spring Data Redis.
+ *
+ * Statistics are local to this application instance and are not a
+ * cluster-wide view. Redis does not expose cache entry counts through
+ * Spring's Cache abstraction, so size is reported as -1 (unknown).
  */
 @Service
 public class CacheMetricsService {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheMetricsService.class);
-    
+
     private final CacheManager cacheManager;
-    
-    // Track hits and misses per cache name
-    private final Map<String, AtomicLong> cacheHits = new ConcurrentHashMap<>();
-    private final Map<String, AtomicLong> cacheMisses = new ConcurrentHashMap<>();
 
     public CacheMetricsService(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
-        // Initialize counters for known caches
-        initializeCacheCounters();
     }
 
-    private void initializeCacheCounters() {
-        cacheManager.getCacheNames().forEach(cacheName -> {
-            cacheHits.put(cacheName, new AtomicLong(0));
-            cacheMisses.put(cacheName, new AtomicLong(0));
-        });
-    }
-
-    /**
-     * Record a cache hit
-     */
-    public void recordHit(String cacheName) {
-        cacheHits.computeIfAbsent(cacheName, k -> new AtomicLong(0)).incrementAndGet();
-    }
-
-    /**
-     * Record a cache miss
-     */
-    public void recordMiss(String cacheName) {
-        cacheMisses.computeIfAbsent(cacheName, k -> new AtomicLong(0)).incrementAndGet();
-    }
-
-    /**
-     * Get hit ratio for a specific cache
-     */
-    public double getHitRatio(String cacheName) {
-        AtomicLong hits = cacheHits.get(cacheName);
-        AtomicLong misses = cacheMisses.get(cacheName);
-        
-        if (hits == null || misses == null) {
-            return 0.0;
-        }
-        
-        long total = hits.get() + misses.get();
-        return total == 0 ? 0.0 : (double) hits.get() / total;
-    }
-
-    /**
-     * Get all cache metrics
-     */
     public Map<String, CacheMetrics> getAllMetrics() {
         Map<String, CacheMetrics> metrics = new HashMap<>();
-        
+
         cacheManager.getCacheNames().forEach(cacheName -> {
             Cache cache = cacheManager.getCache(cacheName);
-            CacheMetrics metric = new CacheMetrics(
-                cacheName,
-                cacheHits.getOrDefault(cacheName, new AtomicLong(0)).get(),
-                cacheMisses.getOrDefault(cacheName, new AtomicLong(0)).get(),
-                getHitRatio(cacheName),
-                cache != null ? getCacheSize(cache) : 0
-            );
-            metrics.put(cacheName, metric);
+            long hits = 0;
+            long misses = 0;
+
+            if (cache instanceof RedisCache) {
+                CacheStatistics statistics = ((RedisCache) cache).getStatistics();
+                hits = statistics.getHits();
+                misses = statistics.getMisses();
+            }
+
+            long total = hits + misses;
+            double hitRatio = total == 0 ? 0.0 : (double) hits / total;
+            metrics.put(cacheName, new CacheMetrics(cacheName, hits, misses, hitRatio, -1));
         });
-        
+
         return metrics;
     }
 
-    /**
-     * Get approximate cache size (number of entries)
-     */
-    private long getCacheSize(Cache cache) {
-        // Note: Redis doesn't provide direct size access through Spring Cache abstraction
-        // This would require native Redis commands or custom implementation
-        // For now, we return 0 as a placeholder
-        return 0;
-    }
-
-    /**
-     * Log cache metrics every 5 minutes
-     */
-    @Scheduled(fixedRate = 300000) // 5 minutes
+    @Scheduled(fixedRate = 300000)
     public void logMetrics() {
-        logger.info("=== Cache Metrics ===");
+        logger.info("=== Cache Metrics (instance-local) ===");
         getAllMetrics().forEach((cacheName, metrics) -> {
-            String hitRatioStr = String.format("%.2f%%", metrics.getHitRatio() * 100);
-            logger.info("Cache: {} | Hits: {} | Misses: {} | Hit Ratio: {} | Size: {}",
-                cacheName,
-                metrics.getHits(),
-                metrics.getMisses(),
-                hitRatioStr,
-                metrics.getSize()
-            );
+            logger.info("Cache: {} | Hits: {} | Misses: {} | Hit Ratio: {} | Size: unknown",
+                    cacheName,
+                    metrics.getHits(),
+                    metrics.getMisses(),
+                    String.format("%.2f%%", metrics.getHitRatio() * 100));
         });
-        logger.info("===================");
+        logger.info("======================================");
     }
 
-    /**
-     * Reset all metrics (useful for testing)
-     */
     public void resetMetrics() {
-        cacheHits.values().forEach(counter -> counter.set(0));
-        cacheMisses.values().forEach(counter -> counter.set(0));
-        logger.info("Cache metrics reset");
+        cacheManager.getCacheNames().forEach(cacheName -> {
+            Cache cache = cacheManager.getCache(cacheName);
+            if (cache instanceof RedisCache) {
+                ((RedisCache) cache).clearStatistics();
+            }
+        });
+        logger.info("Redis cache statistics reset");
     }
 
-    /**
-     * Cache metrics data class
-     */
     public static class CacheMetrics {
         private final String cacheName;
         private final long hits;
@@ -153,24 +90,14 @@ public class CacheMetricsService {
             this.size = size;
         }
 
-        public String getCacheName() {
-            return cacheName;
-        }
+        public String getCacheName() { return cacheName; }
+        public long getHits() { return hits; }
+        public long getMisses() { return misses; }
+        public double getHitRatio() { return hitRatio; }
 
-        public long getHits() {
-            return hits;
-        }
-
-        public long getMisses() {
-            return misses;
-        }
-
-        public double getHitRatio() {
-            return hitRatio;
-        }
-
-        public long getSize() {
-            return size;
-        }
+        /**
+         * Returns -1 when entry count is unavailable through Spring Cache.
+         */
+        public long getSize() { return size; }
     }
 }
