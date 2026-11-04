@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getTrips, deleteTrip } from '../services/api';
-import { useAuth } from '../hooks/useAuth';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import InspirationPhotoUpload from '../components/profile/InspirationPhotoUpload';
 import Dashboard from '../components/dashboard/Dashboard';
 
 const Profile = () => {
-  const { user } = useAuth();
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingTripId, setDeletingTripId] = useState(null);
