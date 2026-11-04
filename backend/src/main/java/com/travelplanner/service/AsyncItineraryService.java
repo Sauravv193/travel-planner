@@ -60,7 +60,7 @@ public class AsyncItineraryService {
     public void generateItineraryAsync(String jobId, Long tripId, Long userId) {
         logger.info("Starting async itinerary generation for job: {}, trip: {}, user: {}", jobId, tripId, userId);
 
-        Job job = jobRepository.findByJobId(jobId)
+        Job job = jobRepository.findByJobIdAndUserId(jobId, userId)
                 .orElseThrow(() -> new RuntimeException("Job not found: " + jobId));
 
         try {
