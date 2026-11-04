@@ -88,7 +88,7 @@ public class AsyncItineraryService {
             // Update job with failure
             job.setStatus(Job.JobStatus.FAILED);
             job.setCompletedAt(LocalDateTime.now());
-            job.setErrorMessage(e.getMessage());
+            job.setErrorMessage("Itinerary generation failed. Please try again later.");
             jobRepository.save(job);
         }
     }
@@ -176,7 +176,7 @@ public class AsyncItineraryService {
 
             job.setStatus(Job.JobStatus.FAILED);
             job.setCompletedAt(LocalDateTime.now());
-            job.setErrorMessage(e.getMessage());
+            job.setErrorMessage("Itinerary adaptation failed. Please try again later.");
             jobRepository.save(job);
         }
     }
