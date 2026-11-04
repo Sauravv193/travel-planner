@@ -50,7 +50,7 @@ class AsyncItineraryServiceTest {
 
     @Test
     void generateItineraryAsync_Success() {
-        when(jobRepository.findByJobId("job-123")).thenReturn(Optional.of(testJob));
+        when(jobRepository.findByJobIdAndUserId("job-123", 1L)).thenReturn(Optional.of(testJob));
         when(jobRepository.save(any(Job.class))).thenReturn(testJob);
 
         Itinerary mockItinerary = new Itinerary();
@@ -68,7 +68,7 @@ class AsyncItineraryServiceTest {
 
     @Test
     void generateItineraryAsync_JobNotFound() {
-        when(jobRepository.findByJobId("job-999")).thenReturn(Optional.empty());
+        when(jobRepository.findByJobIdAndUserId("job-999", 1L)).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
             asyncItineraryService.generateItineraryAsync("job-999", 1L, 1L);
@@ -77,7 +77,7 @@ class AsyncItineraryServiceTest {
 
     @Test
     void generateItineraryAsync_ItineraryServiceFails_UpdatesJobToFailed() {
-        when(jobRepository.findByJobId("job-123")).thenReturn(Optional.of(testJob));
+        when(jobRepository.findByJobIdAndUserId("job-123", 1L)).thenReturn(Optional.of(testJob));
         when(jobRepository.save(any(Job.class))).thenReturn(testJob);
 
         // Simulate failure after all retries
@@ -96,7 +96,7 @@ class AsyncItineraryServiceTest {
 
     @Test
     void generateItineraryAsync_TransientFailureThenSuccess() {
-        when(jobRepository.findByJobId("job-123")).thenReturn(Optional.of(testJob));
+        when(jobRepository.findByJobIdAndUserId("job-123", 1L)).thenReturn(Optional.of(testJob));
         when(jobRepository.save(any(Job.class))).thenReturn(testJob);
 
         // First call fails, second succeeds
@@ -114,7 +114,7 @@ class AsyncItineraryServiceTest {
 
     @Test
     void adaptItineraryAsync_Success() {
-        when(jobRepository.findByJobId("job-456")).thenReturn(Optional.of(testJob));
+        when(jobRepository.findByJobIdAndUserId("job-456", 1L)).thenReturn(Optional.of(testJob));
         when(jobRepository.save(any(Job.class))).thenReturn(testJob);
 
         Itinerary mockItinerary = new Itinerary();
@@ -129,7 +129,7 @@ class AsyncItineraryServiceTest {
 
     @Test
     void adaptItineraryAsync_Failure_UpdatesJobToFailed() {
-        when(jobRepository.findByJobId("job-456")).thenReturn(Optional.of(testJob));
+        when(jobRepository.findByJobIdAndUserId("job-456", 1L)).thenReturn(Optional.of(testJob));
         when(jobRepository.save(any(Job.class))).thenReturn(testJob);
 
         when(itineraryService.adaptItinerary(1L, 1L, "test")).thenThrow(new RuntimeException("Adaptation failed"));
