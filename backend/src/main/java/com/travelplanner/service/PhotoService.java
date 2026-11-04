@@ -141,7 +141,7 @@ public class PhotoService {
     private String safeOriginalName(String originalName) {
         if (originalName == null || originalName.isBlank()) return "photo";
         // Treat both slash styles as separators regardless of the host OS.
-        String portableName = originalName.replace('\\\\', '/');
+        String portableName = originalName.replace('\\', '/');
         String name = portableName.substring(portableName.lastIndexOf('/') + 1)
                 .replaceAll("[\\r\\n\\p{Cntrl}]", "");
         if (name.isBlank()) return "photo";
