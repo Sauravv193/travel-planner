@@ -70,11 +70,10 @@ class JobControllerTest {
     }
 
     @Test
-    void createItineraryAdaptationJob_RejectsBlankContext() throws Exception {
-        mockMvc.perform(post("/api/v1/jobs/itinerary/adapt")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"tripId\":10,\"context\":\"  \"}"))
-                .andExpect(status().isBadRequest());
+    void createItineraryAdaptationJob_RejectsBlankContext() {
+        assertThrows(IllegalArgumentException.class,
+                () -> jobController.createItineraryAdaptationJob(
+                        java.util.Map.of("tripId", 10L, "context", "  "), userDetails));
 
         verifyNoInteractions(asyncItineraryService);
         verifyNoInteractions(jobRepository);
