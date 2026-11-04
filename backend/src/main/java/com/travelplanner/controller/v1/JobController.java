@@ -7,6 +7,7 @@ import com.travelplanner.repository.JobRepository;
 import com.travelplanner.repository.TripRepository;
 import com.travelplanner.security.services.UserDetailsImpl;
 import com.travelplanner.service.AsyncItineraryService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -94,6 +95,9 @@ public class JobController {
                 .orElse(null);
         if (job == null) {
             return ResponseEntity.notFound().build();
+        }
+        if (job.getStatus() == Job.JobStatus.PENDING || job.getStatus() == Job.JobStatus.PROCESSING) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         jobRepository.delete(job);
         return ResponseEntity.noContent().build();
