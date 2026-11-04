@@ -77,13 +77,6 @@ const Planner = () => {
     });
   }, []);
 
-  // Prevent state updates after unmount
-  const safeSetState = useCallback((setter, value) => {
-    if (isMountedRef.current) {
-      setter(value);
-    }
-  }, []);
-
   const handleGenerate = async (planDetails) => {
     setIsGenerating(true);
     setError('');
