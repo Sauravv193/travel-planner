@@ -73,10 +73,10 @@ public class ConversationController {
      * Response: { "conversationId": "...", "messages": [...] }
      */
     @GetMapping("/{conversationId}")
-    public ResponseEntity<ConversationResponse> getConversation(@PathVariable String conversationId) {
+    public ResponseEntity<ConversationResponse> getConversation(@PathVariable String conversationId,\n            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         logger.info("Fetching conversation: {}", conversationId);
         
-        Conversation conversation = conversationService.getConversation(conversationId);
+        Conversation conversation = conversationService.getConversation(conversationId, userDetails.getId());
         
         ConversationResponse response = new ConversationResponse(
             conversation.getConversationId(),
@@ -98,10 +98,10 @@ public class ConversationController {
      * GET /api/v1/conversations/trip/{tripId}
      */
     @GetMapping("/trip/{tripId}")
-    public ResponseEntity<List<ConversationResponse>> getConversationsForTrip(@PathVariable Long tripId) {
+    public ResponseEntity<List<ConversationResponse>> getConversationsForTrip(@PathVariable Long tripId,\n            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         logger.info("Fetching conversations for trip: {}", tripId);
         
-        List<Conversation> conversations = conversationService.getConversationsForTrip(tripId);
+        List<Conversation> conversations = conversationService.getConversationsForTrip(tripId, userDetails.getId());
         
         List<ConversationResponse> response = conversations.stream()
             .map(conv -> new ConversationResponse(
@@ -129,12 +129,12 @@ public class ConversationController {
     @PostMapping("/{conversationId}/message")
     public ResponseEntity<Map<String, Object>> sendMessage(
             @PathVariable String conversationId,
-            @RequestBody Map<String, String> request) {
+            @RequestBody Map<String, String> request,\n            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         
         String content = request.get("content");
         logger.info("Adding message to conversation: {}", conversationId);
         
-        ConversationMessage message = conversationService.addUserMessage(conversationId, content);
+        ConversationMessage message = conversationService.addUserMessage(conversationId, userDetails.getId(), content);
         
         Map<String, Object> response = new HashMap<>();
         response.put("messageId", message.getId());
@@ -152,10 +152,10 @@ public class ConversationController {
      * DELETE /api/v1/conversations/{conversationId}
      */
     @DeleteMapping("/{conversationId}")
-    public ResponseEntity<Void> deleteConversation(@PathVariable String conversationId) {
+    public ResponseEntity<Void> deleteConversation(@PathVariable String conversationId,\n            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         logger.info("Deleting conversation: {}", conversationId);
         
-        conversationService.deleteConversation(conversationId);
+        conversationService.deleteConversation(conversationId, userDetails.getId());
         
         return ResponseEntity.noContent().build();
     }
