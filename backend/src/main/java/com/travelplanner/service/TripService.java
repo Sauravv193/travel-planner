@@ -37,6 +37,10 @@ public class TripService {
         this.userRepository = userRepository;
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
+    })
     public Trip createTrip(Trip trip, Long userId) {
         logger.info("Creating trip for user ID: {}", userId);
         logger.info("Trip details - Destination: {}, Start: {}, End: {}, Budget: {}", 
@@ -96,7 +100,8 @@ public class TripService {
     @Caching(evict = {
         @CacheEvict(value = "trips", key = "#tripId + ':' + #userId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),
-        @CacheEvict(value = "popular", allEntries = true)
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
     })
     public Trip updateTrip(Long tripId, Trip tripDetails, Long userId) {
         Trip trip = tripRepository.findByIdWithItinerary(tripId)
