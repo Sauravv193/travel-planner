@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +35,8 @@ public class ItineraryService {
     @Autowired
     private PromptBuilderService promptBuilderService;
 
-    // @Cacheable removed to allow regeneration - caching prevents new AI calls for same tripId
+    // Regeneration remains enabled; evict the trip snapshot after a successful write.
+    @CacheEvict(value = "trips", key = "#tripId + ':' + #userId")
     public Itinerary generateItinerary(Long tripId, Long userId) {
         Trip trip = tripRepository.findById(tripId)
                 .filter(t -> t.getUser().getId().equals(userId))
@@ -76,7 +78,10 @@ public class ItineraryService {
         return savedItinerary;
     }
 
-    @CacheEvict(value = "itineraries", key = "#tripId")
+    @Caching(evict = {
+        @CacheEvict(value = "itineraries", key = "#tripId"),
+        @CacheEvict(value = "trips", key = "#tripId + ':' + #userId")
+    })
     public Itinerary adaptItinerary(Long tripId, Long userId, String context) {
         Trip trip = tripRepository.findById(tripId)
                 .filter(t -> t.getUser().getId().equals(userId))
