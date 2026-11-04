@@ -1,123 +1,35 @@
 package com.travelplanner.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.info.BuildProperties;
-import org.springframework.boot.info.GitProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.travelplanner.service.GeminiService;
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.time.Instant;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 public class HealthController {
 
-    @Autowired(required = false)
-    private DataSource dataSource;
-
-    @Autowired(required = false)
-    private GeminiService geminiService;
-
-    @Value("${spring.profiles.active:default}")
-    private String activeProfile;
-
-    @Autowired(required = false)
-    private GitProperties gitProperties;
-
-    @Autowired(required = false)
-    private BuildProperties buildProperties;
-
+    /**
+     * Minimal public liveness endpoint. Do not expose environment variables,
+     * infrastructure metadata, exception messages, or stack traces here.
+     */
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
-        try {
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "UP");
-            response.put("timestamp", LocalDateTime.now().toString());
-            response.put("service", "Travel Planner Backend");
-            response.put("version", "1.0.0");
-            response.put("profile", activeProfile);
-            
-            // Database health check
-            Map<String, String> dbHealth = new HashMap<>();
-            if (dataSource != null) {
-                try (Connection connection = dataSource.getConnection()) {
-                    if (connection.isValid(5)) {
-                        dbHealth.put("status", "UP");
-                        dbHealth.put("database", connection.getMetaData().getDatabaseProductName());
-                    } else {
-                        dbHealth.put("status", "DOWN");
-                        dbHealth.put("error", "Connection validation failed");
-                    }
-                } catch (Exception dbEx) {
-                    dbHealth.put("status", "DOWN");
-                    dbHealth.put("error", dbEx.getMessage());
-                }
-            } else {
-                dbHealth.put("status", "NOT_CONFIGURED");
-                dbHealth.put("error", "DataSource not available");
-            }
-            response.put("database", dbHealth);
-            
-            // Environment info
-            Map<String, String> envInfo = new HashMap<>();
-            envInfo.put("DATABASE_URL_SET", System.getenv("DATABASE_URL") != null ? "YES" : "NO");
-            envInfo.put("JWT_SECRET_SET", System.getenv("JWT_SECRET") != null ? "YES" : "NO");
-            envInfo.put("GEMINI_API_KEY_SET", System.getenv("GEMINI_API_KEY") != null ? "YES" : "NO");
-            envInfo.put("PORT", System.getenv("PORT"));
-            if (gitProperties != null) {
-                String commitId = gitProperties.getShortCommitId();
-                String commitTime = gitProperties.get("commit.time");
-                envInfo.put("BUILD", (commitTime != null ? commitTime.substring(0, 10) : "") + "-" + commitId);
-            } else if (buildProperties != null) {
-                envInfo.put("BUILD", buildProperties.getTime().toString().substring(0, 10) + "-local");
-            } else {
-                envInfo.put("BUILD", "dev-local");
-            }
-            response.put("environment", envInfo);
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("status", "ERROR");
-            errorResponse.put("error", e.getMessage());
-            errorResponse.put("stackTrace", e.getStackTrace());
-            return ResponseEntity.status(500).body(errorResponse);
-        }
+        return ResponseEntity.ok(Map.of(
+            "status", "UP",
+            "service", "Travel Planner Backend",
+            "timestamp", Instant.now().toString()
+        ));
     }
 
-    // Simple diagnostic endpoint
     @GetMapping("/status")
     public ResponseEntity<Map<String, String>> status() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "OK");
-        response.put("service", "Travel Planner Backend");
-        response.put("timestamp", LocalDateTime.now().toString());
-        return ResponseEntity.ok(response);
-    }
-
-    // Test Gemini API connectivity - lists available models
-    @GetMapping("/test-gemini")
-    public ResponseEntity<Map<String, Object>> testGemini() {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            if (geminiService == null) {
-                response.put("error", "GeminiService not injected");
-                return ResponseEntity.ok(response);
-            }
-            String modelsRaw = geminiService.listModels();
-            response.put("raw_response", modelsRaw);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("error", e.getMessage());
-            return ResponseEntity.ok(response);
-        }
+        return ResponseEntity.ok(Map.of(
+            "status", "OK",
+            "service", "Travel Planner Backend"
+        ));
     }
 }
