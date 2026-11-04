@@ -73,26 +73,41 @@ public class PhotoService {
             extensions.add(extensionFor(detectedType));
         }
 
-        for (int i = 0; i < files.length; i++) {
-            MultipartFile file = files[i];
-            String uniqueFilename = UUID.randomUUID() + extensions.get(i);
-            Path filePath = uploadPath.resolve(uniqueFilename).normalize();
-            if (!filePath.startsWith(uploadPath)) {
-                throw new IllegalArgumentException("Invalid upload path.");
-            }
+        List<Path> createdFiles = new ArrayList<>();
+        try {
+            for (int i = 0; i < files.length; i++) {
+                MultipartFile file = files[i];
+                String uniqueFilename = UUID.randomUUID() + extensions.get(i);
+                Path filePath = uploadPath.resolve(uniqueFilename).normalize();
+                if (!filePath.startsWith(uploadPath)) {
+                    throw new IllegalArgumentException("Invalid upload path.");
+                }
 
-            Files.write(filePath, contents.get(i), StandardOpenOption.CREATE_NEW);
-            Photo photo = new Photo();
-            photo.setTrip(trip);
-            photo.setOriginalName(safeOriginalName(file.getOriginalFilename()));
-            photo.setFileName(uniqueFilename);
-            photo.setFilePath(filePath.toString());
-            photo.setFileSize((long) contents.get(i).length);
-            photo.setMimeType(mimeTypes.get(i));
-            photo.setUploadTime(LocalDateTime.now());
-            uploadedPhotos.add(photoRepository.save(photo));
+                Files.write(filePath, contents.get(i), StandardOpenOption.CREATE_NEW);
+                createdFiles.add(filePath);
+
+                Photo photo = new Photo();
+                photo.setTrip(trip);
+                photo.setOriginalName(safeOriginalName(file.getOriginalFilename()));
+                photo.setFileName(uniqueFilename);
+                photo.setFilePath(filePath.toString());
+                photo.setFileSize((long) contents.get(i).length);
+                photo.setMimeType(mimeTypes.get(i));
+                photo.setUploadTime(LocalDateTime.now());
+                uploadedPhotos.add(photoRepository.save(photo));
+            }
+            return uploadedPhotos;
+        } catch (IOException | RuntimeException e) {
+            // A database failure after writing one or more files must not leave orphaned uploads.
+            for (Path createdFile : createdFiles) {
+                try {
+                    Files.deleteIfExists(createdFile);
+                } catch (IOException cleanupException) {
+                    e.addSuppressed(cleanupException);
+                }
+            }
+            throw e;
         }
-        return uploadedPhotos;
     }
 
     private String detectImageType(byte[] bytes) {
@@ -124,7 +139,11 @@ public class PhotoService {
 
     private String safeOriginalName(String originalName) {
         if (originalName == null || originalName.isBlank()) return "photo";
-        String name = Paths.get(originalName).getFileName().toString().replaceAll("[\\r\\n\\p{Cntrl}]", "");
+        // Treat both slash styles as separators regardless of the host OS.
+        String portableName = originalName.replace('\\\\', '/');
+        String name = portableName.substring(portableName.lastIndexOf('/') + 1)
+                .replaceAll("[\\r\\n\\p{Cntrl}]", "");
+        if (name.isBlank()) return "photo";
         return name.length() > 150 ? name.substring(0, 150) : name;
     }
 
