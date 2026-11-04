@@ -31,6 +31,8 @@ public class PhotoController {
         try {
             List<Photo> uploadedPhotos = photoService.uploadPhotos(tripId, files, userDetails.getId());
             return ResponseEntity.ok(uploadedPhotos);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
