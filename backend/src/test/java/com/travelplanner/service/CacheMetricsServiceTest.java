@@ -33,12 +33,12 @@ class CacheMetricsServiceTest {
     void setUp() {
         when(cacheManager.getCacheNames()).thenReturn(Set.of("trips"));
         when(cacheManager.getCache("trips")).thenReturn(redisCache);
-        when(redisCache.getStatistics()).thenReturn(statistics);
         service = new CacheMetricsService(cacheManager);
     }
 
     @Test
     void reportsActualRedisHitAndMissCounts() {
+        when(redisCache.getStatistics()).thenReturn(statistics);
         when(statistics.getHits()).thenReturn(8L);
         when(statistics.getMisses()).thenReturn(2L);
 
@@ -51,6 +51,7 @@ class CacheMetricsServiceTest {
 
     @Test
     void reportsUnknownSizeInsteadOfInventingAnEntryCount() {
+        when(redisCache.getStatistics()).thenReturn(statistics);
         CacheMetricsService.CacheMetrics metrics = service.getAllMetrics().get("trips");
 
         assertEquals(-1L, metrics.getSize());
@@ -65,6 +66,7 @@ class CacheMetricsServiceTest {
 
     @Test
     void returnsZeroRatioWhenThereAreNoCacheRequests() {
+        when(redisCache.getStatistics()).thenReturn(statistics);
         when(statistics.getHits()).thenReturn(0L);
         when(statistics.getMisses()).thenReturn(0L);
 
