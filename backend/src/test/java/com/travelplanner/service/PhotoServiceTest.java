@@ -83,7 +83,7 @@ class PhotoServiceTest {
     }
 
     @Test
-    void uploadPhotosRejectsMimeTypeThatDoesNotMatchSignature() {
+    void uploadPhotosRejectsMimeTypeThatDoesNotMatchSignature() throws Exception {
         MockMultipartFile mislabeled = new MockMultipartFile(
                 "files", "photo.jpg", "image/jpeg", png("photo.png").getBytes());
 
