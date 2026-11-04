@@ -83,8 +83,9 @@ public class PhotoService {
                     throw new IllegalArgumentException("Invalid upload path.");
                 }
 
-                Files.write(filePath, contents.get(i), StandardOpenOption.CREATE_NEW);
+                Files.createFile(filePath);
                 createdFiles.add(filePath);
+                Files.write(filePath, contents.get(i), StandardOpenOption.WRITE);
 
                 Photo photo = new Photo();
                 photo.setTrip(trip);
