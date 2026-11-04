@@ -88,6 +88,7 @@ public class RedisConfig {
                 .withCacheConfiguration("destinations", destinationConfig)
                 .withCacheConfiguration("popular", popularConfig)
                 .transactionAware() // Ensures cache operations participate in transactions
+                .enableStatistics() // Collect per-instance hit/miss statistics for monitoring
                 .build();
     }
 
