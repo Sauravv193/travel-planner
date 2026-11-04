@@ -126,7 +126,8 @@ public class TripService {
     @Caching(evict = {
         @CacheEvict(value = "trips", key = "#tripId + ':' + #userId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),
-        @CacheEvict(value = "popular", allEntries = true)
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
     })
     public void deleteTrip(Long tripId, Long userId) {
         Trip trip = tripRepository.findById(tripId)
