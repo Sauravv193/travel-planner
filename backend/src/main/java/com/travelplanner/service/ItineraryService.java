@@ -90,9 +90,16 @@ public class ItineraryService {
         String cleanJsonResponse = extractJson(aiResponse);
 
         Itinerary itinerary = trip.getItinerary();
+        if (itinerary == null) {
+            itinerary = new Itinerary();
+            itinerary.setTrip(trip);
+            trip.setItinerary(itinerary);
+        }
         itinerary.setContent(cleanJsonResponse);
 
-        return itineraryRepository.save(itinerary);
+        Itinerary savedItinerary = itineraryRepository.save(itinerary);
+        tripRepository.save(trip);
+        return savedItinerary;
     }
 
     private LocalDate convertToLocalDate(Date date) {
