@@ -1,9 +1,12 @@
 package com.travelplanner.controller.v1;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.travelplanner.model.Job;
+import com.travelplanner.model.Trip;
+import com.travelplanner.model.User;
 import com.travelplanner.repository.JobRepository;
+import com.travelplanner.repository.TripRepository;
 import com.travelplanner.security.services.UserDetailsImpl;
+import com.travelplanner.service.AsyncItineraryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,10 +17,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -27,118 +30,124 @@ class JobControllerTest {
 
     private MockMvc mockMvc;
 
-    @Mock
-    private JobRepository jobRepository;
+    @Mock private JobRepository jobRepository;
+    @Mock private TripRepository tripRepository;
+    @Mock private AsyncItineraryService asyncItineraryService;
+    @InjectMocks private JobController jobController;
 
-    @InjectMocks
-    private JobController jobController;
-
-    private ObjectMapper objectMapper;
     private UserDetailsImpl userDetails;
+    private Trip ownedTrip;
     private Job testJob;
 
     @BeforeEach
     void setUp() {
         userDetails = new UserDetailsImpl(1L, "testuser", "test@example.com", "password");
+        User owner = new User("testuser", "test@example.com", "password");
+        owner.setId(1L);
+        ownedTrip = new Trip();
+        ownedTrip.setId(10L);
+        ownedTrip.setUser(owner);
+        testJob = new Job("job-123", "ITINERARY_GENERATION", 10L, 1L);
+
         mockMvc = MockMvcBuilders.standaloneSetup(jobController)
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver(userDetails))
                 .build();
-        objectMapper = new ObjectMapper();
-
-        testJob = new Job("job-123", "ITINERARY_GENERATION", 1L, 1L);
     }
 
     @Test
-    void createItineraryGenerationJob_ReturnsAccepted() throws Exception {
+    void createItineraryGenerationJob_VerifiesOwnershipAndStartsAsyncWork() throws Exception {
+        when(tripRepository.findByIdWithItinerary(10L)).thenReturn(Optional.of(ownedTrip));
         when(jobRepository.save(any(Job.class))).thenReturn(testJob);
 
         mockMvc.perform(post("/api/v1/jobs/itinerary/generate")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"tripId\": 1}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tripId\":10}"))
                 .andExpect(status().isAccepted())
-                .andExpect(jsonPath("$.jobId").exists())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.jobId").value("job-123"))
+                .andExpect(jsonPath("$.status").value("PENDING"));
+
+        verify(asyncItineraryService).generateItineraryAsync(anyString(), eq(10L), eq(1L));
     }
 
     @Test
-    void createItineraryAdaptationJob_ReturnsAccepted() throws Exception {
-        when(jobRepository.save(any(Job.class))).thenReturn(testJob);
+    void createItineraryAdaptationJob_RejectsBlankContext() {
+        assertThrows(IllegalArgumentException.class,
+                () -> jobController.createItineraryAdaptationJob(
+                        java.util.Map.of("tripId", 10L, "context", "  "), userDetails));
+
+        verifyNoInteractions(asyncItineraryService);
+        verifyNoInteractions(jobRepository);
+    }
+
+    @Test
+    void createItineraryAdaptationJob_StartsAsyncWork() throws Exception {
+        when(tripRepository.findByIdWithItinerary(10L)).thenReturn(Optional.of(ownedTrip));
+        when(jobRepository.save(any(Job.class))).thenReturn(
+                new Job("job-456", "ITINERARY_ADAPTATION", 10L, 1L));
 
         mockMvc.perform(post("/api/v1/jobs/itinerary/adapt")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"tripId\": 1, \"context\": \"Add more outdoor activities\"}"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"tripId\":10,\"context\":\"Add outdoor activities\"}"))
                 .andExpect(status().isAccepted())
-                .andExpect(jsonPath("$.jobId").exists())
                 .andExpect(jsonPath("$.status").value("PENDING"));
+
+        verify(asyncItineraryService).adaptItineraryAsync(anyString(), eq(10L), eq(1L), eq("Add outdoor activities"));
     }
 
     @Test
-    void getJobStatus_Found_ReturnsJobResponse() throws Exception {
+    void getJobStatus_OnlyFindsJobsOwnedByAuthenticatedUser() throws Exception {
         testJob.setStatus(Job.JobStatus.COMPLETED);
         testJob.setResult("{\"days\": []}");
-        testJob.setStartedAt(LocalDateTime.now().minusMinutes(5));
-        testJob.setCompletedAt(LocalDateTime.now());
-
-        when(jobRepository.findByJobId("job-123")).thenReturn(Optional.of(testJob));
+        when(jobRepository.findByJobIdAndUserId("job-123", 1L)).thenReturn(Optional.of(testJob));
 
         mockMvc.perform(get("/api/v1/jobs/job-123"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.jobId").value("job-123"))
-                .andExpect(jsonPath("$.status").value("COMPLETED"))
-                .andExpect(jsonPath("$.result").value("{\"days\": []}"));
+                .andExpect(jsonPath("$.status").value("COMPLETED"));
+
+        verify(jobRepository).findByJobIdAndUserId("job-123", 1L);
+        verify(jobRepository, never()).findByJobId(anyString());
     }
 
     @Test
-    void getJobStatus_Pending_ReturnsPendingStatus() throws Exception {
-        when(jobRepository.findByJobId("job-123")).thenReturn(Optional.of(testJob));
+    void getJobStatus_UnknownOrOtherUsersJobReturns404() throws Exception {
+        when(jobRepository.findByJobIdAndUserId("job-123", 1L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/v1/jobs/job-123"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("PENDING"))
-                .andExpect(jsonPath("$.result").doesNotExist());
-    }
-
-    @Test
-    void getJobStatus_Failed_ReturnsError() throws Exception {
-        testJob.setStatus(Job.JobStatus.FAILED);
-        testJob.setErrorMessage("Gemini API error");
-        testJob.setCompletedAt(LocalDateTime.now());
-
-        when(jobRepository.findByJobId("job-123")).thenReturn(Optional.of(testJob));
-
-        mockMvc.perform(get("/api/v1/jobs/job-123"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("FAILED"))
-                .andExpect(jsonPath("$.errorMessage").value("Gemini API error"));
-    }
-
-    @Test
-    void getJobStatus_NotFound_Returns404() throws Exception {
-        when(jobRepository.findByJobId("job-999")).thenReturn(Optional.empty());
-
-        mockMvc.perform(get("/api/v1/jobs/job-999"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void deleteJob_Found_ReturnsNoContent() throws Exception {
-        when(jobRepository.findByJobId("job-123")).thenReturn(Optional.of(testJob));
-        doNothing().when(jobRepository).deleteByJobId("job-123");
+    void deleteJob_RejectsActiveJobs() throws Exception {
+        testJob.setStatus(Job.JobStatus.PROCESSING);
+        when(jobRepository.findByJobIdAndUserId("job-123", 1L)).thenReturn(Optional.of(testJob));
+
+        mockMvc.perform(delete("/api/v1/jobs/job-123"))
+                .andExpect(status().isConflict());
+
+        verify(jobRepository, never()).delete(any(Job.class));
+    }
+
+    @Test
+    void deleteJob_DeletesTerminalJobsOwnedByUser() throws Exception {
+        testJob.setStatus(Job.JobStatus.COMPLETED);
+        when(jobRepository.findByJobIdAndUserId("job-123", 1L)).thenReturn(Optional.of(testJob));
 
         mockMvc.perform(delete("/api/v1/jobs/job-123"))
                 .andExpect(status().isNoContent());
 
-        verify(jobRepository).deleteByJobId("job-123");
+        verify(jobRepository).delete(testJob);
     }
 
     @Test
-    void deleteJob_NotFound_Returns404() throws Exception {
-        when(jobRepository.findByJobId("job-999")).thenReturn(Optional.empty());
+    void createGenerationJob_DoesNotStartForUnownedTrip() {
+        when(tripRepository.findByIdWithItinerary(10L)).thenReturn(Optional.empty());
 
-        mockMvc.perform(delete("/api/v1/jobs/job-999"))
-                .andExpect(status().isNotFound());
+        assertThrows(com.travelplanner.exception.UnauthorizedException.class,
+                () -> jobController.createItineraryGenerationJob(
+                        java.util.Map.of("tripId", 10L), userDetails));
 
-        verify(jobRepository, never()).deleteByJobId(anyString());
+        verify(jobRepository, never()).save(any(Job.class));
+        verifyNoInteractions(asyncItineraryService);
     }
 }

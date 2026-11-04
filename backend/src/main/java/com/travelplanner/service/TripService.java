@@ -37,6 +37,10 @@ public class TripService {
         this.userRepository = userRepository;
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
+    })
     public Trip createTrip(Trip trip, Long userId) {
         logger.info("Creating trip for user ID: {}", userId);
         logger.info("Trip details - Destination: {}, Start: {}, End: {}, Budget: {}", 
@@ -72,7 +76,7 @@ public class TripService {
         return trips;
     }
 
-    @Cacheable(value = "trips", key = "#tripId")
+    @Cacheable(value = "trips", key = "#tripId + ':' + #userId")
     public Optional<Trip> getTripById(Long tripId, Long userId) {
         logger.info("Fetching trip with ID: {} for user ID: {}", tripId, userId);
         Optional<Trip> tripOpt = tripRepository.findByIdWithItinerary(tripId)
@@ -94,9 +98,10 @@ public class TripService {
 
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "trips", key = "#tripId"),
+        @CacheEvict(value = "trips", key = "#tripId + ':' + #userId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),
-        @CacheEvict(value = "popular", allEntries = true)
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
     })
     public Trip updateTrip(Long tripId, Trip tripDetails, Long userId) {
         Trip trip = tripRepository.findByIdWithItinerary(tripId)
@@ -119,9 +124,10 @@ public class TripService {
     }
 
     @Caching(evict = {
-        @CacheEvict(value = "trips", key = "#tripId"),
+        @CacheEvict(value = "trips", key = "#tripId + ':' + #userId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),
-        @CacheEvict(value = "popular", allEntries = true)
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
     })
     public void deleteTrip(Long tripId, Long userId) {
         Trip trip = tripRepository.findById(tripId)
@@ -139,6 +145,12 @@ public class TripService {
     /**
      * Permanently delete a trip (admin only)
      */
+    @Caching(evict = {
+        @CacheEvict(value = "trips", allEntries = true),
+        @CacheEvict(value = "itineraries", key = "#tripId"),
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
+    })
     public void permanentDeleteTrip(Long tripId, Long userId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip", "id", tripId));
@@ -150,6 +162,12 @@ public class TripService {
     /**
      * Restore a soft-deleted trip
      */
+    @Caching(evict = {
+        @CacheEvict(value = "trips", key = "#tripId + ':' + #userId"),
+        @CacheEvict(value = "itineraries", key = "#tripId"),
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
+    })
     public void restoreTrip(Long tripId, Long userId) {
         Trip trip = tripRepository.findById(tripId)
                 .filter(t -> t.getUser().getId().equals(userId))

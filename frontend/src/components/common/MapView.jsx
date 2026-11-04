@@ -1,10 +1,6 @@
-import { useState } from 'react';
 import { MapPin, Navigation, ExternalLink } from 'lucide-react';
-import { useToast } from './Toast';
 
 const MapView = ({ locations = [], destination, center, className = '' }) => {
-  const toast = useToast();
-
   const defaultCenter = { lat: 20, lng: 0 };
   const mapCenter = center || defaultCenter;
 

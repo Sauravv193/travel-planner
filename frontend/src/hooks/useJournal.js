@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { getJournal, saveJournal, deleteJournal as deleteJournalAPI, getPhotosForTrip, uploadPhotos, deletePhoto, getPhotoUrl, generateJournal as generateJournalAPI } from '../services/api';
+import { getJournal, deleteJournal as deleteJournalAPI, getPhotosForTrip, uploadPhotos, deletePhoto, getPhotoUrl, generateJournal as generateJournalAPI } from '../services/api';
 
 // Removed fileToGenerativePart as journal generation now happens on backend
 

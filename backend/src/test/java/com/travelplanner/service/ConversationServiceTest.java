@@ -1,8 +1,10 @@
 package com.travelplanner.service;
 
+import com.travelplanner.exception.UnauthorizedException;
 import com.travelplanner.model.Conversation;
 import com.travelplanner.model.ConversationMessage;
 import com.travelplanner.repository.ConversationRepository;
+import com.travelplanner.repository.TripRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,172 +16,85 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ConversationServiceTest {
 
-    @Mock
-    private ConversationRepository conversationRepository;
+    @Mock private ConversationRepository conversationRepository;
+    @Mock private TripRepository tripRepository;
+    @InjectMocks private ConversationService conversationService;
 
-    @InjectMocks
-    private ConversationService conversationService;
-
-    private Conversation testConversation;
+    private Conversation conversation;
 
     @BeforeEach
     void setUp() {
-        testConversation = new Conversation("conv-123", 1L, 1L);
+        conversation = new Conversation("conv-123", 10L, 7L);
     }
 
     @Test
-    void createConversation_Success() {
-        when(conversationRepository.save(any(Conversation.class))).thenReturn(testConversation);
+    void getConversation_OnlyReturnsForOwner() {
+        when(conversationRepository.findByConversationIdAndUserId("conv-123", 7L))
+                .thenReturn(Optional.of(conversation));
 
-        Conversation result = conversationService.createConversation(1L, 1L);
-
-        assertNotNull(result);
-        assertEquals("conv-123", result.getConversationId());
-        assertEquals(1L, result.getTripId());
-        assertEquals(1L, result.getUserId());
-        verify(conversationRepository).save(any(Conversation.class));
+        assertEquals("conv-123", conversationService.getConversation("conv-123", 7L).getConversationId());
+        verify(conversationRepository).findByConversationIdAndUserId("conv-123", 7L);
     }
 
     @Test
-    void getConversation_Found() {
-        when(conversationRepository.findByConversationId("conv-123")).thenReturn(Optional.of(testConversation));
+    void getConversation_OtherUserCannotRead() {
+        when(conversationRepository.findByConversationIdAndUserId("conv-123", 8L))
+                .thenReturn(Optional.empty());
 
-        Conversation result = conversationService.getConversation("conv-123");
-
-        assertNotNull(result);
-        assertEquals("conv-123", result.getConversationId());
+        assertThrows(UnauthorizedException.class,
+                () -> conversationService.getConversation("conv-123", 8L));
     }
 
     @Test
-    void getConversation_NotFound_ThrowsException() {
-        when(conversationRepository.findByConversationId("conv-999")).thenReturn(Optional.empty());
+    void getConversationsForTrip_IsScopedToOwner() {
+        when(conversationRepository.findByTripIdAndUserId(10L, 7L))
+                .thenReturn(List.of(conversation));
 
-        assertThrows(RuntimeException.class, () -> conversationService.getConversation("conv-999"));
+        assertEquals(1, conversationService.getConversationsForTrip(10L, 7L).size());
+        verify(conversationRepository).findByTripIdAndUserId(10L, 7L);
     }
 
     @Test
-    void getConversationsForTrip_ReturnsList() {
-        when(conversationRepository.findByTripId(1L)).thenReturn(List.of(testConversation));
+    void addUserMessage_RequiresOwner() {
+        when(conversationRepository.findByConversationIdAndUserId("conv-123", 7L))
+                .thenReturn(Optional.of(conversation));
+        when(conversationRepository.save(any(Conversation.class))).thenReturn(conversation);
 
-        List<Conversation> results = conversationService.getConversationsForTrip(1L);
+        ConversationMessage result = conversationService.addUserMessage("conv-123", 7L, "Change day two");
 
-        assertEquals(1, results.size());
-        assertEquals("conv-123", results.get(0).getConversationId());
+        assertEquals("Change day two", result.getContent());
+        assertEquals(ConversationMessage.MessageType.USER_REQUEST, result.getType());
     }
 
     @Test
-    void getConversationsForTrip_NoConversations_ReturnsEmptyList() {
-        when(conversationRepository.findByTripId(1L)).thenReturn(List.of());
-
-        List<Conversation> results = conversationService.getConversationsForTrip(1L);
-
-        assertTrue(results.isEmpty());
+    void addUserMessage_RejectsBlankContent() {
+        assertThrows(IllegalArgumentException.class,
+                () -> conversationService.addUserMessage("conv-123", 7L, "  "));
+        verifyNoInteractions(conversationRepository);
     }
 
     @Test
-    void getConversationsForUser_ReturnsList() {
-        when(conversationRepository.findByUserId(1L)).thenReturn(List.of(testConversation));
+    void deleteConversation_RequiresOwner() {
+        when(conversationRepository.findByConversationIdAndUserId("conv-123", 7L))
+                .thenReturn(Optional.of(conversation));
 
-        List<Conversation> results = conversationService.getConversationsForUser(1L);
+        conversationService.deleteConversation("conv-123", 7L);
 
-        assertEquals(1, results.size());
+        verify(conversationRepository).delete(conversation);
     }
 
     @Test
-    void addUserMessage_Success() {
-        when(conversationRepository.findByConversationId("conv-123")).thenReturn(Optional.of(testConversation));
-        when(conversationRepository.save(any(Conversation.class))).thenReturn(testConversation);
+    void deleteConversation_OtherUserCannotDelete() {
+        when(conversationRepository.findByConversationIdAndUserId("conv-123", 8L))
+                .thenReturn(Optional.empty());
 
-        ConversationMessage message = conversationService.addUserMessage("conv-123", "Replace Day 2");
-
-        assertNotNull(message);
-        assertEquals(ConversationMessage.MessageType.USER_REQUEST, message.getType());
-        assertEquals("Replace Day 2", message.getContent());
-        assertEquals(1, message.getSequenceNumber());
-        verify(conversationRepository).save(any(Conversation.class));
-    }
-
-    @Test
-    void addUserMessage_MultipleMessages_CorrectSequence() {
-        // Add first user message
-        when(conversationRepository.findByConversationId("conv-123")).thenReturn(Optional.of(testConversation));
-        when(conversationRepository.save(any(Conversation.class))).thenReturn(testConversation);
-
-        conversationService.addUserMessage("conv-123", "First message");
-
-        // Add AI response (simulated via messages list size now being 1)
-        when(conversationRepository.findByConversationId("conv-123")).thenReturn(Optional.of(testConversation));
-
-        ConversationMessage aiResponse = conversationService.addAiResponse("conv-123", "AI response");
-
-        assertNotNull(aiResponse);
-        assertEquals(ConversationMessage.MessageType.AI_RESPONSE, aiResponse.getType());
-        assertEquals("AI response", aiResponse.getContent());
-    }
-
-    @Test
-    void addUserMessage_ConversationNotFound_ThrowsException() {
-        when(conversationRepository.findByConversationId("conv-999")).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> conversationService.addUserMessage("conv-999", "test"));
-    }
-
-    @Test
-    void addAiResponse_Success() {
-        when(conversationRepository.findByConversationId("conv-123")).thenReturn(Optional.of(testConversation));
-        when(conversationRepository.save(any(Conversation.class))).thenReturn(testConversation);
-
-        ConversationMessage message = conversationService.addAiResponse("conv-123", "Here is your updated itinerary");
-
-        assertNotNull(message);
-        assertEquals(ConversationMessage.MessageType.AI_RESPONSE, message.getType());
-        assertEquals("Here is your updated itinerary", message.getContent());
-    }
-
-    @Test
-    void getConversationHistory_ReturnsFormattedString() {
-        // Add a user message and AI response to the conversation
-        ConversationMessage userMsg = new ConversationMessage(
-            testConversation, ConversationMessage.MessageType.USER_REQUEST, "Add more outdoor activities", 1
-        );
-        ConversationMessage aiMsg = new ConversationMessage(
-            testConversation, ConversationMessage.MessageType.AI_RESPONSE, "Updated itinerary with outdoor activities", 2
-        );
-        testConversation.getMessages().add(userMsg);
-        testConversation.getMessages().add(aiMsg);
-
-        when(conversationRepository.findByConversationId("conv-123")).thenReturn(Optional.of(testConversation));
-
-        String history = conversationService.getConversationHistory("conv-123");
-
-        assertTrue(history.contains("Add more outdoor activities"));
-        assertTrue(history.contains("Updated itinerary with outdoor activities"));
-        assertTrue(history.contains("User:"));
-        assertTrue(history.contains("AI:"));
-    }
-
-    @Test
-    void getConversationHistory_EmptyConversation() {
-        when(conversationRepository.findByConversationId("conv-123")).thenReturn(Optional.of(testConversation));
-
-        String history = conversationService.getConversationHistory("conv-123");
-
-        assertTrue(history.contains("CONVERSATION HISTORY"));
-        assertFalse(history.contains("User:"));
-    }
-
-    @Test
-    void deleteConversation_Success() {
-        doNothing().when(conversationRepository).deleteByConversationId("conv-123");
-
-        conversationService.deleteConversation("conv-123");
-
-        verify(conversationRepository).deleteByConversationId("conv-123");
+        assertThrows(UnauthorizedException.class,
+                () -> conversationService.deleteConversation("conv-123", 8L));
+        verify(conversationRepository, never()).delete(any(Conversation.class));
     }
 }

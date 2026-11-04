@@ -60,7 +60,7 @@ public class AsyncItineraryService {
     public void generateItineraryAsync(String jobId, Long tripId, Long userId) {
         logger.info("Starting async itinerary generation for job: {}, trip: {}, user: {}", jobId, tripId, userId);
 
-        Job job = jobRepository.findByJobId(jobId)
+        Job job = jobRepository.findByJobIdAndUserId(jobId, userId)
                 .orElseThrow(() -> new RuntimeException("Job not found: " + jobId));
 
         try {
@@ -88,7 +88,7 @@ public class AsyncItineraryService {
             // Update job with failure
             job.setStatus(Job.JobStatus.FAILED);
             job.setCompletedAt(LocalDateTime.now());
-            job.setErrorMessage(e.getMessage());
+            job.setErrorMessage("Itinerary generation failed. Please try again later.");
             jobRepository.save(job);
         }
     }
@@ -132,18 +132,10 @@ public class AsyncItineraryService {
         }
 
         job.setRetryCount(attempt);
-        // Capture stack trace from lastException for diagnosis
-        String errorDetail = "Unknown";
-        if (lastException != null) {
-            java.io.StringWriter sw = new java.io.StringWriter();
-            java.io.PrintWriter pw = new java.io.PrintWriter(sw);
-            lastException.printStackTrace(pw);
-            pw.flush();
-            String fullTrace = sw.toString();
-            // First 2000 chars of stack trace
-            errorDetail = lastException.getClass().getName() + ": " + lastException.getMessage() + " | STACK: " + fullTrace.substring(0, Math.min(fullTrace.length(), 2000));
-        }
-        throw new RuntimeException("Failed to generate itinerary after " + MAX_RETRIES + " attempts. Full error: " + errorDetail, lastException);
+        // Keep diagnostic details in the exception cause and server logs, not in client-facing job data.
+        throw new RuntimeException(
+                "Failed to generate itinerary after " + MAX_RETRIES + " attempts.",
+                lastException);
     }
 
     /**
@@ -154,7 +146,7 @@ public class AsyncItineraryService {
     public void adaptItineraryAsync(String jobId, Long tripId, Long userId, String context) {
         logger.info("Starting async itinerary adaptation for job: {}, trip: {}, user: {}", jobId, tripId, userId);
 
-        Job job = jobRepository.findByJobId(jobId)
+        Job job = jobRepository.findByJobIdAndUserId(jobId, userId)
                 .orElseThrow(() -> new RuntimeException("Job not found: " + jobId));
 
         try {
@@ -176,7 +168,7 @@ public class AsyncItineraryService {
 
             job.setStatus(Job.JobStatus.FAILED);
             job.setCompletedAt(LocalDateTime.now());
-            job.setErrorMessage(e.getMessage());
+            job.setErrorMessage("Itinerary adaptation failed. Please try again later.");
             jobRepository.save(job);
         }
     }
