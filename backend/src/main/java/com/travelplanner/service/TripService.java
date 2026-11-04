@@ -119,7 +119,7 @@ public class TripService {
     }
 
     @Caching(evict = {
-        @CacheEvict(value = "trips", key = "#tripId"),
+        @CacheEvict(value = "trips", key = "#tripId + ':' + #userId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),
         @CacheEvict(value = "popular", allEntries = true)
     })
@@ -139,6 +139,12 @@ public class TripService {
     /**
      * Permanently delete a trip (admin only)
      */
+    @Caching(evict = {
+        @CacheEvict(value = "trips", allEntries = true),
+        @CacheEvict(value = "itineraries", key = "#tripId"),
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
+    })
     public void permanentDeleteTrip(Long tripId, Long userId) {
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new ResourceNotFoundException("Trip", "id", tripId));
@@ -150,6 +156,12 @@ public class TripService {
     /**
      * Restore a soft-deleted trip
      */
+    @Caching(evict = {
+        @CacheEvict(value = "trips", key = "#tripId + ':' + #userId"),
+        @CacheEvict(value = "itineraries", key = "#tripId"),
+        @CacheEvict(value = "popular", allEntries = true),
+        @CacheEvict(value = "destinations", allEntries = true)
+    })
     public void restoreTrip(Long tripId, Long userId) {
         Trip trip = tripRepository.findById(tripId)
                 .filter(t -> t.getUser().getId().equals(userId))
