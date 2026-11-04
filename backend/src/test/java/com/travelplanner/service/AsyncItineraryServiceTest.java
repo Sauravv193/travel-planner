@@ -90,8 +90,8 @@ class AsyncItineraryServiceTest {
         Job lastJob = jobCaptor.getAllValues().get(jobCaptor.getAllValues().size() - 1);
         assertEquals(Job.JobStatus.FAILED, lastJob.getStatus());
         assertNotNull(lastJob.getErrorMessage());
-        assertTrue(lastJob.getErrorMessage().contains("Gemini API error") || 
-                   lastJob.getErrorMessage().contains("3 attempts"));
+        assertEquals("Itinerary generation failed. Please try again later.",
+                lastJob.getErrorMessage());
     }
 
     @Test
