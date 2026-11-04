@@ -66,7 +66,7 @@ public class ConversationService {
      */
     @Transactional
     public ConversationMessage addUserMessage(String conversationId, String content) {
-        Conversation conversation = getConversation(conversationId);
+        Conversation conversation = getConversationInternal(conversationId);
         
         int nextSequence = conversation.getMessages().size() + 1;
         ConversationMessage message = new ConversationMessage(
