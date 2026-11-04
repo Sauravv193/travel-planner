@@ -72,7 +72,7 @@ public class TripService {
         return trips;
     }
 
-    @Cacheable(value = "trips", key = "#tripId")
+    @Cacheable(value = "trips", key = "#tripId + ':' + #userId")
     public Optional<Trip> getTripById(Long tripId, Long userId) {
         logger.info("Fetching trip with ID: {} for user ID: {}", tripId, userId);
         Optional<Trip> tripOpt = tripRepository.findByIdWithItinerary(tripId)
@@ -94,7 +94,7 @@ public class TripService {
 
     @Transactional
     @Caching(evict = {
-        @CacheEvict(value = "trips", key = "#tripId"),
+        @CacheEvict(value = "trips", key = "#tripId + ':' + #userId"),
         @CacheEvict(value = "itineraries", key = "#tripId"),
         @CacheEvict(value = "popular", allEntries = true)
     })
