@@ -88,7 +88,7 @@ class ConversationControllerTest {
 
     @Test
     void getConversationsForTrip_Empty_ReturnsEmptyList() throws Exception {
-        when(conversationService.getConversationsForTrip(1L)).thenReturn(List.of());
+        when(conversationService.getConversationsForTrip(1L, 1L)).thenReturn(List.of());
 
         mockMvc.perform(get("/api/v1/conversations/trip/1"))
                 .andExpect(status().isOk())
