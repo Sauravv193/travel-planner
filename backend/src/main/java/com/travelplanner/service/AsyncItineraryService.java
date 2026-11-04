@@ -146,7 +146,7 @@ public class AsyncItineraryService {
     public void adaptItineraryAsync(String jobId, Long tripId, Long userId, String context) {
         logger.info("Starting async itinerary adaptation for job: {}, trip: {}, user: {}", jobId, tripId, userId);
 
-        Job job = jobRepository.findByJobId(jobId)
+        Job job = jobRepository.findByJobIdAndUserId(jobId, userId)
                 .orElseThrow(() -> new RuntimeException("Job not found: " + jobId));
 
         try {
