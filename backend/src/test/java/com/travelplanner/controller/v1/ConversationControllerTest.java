@@ -68,7 +68,7 @@ class ConversationControllerTest {
         );
         testConversation.getMessages().add(msg);
 
-        when(conversationService.getConversation("conv-123")).thenReturn(testConversation);
+        when(conversationService.getConversation("conv-123", 1L)).thenReturn(testConversation);
 
         mockMvc.perform(get("/api/v1/conversations/conv-123"))
                 .andExpect(status().isOk())
@@ -79,7 +79,7 @@ class ConversationControllerTest {
 
     @Test
     void getConversationsForTrip_ReturnsList() throws Exception {
-        when(conversationService.getConversationsForTrip(1L)).thenReturn(List.of(testConversation));
+        when(conversationService.getConversationsForTrip(1L, 1L)).thenReturn(List.of(testConversation));
 
         mockMvc.perform(get("/api/v1/conversations/trip/1"))
                 .andExpect(status().isOk())
@@ -103,7 +103,7 @@ class ConversationControllerTest {
         );
         message.setId(1L);
 
-        when(conversationService.addUserMessage("conv-123", "Add more activities")).thenReturn(message);
+        when(conversationService.addUserMessage("conv-123", 1L, "Add more activities")).thenReturn(message);
 
         mockMvc.perform(post("/api/v1/conversations/conv-123/message")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -117,12 +117,12 @@ class ConversationControllerTest {
 
     @Test
     void deleteConversation_ReturnsNoContent() throws Exception {
-        doNothing().when(conversationService).deleteConversation("conv-123");
+        doNothing().when(conversationService).deleteConversation("conv-123", 1L);
 
         mockMvc.perform(delete("/api/v1/conversations/conv-123"))
                 .andExpect(status().isNoContent());
 
-        verify(conversationService).deleteConversation("conv-123");
+        verify(conversationService).deleteConversation("conv-123", 1L);
     }
 
     @Test
