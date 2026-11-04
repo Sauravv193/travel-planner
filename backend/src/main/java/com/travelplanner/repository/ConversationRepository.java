@@ -15,11 +15,11 @@ import java.util.Optional;
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
     
-    Optional<Conversation> findByConversationId(String conversationId);
+    Optional<Conversation> findByConversationId(String conversationId);\n\n    Optional<Conversation> findByConversationIdAndUserId(String conversationId, Long userId);
     
-    List<Conversation> findByTripId(Long tripId);
+    List<Conversation> findByTripId(Long tripId);\n\n    List<Conversation> findByTripIdAndUserId(Long tripId, Long userId);
     
     List<Conversation> findByUserId(Long userId);
     
-    void deleteByConversationId(String conversationId);
+    void deleteByConversationId(String conversationId);\n\n    void deleteByConversationIdAndUserId(String conversationId, Long userId);
 }
