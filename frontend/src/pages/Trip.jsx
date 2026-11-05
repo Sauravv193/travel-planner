@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { getTripById, regenerateItinerary, deleteTrip, adaptItinerary } from '../services/api';
+import { getTripById, regenerateItinerary, deleteTrip, adaptItinerary, waitForJobCompletion } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ItineraryView from '../components/itinerary/ItineraryView';
 import AIChatInterface from '../components/ai/AIChatInterface';
@@ -54,8 +54,8 @@ const Trip = () => {
     }
   };
 
-  const fetchTrip = async () => {
-    setLoading(true);
+  const fetchTrip = async (showSpinner = true) => {
+    if (showSpinner) setLoading(true);
     setParseError(null);
     setLoadError('');
     try {
@@ -72,12 +72,14 @@ const Trip = () => {
         ...response.data,
         itinerary: parsedContent ? { ...response.data.itinerary, content: parsedContent } : null
       });
+      return true;
     } catch (error) {
       const status = error.response?.status;
       setLoadError(status === 404 ? 'This trip could not be found for your account.' : 'We could not load this trip from the server. Check your connection and try again.');
-      toast.error(status === 404 ? 'Trip not found.' : 'Could not load trip. Please try again.');
+      if (showSpinner) toast.error(status === 404 ? 'Trip not found.' : 'Could not load trip. Please try again.');
+      return false;
     } finally {
-      setLoading(false);
+      if (showSpinner) setLoading(false);
     }
   };
 
@@ -88,11 +90,14 @@ const Trip = () => {
   const handleUpdateItinerary = async () => {
     setIsUpdating(true);
     try {
-      await regenerateItinerary(tripId);
-      fetchTrip();
+      const response = await regenerateItinerary(tripId);
+      const jobId = response.data?.jobId;
+      if (!jobId) throw new Error('The server did not return an itinerary job ID.');
+      await waitForJobCompletion(jobId);
+      if (!(await fetchTrip(false))) throw new Error('The itinerary finished, but the updated trip could not be loaded.');
       toast.success('Itinerary regenerated successfully!');
     } catch (error) {
-      toast.error('Failed to regenerate itinerary.');
+      toast.error(error.message || 'Failed to regenerate itinerary.');
     } finally {
       setIsUpdating(false);
     }
@@ -115,11 +120,16 @@ const Trip = () => {
     }
     setIsUpdating(true);
     try {
-      await adaptItinerary(tripId, { context });
-      fetchTrip();
+      const response = await adaptItinerary(tripId, { context });
+      const jobId = response.data?.jobId;
+      if (!jobId) throw new Error('The server did not return an itinerary job ID.');
+      await waitForJobCompletion(jobId);
+      if (!(await fetchTrip())) throw new Error('The itinerary finished, but the updated trip could not be loaded.');
       toast.success('Itinerary adapted successfully!');
+      return true;
     } catch (error) {
-      toast.error('Failed to adapt itinerary.');
+      toast.error(error.message || 'Failed to adapt itinerary.');
+      return false;
     } finally {
       setIsUpdating(false);
     }
