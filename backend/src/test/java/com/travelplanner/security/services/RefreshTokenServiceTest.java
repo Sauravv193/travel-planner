@@ -123,6 +123,7 @@ class RefreshTokenServiceTest {
 
     @Test
     void testRotateRefreshToken_Success() {
+        when(refreshTokenRepository.findUserIdByToken("test-token")).thenReturn(Optional.of(1L));
         when(refreshTokenRepository.findByToken("test-token")).thenReturn(Optional.of(testRefreshToken));
         when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(testUser));
         when(refreshTokenRepository.findAllByUserAndRevokedFalse(testUser)).thenReturn(List.of());
@@ -137,7 +138,7 @@ class RefreshTokenServiceTest {
 
     @Test
     void testRotateRefreshToken_TokenNotFound() {
-        when(refreshTokenRepository.findByToken("test-token")).thenReturn(Optional.empty());
+        when(refreshTokenRepository.findUserIdByToken("test-token")).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> refreshTokenService.rotateRefreshToken("test-token"));
     }
@@ -145,8 +146,9 @@ class RefreshTokenServiceTest {
     @Test
     void testRotateRefreshToken_AlreadyRevoked() {
         testRefreshToken.setRevoked(true);
-        when(refreshTokenRepository.findByToken("test-token")).thenReturn(Optional.of(testRefreshToken));
+        when(refreshTokenRepository.findUserIdByToken("test-token")).thenReturn(Optional.of(1L));
         when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(testUser));
+        when(refreshTokenRepository.findByToken("test-token")).thenReturn(Optional.of(testRefreshToken));
 
         assertThrows(TokenRefreshException.class, () -> refreshTokenService.rotateRefreshToken("test-token"));
         verify(refreshTokenRepository).deleteByUser(testUser);
