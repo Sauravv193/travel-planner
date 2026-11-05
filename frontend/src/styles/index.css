@@ -843,3 +843,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .wg-footer-main { grid-template-columns:1fr 1fr; }
   .wg-footer-bottom { flex-direction:column; gap:.4rem; }
 }
+
+
+/* Legacy Tailwind surfaces mapped onto the same semantic palette. */
+.bg-cream-50, .bg-white { background-color:var(--wg-surface)!important; }
+.bg-cream-100, .bg-beige-50 { background-color:var(--wg-surface-soft)!important; }
+.dark [class~="bg-white"], .dark [class~="bg-white/80"], .dark [class~="bg-white/90"] { background-color:var(--wg-surface)!important; }
+.dark [class~="bg-cream-50"], .dark [class~="bg-cream-100"], .dark [class~="bg-beige-50"] { background-color:var(--wg-surface-soft)!important; }
+.dark [class~="border-cream-100"], .dark [class~="border-cream-200"] { border-color:var(--wg-border)!important; }
+.dark [class~="text-brown-500"], .dark [class~="text-brown-600"], .dark [class~="text-cream-500"] { color:var(--wg-muted)!important; }
