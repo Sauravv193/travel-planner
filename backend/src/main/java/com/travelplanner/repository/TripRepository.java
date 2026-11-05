@@ -17,6 +17,9 @@ public interface TripRepository extends JpaRepository<Trip, Long>, JpaSpecificat
     @Query("SELECT t FROM Trip t JOIN FETCH t.user LEFT JOIN FETCH t.itinerary WHERE t.user.id = :userId AND t.deleted = false")
     List<Trip> findByUserId(@Param("userId") Long userId);
     
+    @Query("SELECT t FROM Trip t LEFT JOIN FETCH t.itinerary WHERE t.shareToken = :shareToken AND t.deleted = false")
+    Optional<Trip> findActiveSharedTrip(@Param("shareToken") String shareToken);
+
     @Query("SELECT t FROM Trip t JOIN FETCH t.user LEFT JOIN FETCH t.itinerary WHERE t.id = :tripId AND t.deleted = false")
     Optional<Trip> findByIdWithItinerary(@Param("tripId") Long tripId);
     
