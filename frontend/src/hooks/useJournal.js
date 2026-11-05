@@ -83,17 +83,22 @@ export const useJournal = (trip) => {
         
         if (response.data) {
           // Convert server response to photo format
-          const serverPhotos = await Promise.all(response.data.map(async (photo) => ({
-            id: photo.id,
-            name: photo.originalName,
-            url: await fetchPhotoBlob(photo.id),
-            timestamp: photo.uploadTime,
-            size: photo.fileSize,
-            type: photo.mimeType,
-            fileObject: null
-          })));
-          
-          
+          const serverPhotos = (await Promise.all(response.data.map(async (photo) => {
+            try {
+              return {
+                id: photo.id,
+                name: photo.originalName,
+                url: await fetchPhotoBlob(photo.id),
+                timestamp: photo.uploadTime,
+                size: photo.fileSize,
+                type: photo.mimeType,
+                fileObject: null
+              };
+            } catch {
+              return null;
+            }
+          }))).filter(Boolean);
+
           // Update state with uploaded photos
           setPhotos(prev => {
             const existingIds = new Set(prev.map(p => p.id));
