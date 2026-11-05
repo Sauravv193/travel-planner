@@ -37,7 +37,7 @@ const Dashboard = ({ trips = [] }) => {
 
       <div className="wg-dashboard-stats">
         {stats.map((stat) => (
-          <div className="wg-dashboard-stat" key={label}>
+          <div className="wg-dashboard-stat" key={stat.label}>
             <span className="wg-dashboard-stat-icon">{createElement(stat.icon, { size: 18 })}</span>
             <div><strong>{stat.value}</strong><small>{stat.label}</small></div>
           </div>
