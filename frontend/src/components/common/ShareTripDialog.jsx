@@ -1,13 +1,37 @@
 import { useState, useCallback } from 'react';
+import { createTripShare, revokeTripShare } from '../../services/api';
 import { X, Link, Twitter, Facebook, Mail, Check, Printer, Download, Calendar, Share2 } from 'lucide-react';
 import { useToast } from './Toast';
 import { copyItineraryToClipboard, printItinerary, downloadItineraryHTML, generateCalendarUrl } from '../../utils/export';
 
 const ShareTripDialog = ({ isOpen, onClose, trip, itinerary }) => {
   const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [sharing, setSharing] = useState(false);
   const toast = useToast();
 
-  const shareUrl = window.location.href;
+  const handleCreateShare = async () => {
+    if (!trip?.id) return;
+    setSharing(true);
+    try {
+      const response = await createTripShare(trip.id);
+      setShareUrl(window.location.origin + '/shared/' + response.data.shareToken);
+      toast.success('Public share link created. Anyone with the link can view this trip.');
+    } catch { toast.error('Could not create a share link. Please try again.'); }
+    finally { setSharing(false); }
+  };
+
+  const handleRevokeShare = async () => {
+    if (!trip?.id) return;
+    setSharing(true);
+    try {
+      await revokeTripShare(trip.id);
+      setShareUrl('');
+      setCopied(false);
+      toast.success('Share link revoked.');
+    } catch { toast.error('Could not revoke the share link.'); }
+    finally { setSharing(false); }
+  };
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -97,8 +121,13 @@ const ShareTripDialog = ({ isOpen, onClose, trip, itinerary }) => {
           </button>
         </div>
 
+        {/* Public link controls */}
+        <div className="mb-3 flex gap-2">
+          <button onClick={handleCreateShare} disabled={sharing} className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">{sharing ? 'Please wait...' : shareUrl ? 'Refresh share link' : 'Create public link'}</button>
+          {shareUrl && <button onClick={handleRevokeShare} disabled={sharing} className="rounded-xl border border-red-300 px-3 py-3 text-sm text-red-600 disabled:opacity-50">Revoke</button>}
+        </div>
         {/* Copy Link */}
-        <button
+        <button disabled={!shareUrl || sharing}
           onClick={handleCopyLink}
           className="w-full flex items-center space-x-4 p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group"
         >
@@ -107,7 +136,7 @@ const ShareTripDialog = ({ isOpen, onClose, trip, itinerary }) => {
           </div>
           <div className="flex-1 text-left">
             <p className="font-medium text-gray-900 dark:text-white">Copy Link</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Share the trip URL</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{shareUrl ? 'Anyone with this link can view the trip' : 'Create a public link first'}</p>
           </div>
           {copied && <Check className="w-5 h-5 text-green-500" />}
         </button>
@@ -115,7 +144,7 @@ const ShareTripDialog = ({ isOpen, onClose, trip, itinerary }) => {
         {/* Social Share */}
         <div className="grid grid-cols-3 gap-3 my-4">
           <button
-            onClick={handleShareTwitter}
+            onClick={handleShareTwitter} disabled={!shareUrl}
             className="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             aria-label="Share on Twitter"
           >
@@ -125,7 +154,7 @@ const ShareTripDialog = ({ isOpen, onClose, trip, itinerary }) => {
             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Twitter</span>
           </button>
           <button
-            onClick={handleShareFacebook}
+            onClick={handleShareFacebook} disabled={!shareUrl}
             className="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             aria-label="Share on Facebook"
           >
@@ -135,7 +164,7 @@ const ShareTripDialog = ({ isOpen, onClose, trip, itinerary }) => {
             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Facebook</span>
           </button>
           <button
-            onClick={handleShareEmail}
+            onClick={handleShareEmail} disabled={!shareUrl}
             className="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             aria-label="Share via Email"
           >
