@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -31,32 +32,30 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private String frontendUrl;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, 
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
-        
+
         OAuth2User oauth2User = (OAuth2User) authentication.getPrincipal();
         UserDetailsImpl userDetails = (UserDetailsImpl) oauth2User;
-        
-        String token = jwtUtils.generateJwtToken(authentication);
-        
-        // Create a refresh token for the OAuth user as well
-        String refreshToken = "";
+
+        final String refreshToken;
         try {
+            // Do not issue an access token unless the refresh session is also persisted.
             refreshToken = refreshTokenService.createRefreshToken(userDetails.getId()).getToken();
-        } catch (Exception e) {
-            logger.warn("Could not create refresh token for OAuth user: {}", e.getMessage());
+        } catch (Exception ex) {
+            SecurityContextHolder.clearContext();
+            logger.error("OAuth2 login could not establish a refresh-token session: {}",
+                    ex.getClass().getSimpleName());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Unable to establish a login session. Please try again.");
+            return;
         }
-        
-        logger.info("OAuth2 authentication successful for user: {}", userDetails.getUsername());
-        
-        // Redirect to frontend with JWT token and refresh token (if available)
-        String redirectUrl;
-        if (!refreshToken.isEmpty()) {
-            redirectUrl = String.format("%s/oauth2/callback?token=%s&refreshToken=%s", 
-                    frontendUrl, token, refreshToken);
-        } else {
-            redirectUrl = String.format("%s/oauth2/callback?token=%s", frontendUrl, token);
-        }
+
+        String accessToken = jwtUtils.generateJwtToken(authentication);
+        logger.info("OAuth2 authentication completed for user id: {}", userDetails.getId());
+
+        String redirectUrl = String.format("%s/oauth2/callback?token=%s&refreshToken=%s",
+                frontendUrl, accessToken, refreshToken);
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }

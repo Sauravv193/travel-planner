@@ -7,12 +7,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     @Query("SELECT r FROM RefreshToken r JOIN FETCH r.user WHERE r.token = :token")
     Optional<RefreshToken> findByToken(@Param("token") String token);
-    Optional<RefreshToken> findByUserAndRevokedFalse(User user);
+
+    @Query("SELECT r.user.id FROM RefreshToken r WHERE r.token = :token")
+    Optional<Long> findUserIdByToken(@Param("token") String token);
+
+    // List rather than Optional: older/concurrent deployments may already contain duplicates.
+    List<RefreshToken> findAllByUserAndRevokedFalse(User user);
+
     void deleteByUser(User user);
 }

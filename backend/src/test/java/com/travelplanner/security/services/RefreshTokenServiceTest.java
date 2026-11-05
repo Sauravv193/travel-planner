@@ -2,6 +2,7 @@ package com.travelplanner.security.services;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -64,8 +65,8 @@ class RefreshTokenServiceTest {
 
     @Test
     void testCreateRefreshToken_Success() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(refreshTokenRepository.findByUserAndRevokedFalse(testUser)).thenReturn(Optional.empty());
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(testUser));
+        when(refreshTokenRepository.findAllByUserAndRevokedFalse(testUser)).thenReturn(List.of());
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(testRefreshToken);
 
         RefreshToken result = refreshTokenService.createRefreshToken(1L);
@@ -78,7 +79,7 @@ class RefreshTokenServiceTest {
 
     @Test
     void testCreateRefreshToken_UserNotFound() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.empty());
 
         assertThrows(BadRequestException.class, () -> refreshTokenService.createRefreshToken(1L));
         verify(refreshTokenRepository, never()).save(any(RefreshToken.class));
@@ -91,13 +92,13 @@ class RefreshTokenServiceTest {
         existingToken.setUser(testUser);
         existingToken.setRevoked(false);
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(refreshTokenRepository.findByUserAndRevokedFalse(testUser)).thenReturn(Optional.of(existingToken));
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(testUser));
+        when(refreshTokenRepository.findAllByUserAndRevokedFalse(testUser)).thenReturn(List.of(existingToken));
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(testRefreshToken);
 
         refreshTokenService.createRefreshToken(1L);
 
-        verify(refreshTokenRepository).save(existingToken);
+        verify(refreshTokenRepository).saveAll(List.of(existingToken));
         assertTrue(existingToken.isRevoked());
     }
 
@@ -122,9 +123,10 @@ class RefreshTokenServiceTest {
 
     @Test
     void testRotateRefreshToken_Success() {
+        when(refreshTokenRepository.findUserIdByToken("test-token")).thenReturn(Optional.of(1L));
         when(refreshTokenRepository.findByToken("test-token")).thenReturn(Optional.of(testRefreshToken));
-        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(refreshTokenRepository.findByUserAndRevokedFalse(testUser)).thenReturn(Optional.empty());
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(testUser));
+        when(refreshTokenRepository.findAllByUserAndRevokedFalse(testUser)).thenReturn(List.of(testRefreshToken));
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(testRefreshToken);
 
         RefreshToken result = refreshTokenService.rotateRefreshToken("test-token");
@@ -136,7 +138,7 @@ class RefreshTokenServiceTest {
 
     @Test
     void testRotateRefreshToken_TokenNotFound() {
-        when(refreshTokenRepository.findByToken("test-token")).thenReturn(Optional.empty());
+        when(refreshTokenRepository.findUserIdByToken("test-token")).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> refreshTokenService.rotateRefreshToken("test-token"));
     }
@@ -144,6 +146,8 @@ class RefreshTokenServiceTest {
     @Test
     void testRotateRefreshToken_AlreadyRevoked() {
         testRefreshToken.setRevoked(true);
+        when(refreshTokenRepository.findUserIdByToken("test-token")).thenReturn(Optional.of(1L));
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(testUser));
         when(refreshTokenRepository.findByToken("test-token")).thenReturn(Optional.of(testRefreshToken));
 
         assertThrows(TokenRefreshException.class, () -> refreshTokenService.rotateRefreshToken("test-token"));
