@@ -153,6 +153,67 @@ class TripServiceTest {
     }
 
     @Test
+    void createShareToken_GeneratesOpaqueTokenForOwner() {
+        when(tripRepository.findByIdWithItinerary(1L)).thenReturn(Optional.of(testTrip));
+        when(tripRepository.save(any(Trip.class))).thenReturn(testTrip);
+
+        String token = tripService.createShareToken(1L, 1L);
+
+        assertNotNull(token);
+        assertTrue(token.matches("[a-fA-F0-9]{32}"));
+        assertEquals(token, testTrip.getShareToken());
+        verify(tripRepository).save(testTrip);
+    }
+
+    @Test
+    void createShareToken_ReusesExistingToken() {
+        testTrip.setShareToken("a".repeat(32));
+        when(tripRepository.findByIdWithItinerary(1L)).thenReturn(Optional.of(testTrip));
+
+        String token = tripService.createShareToken(1L, 1L);
+
+        assertEquals("a".repeat(32), token);
+        verify(tripRepository, never()).save(any(Trip.class));
+    }
+
+    @Test
+    void createShareToken_RejectsNonOwner() {
+        when(tripRepository.findByIdWithItinerary(1L)).thenReturn(Optional.of(testTrip));
+
+        assertThrows(UnauthorizedException.class, () -> tripService.createShareToken(1L, 999L));
+        verify(tripRepository, never()).save(any(Trip.class));
+    }
+
+    @Test
+    void revokeShareToken_ClearsTokenForOwner() {
+        testTrip.setShareToken("a".repeat(32));
+        when(tripRepository.findByIdWithItinerary(1L)).thenReturn(Optional.of(testTrip));
+        when(tripRepository.save(any(Trip.class))).thenReturn(testTrip);
+
+        tripService.revokeShareToken(1L, 1L);
+
+        assertNull(testTrip.getShareToken());
+        verify(tripRepository).save(testTrip);
+    }
+
+    @Test
+    void getSharedTrip_RejectsMalformedTokenWithoutRepositoryLookup() {
+        assertTrue(tripService.getSharedTrip("not-a-share-token").isEmpty());
+        verify(tripRepository, never()).findActiveSharedTrip(anyString());
+    }
+
+    @Test
+    void getSharedTrip_FindsActiveSharedTrip() {
+        String token = "b".repeat(32);
+        when(tripRepository.findActiveSharedTrip(token)).thenReturn(Optional.of(testTrip));
+
+        Optional<Trip> result = tripService.getSharedTrip(token);
+
+        assertTrue(result.isPresent());
+        verify(tripRepository).findActiveSharedTrip(token);
+    }
+
+    @Test
     void updateTrip_Success() {
         Trip updatedDetails = new Trip();
         updatedDetails.setDestination("London");
