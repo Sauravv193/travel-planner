@@ -545,3 +545,18 @@ body { background-color: var(--wg-page); color: var(--wg-text); }
 
 .wg-alert-link { display:inline-flex; align-items:center; gap:.25rem; margin-left:auto; color:inherit; font-size:.82rem; font-weight:800; white-space:nowrap; text-decoration:underline; text-underline-offset:3px; }
 @media(max-width:640px) { .wg-alert { align-items:flex-start; flex-wrap:wrap; } .wg-alert-link { margin-left:2rem; } }
+
+
+/* Apply the same accessible surface system to existing landing, auth, and form components. */
+.btn-primary { color:#fff; background-color:#17665d; }
+.btn-primary:hover { background-color:#104d47; }
+.dark .btn-primary { color:#10201c; background-color:#83c8b2; }
+.dark .btn-primary:hover { background-color:#a2ddca; }
+.btn-secondary { color:var(--wg-text); background-color:var(--wg-surface); border-color:var(--wg-border); }
+.btn-secondary:hover { color:var(--wg-accent-strong); border-color:var(--wg-accent); background-color:var(--wg-accent-soft); }
+.btn-ghost { color:var(--wg-muted); }
+.btn-ghost:hover { color:var(--wg-accent-strong); background-color:var(--wg-accent-soft); }
+.input-field { color:var(--wg-text); background-color:var(--wg-surface); border-color:var(--wg-border); }
+.input-field:focus { border-color:var(--wg-accent); box-shadow:0 0 0 3px color-mix(in srgb,var(--wg-accent) 18%,transparent); }
+.input-field::placeholder { color:var(--wg-muted); opacity:1; }
+.card { color:var(--wg-text); background-color:var(--wg-surface); border-color:var(--wg-border); }
