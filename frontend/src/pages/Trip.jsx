@@ -54,8 +54,8 @@ const Trip = () => {
     }
   };
 
-  const fetchTrip = async () => {
-    setLoading(true);
+  const fetchTrip = async (showSpinner = true) => {
+    if (showSpinner) setLoading(true);
     setParseError(null);
     setLoadError('');
     try {
@@ -79,7 +79,7 @@ const Trip = () => {
       toast.error(status === 404 ? 'Trip not found.' : 'Could not load trip. Please try again.');
       return false;
     } finally {
-      setLoading(false);
+      if (showSpinner) setLoading(false);
     }
   };
 
@@ -94,7 +94,7 @@ const Trip = () => {
       const jobId = response.data?.jobId;
       if (!jobId) throw new Error('The server did not return an itinerary job ID.');
       await waitForJobCompletion(jobId);
-      if (!(await fetchTrip())) throw new Error('The itinerary finished, but the updated trip could not be loaded.');
+      if (!(await fetchTrip(false))) throw new Error('The itinerary finished, but the updated trip could not be loaded.');
       toast.success('Itinerary regenerated successfully!');
     } catch (error) {
       toast.error(error.message || 'Failed to regenerate itinerary.');
