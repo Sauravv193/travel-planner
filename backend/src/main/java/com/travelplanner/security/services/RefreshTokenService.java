@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,16 +36,24 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
+    @Transactional
     public RefreshToken createRefreshToken(Long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdForUpdate(userId)
                 .orElseThrow(() -> new BadRequestException("User not found"));
+        return createRefreshTokenForLockedUser(user);
+    }
 
-        // Revoke all existing refresh tokens for this user (token rotation)
-        refreshTokenRepository.findByUserAndRevokedFalse(user).ifPresent(existingToken -> {
-            existingToken.setRevoked(true);
-            refreshTokenRepository.save(existingToken);
-            logger.info("Revoked previous refresh token for user: {}", userId);
-        });
+    private RefreshToken createRefreshTokenForLockedUser(User user) {
+        // Revoke every active token, including duplicates left by previous concurrent requests.
+        List<RefreshToken> activeTokens = refreshTokenRepository.findAllByUserAndRevokedFalse(user);
+        for (RefreshToken activeToken : activeTokens) {
+            activeToken.setRevoked(true);
+        }
+        if (!activeTokens.isEmpty()) {
+            refreshTokenRepository.saveAll(activeTokens);
+            logger.info("Revoked {} previous refresh token(s) for user: {}",
+                    activeTokens.size(), user.getId());
+        }
 
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
@@ -52,15 +61,15 @@ public class RefreshTokenService {
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setRevoked(false);
 
-        refreshToken = refreshTokenRepository.save(refreshToken);
-        logger.info("Created new refresh token for user: {}", userId);
-        return refreshToken;
+        RefreshToken savedToken = refreshTokenRepository.save(refreshToken);
+        logger.info("Created new refresh token for user: {}", user.getId());
+        return savedToken;
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
-            throw new TokenRefreshException(token.getToken(), 
+            throw new TokenRefreshException(token.getToken(),
                     "Refresh token was expired. Please make a new signin request");
         }
         return token;
@@ -68,27 +77,36 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken rotateRefreshToken(String refreshTokenValue) {
-        RefreshToken oldRefreshToken = findByToken(refreshTokenValue)
-                .map(this::verifyExpiration)
-                .orElseThrow(() -> new TokenRefreshException(refreshTokenValue, 
+        // Resolve the owner first, then lock in a consistent order (user -> token).
+        RefreshToken tokenReference = refreshTokenRepository.findByToken(refreshTokenValue)
+                .orElseThrow(() -> new TokenRefreshException(refreshTokenValue,
                         "Refresh token not found"));
 
-        // Check if token is already revoked (potential token reuse attack)
+        User lockedUser = userRepository.findByIdForUpdate(tokenReference.getUser().getId())
+                .orElseThrow(() -> new BadRequestException("User not found"));
+
+        // Re-read under lock: another request may have rotated/revoked this token while waiting.
+        RefreshToken oldRefreshToken = refreshTokenRepository.findByTokenForUpdate(refreshTokenValue)
+                .orElseThrow(() -> new TokenRefreshException(refreshTokenValue,
+                        "Refresh token not found"));
+
+        verifyExpiration(oldRefreshToken);
+
         if (oldRefreshToken.isRevoked()) {
-            logger.warn("Detected token reuse attempt for user: {}", 
-                    oldRefreshToken.getUser().getId());
-            refreshTokenRepository.deleteByUser(oldRefreshToken.getUser());
-            throw new TokenRefreshException(refreshTokenValue, 
+            logger.warn("Detected refresh-token reuse for user: {}", lockedUser.getId());
+            refreshTokenRepository.deleteByUser(lockedUser);
+            throw new TokenRefreshException(refreshTokenValue,
                     "Refresh token has been revoked due to suspicious activity");
         }
 
-        // Revoke old token and create new one (token rotation)
         oldRefreshToken.setRevoked(true);
-        RefreshToken newRefreshToken = createRefreshToken(oldRefreshToken.getUser().getId());
+        refreshTokenRepository.save(oldRefreshToken);
+
+        RefreshToken newRefreshToken = createRefreshTokenForLockedUser(lockedUser);
         oldRefreshToken.setReplacedByToken(newRefreshToken.getToken());
         refreshTokenRepository.save(oldRefreshToken);
 
-        logger.info("Rotated refresh token for user: {}", oldRefreshToken.getUser().getId());
+        logger.info("Rotated refresh token for user: {}", lockedUser.getId());
         return newRefreshToken;
     }
 
