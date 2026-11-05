@@ -139,6 +139,10 @@ export const getTrips = () => {
   return api.get('/v1/trips');
 };
 
+export const createTripShare = (tripId) => api.post('/v1/trips/' + tripId + '/share');
+export const revokeTripShare = (tripId) => api.delete('/v1/trips/' + tripId + '/share');
+export const getPublicSharedTrip = (shareToken) => axios.get(API_URL + '/v1/public/trips/' + encodeURIComponent(shareToken));
+
 export const getTripById = (tripId) => {
   return api.get(`/v1/trips/${tripId}`);
 };

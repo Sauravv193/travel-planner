@@ -22,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Validated
@@ -140,6 +141,35 @@ public class TripService {
         tripRepository.save(trip);
         
         logger.info("Soft deleted trip {} for user {}", tripId, userId);
+    }
+
+    @Transactional
+    public String createShareToken(Long tripId, Long userId) {
+        Trip trip = tripRepository.findByIdWithItinerary(tripId)
+                .filter(t -> t.getUser().getId().equals(userId))
+                .orElseThrow(() -> new UnauthorizedException("Trip not found or access denied"));
+        if (trip.getShareToken() == null || trip.getShareToken().isBlank()) {
+            trip.setShareToken(UUID.randomUUID().toString().replace("-", ""));
+            tripRepository.save(trip);
+        }
+        return trip.getShareToken();
+    }
+
+    @Transactional
+    public void revokeShareToken(Long tripId, Long userId) {
+        Trip trip = tripRepository.findByIdWithItinerary(tripId)
+                .filter(t -> t.getUser().getId().equals(userId))
+                .orElseThrow(() -> new UnauthorizedException("Trip not found or access denied"));
+        trip.setShareToken(null);
+        tripRepository.save(trip);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Trip> getSharedTrip(String shareToken) {
+        if (shareToken == null || !shareToken.matches("[a-fA-F0-9]{32}")) {
+            return Optional.empty();
+        }
+        return tripRepository.findActiveSharedTrip(shareToken);
     }
 
     /**

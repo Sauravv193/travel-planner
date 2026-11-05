@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -86,6 +87,23 @@ public class TripController {
         Trip tripDetails = TripMapper.toEntity(tripRequest);
         Trip updatedTrip = tripService.updateTrip(tripId, tripDetails, userDetails.getId());
         return ResponseEntity.ok(TripMapper.toResponse(updatedTrip));
+    }
+
+
+    @PostMapping("/{id}/share")
+    public ResponseEntity<Map<String, String>> createShareLink(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String token = tripService.createShareToken(id, userDetails.getId());
+        return ResponseEntity.ok(Map.of("shareToken", token));
+    }
+
+    @DeleteMapping("/{id}/share")
+    public ResponseEntity<Void> revokeShareLink(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        tripService.revokeShareToken(id, userDetails.getId());
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

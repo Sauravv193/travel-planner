@@ -23,6 +23,9 @@ public class Trip {
     @Version
     private Long version;
 
+    @Column(name = "share_token", unique = true, length = 64)
+    private String shareToken;
+
     @NotBlank(message = "Destination is required")
     @Size(min = 2, max = 100, message = "Destination must be between 2 and 100 characters")
     @Column(nullable = false)
@@ -105,6 +108,10 @@ public class Trip {
         this.createdAt = LocalDateTime.now();
         this.deleted = false;
     }
+
+    public String getShareToken() { return shareToken; }
+
+    public void setShareToken(String shareToken) { this.shareToken = shareToken; }
 
     public Long getId() {
         return id;
