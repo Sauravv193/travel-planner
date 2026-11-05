@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertCircle, ArrowUpRight, CalendarDays, Compass, MapPin, Plus,
-  RefreshCw, Search, Trash2, Wallet, Users, X
+  RefreshCw, Search, Trash2, Wallet, X
 } from 'lucide-react';
 import { getTrips, deleteTrip } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
