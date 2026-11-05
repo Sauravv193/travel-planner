@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, ArrowUpRight, Camera, Check, ChevronDown, Compass,
-  MapPin, Menu, Sparkles, Wallet, WandSparkles, CalendarDays,
-  Route, ShieldCheck, Sun, Clock3, Heart, Mountain, Waves
+  MapPin, Sparkles, Wallet, WandSparkles, CalendarDays, Route
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
