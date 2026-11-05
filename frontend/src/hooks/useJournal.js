@@ -12,6 +12,12 @@ export const useJournal = (trip) => {
   const photosRef = useRef(photos);
   useEffect(() => { photosRef.current = photos; }, [photos]);
 
+  useEffect(() => () => {
+    photosRef.current.forEach(photo => {
+      if (photo.url?.startsWith('blob:')) URL.revokeObjectURL(photo.url);
+    });
+  }, [trip?.id]);
+
   useEffect(() => {
     if (trip?.id) {
       const fetchData = async () => {
@@ -31,7 +37,7 @@ export const useJournal = (trip) => {
             const serverPhotos = await Promise.all(
               photosResponse.data.map(async (photo) => {
                 try {
-                  // For now, use direct URL - auth headers will be handled by axios interceptor
+                  // Fetch through the authenticated API client; img elements cannot attach bearer headers.
                   const photoUrl = await fetchPhotoBlob(photo.id);
                   return {
                     id: photo.id,
@@ -43,7 +49,7 @@ export const useJournal = (trip) => {
                     fileObject: null // Server photos don't have file objects
                   };
                 } catch (error) {
-                  console.error('Failed to load photo:', photo.originalName, error);
+                  console.error('Failed to load a saved photo.');
                   return null;
                 }
               })
@@ -77,15 +83,16 @@ export const useJournal = (trip) => {
         
         if (response.data) {
           // Convert server response to photo format
-          const serverPhotos = response.data.map(photo => ({
+          const serverPhotos = await Promise.all(response.data.map(async (photo) => ({
             id: photo.id,
             name: photo.originalName,
             url: await fetchPhotoBlob(photo.id),
             timestamp: photo.uploadTime,
             size: photo.fileSize,
             type: photo.mimeType,
-            fileObject: null // Clear file object after upload
-          }));
+            fileObject: null
+          })));
+          
           
           // Update state with uploaded photos
           setPhotos(prev => {
