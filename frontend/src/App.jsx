@@ -11,6 +11,7 @@ import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Lazy loaded pages for performance (Phase 14)
 const Home = lazy(() => import('./pages/Home'));
+const PublicTrip = lazy(() => import('./pages/PublicTrip'));
 const Planner = lazy(() => import('./pages/Planner'));
 const Journal = lazy(() => import('./pages/Journal'));
 const Trip = lazy(() => import('./pages/Trip'));
@@ -53,6 +54,7 @@ function AppRoutes() {
       <main className="flex-grow wg-app-main">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/shared/:shareToken" element={<PublicTrip />} />
           
           <Route element={<PublicOnlyRoute />}>
             <Route path="/signin" element={<SignIn />} />
