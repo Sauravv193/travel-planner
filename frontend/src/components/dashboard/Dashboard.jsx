@@ -1,3 +1,4 @@
+import { createElement } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { ArrowRight, CalendarDays, Compass, MapPin, Wallet } from 'lucide-react';
@@ -35,10 +36,10 @@ const Dashboard = ({ trips = [] }) => {
       </div>
 
       <div className="wg-dashboard-stats">
-        {stats.map(({ label, value, icon: Icon }) => (
+        {stats.map((stat) => (
           <div className="wg-dashboard-stat" key={label}>
-            <span className="wg-dashboard-stat-icon"><Icon size={18} /></span>
-            <div><strong>{value}</strong><small>{label}</small></div>
+            <span className="wg-dashboard-stat-icon">{createElement(stat.icon, { size: 18 })}</span>
+            <div><strong>{stat.value}</strong><small>{stat.label}</small></div>
           </div>
         ))}
       </div>
