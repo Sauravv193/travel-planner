@@ -7,7 +7,7 @@ A travel planner that uses Google Gemini to generate itineraries. Spring Boot ba
 - Generate day-by-day trip itineraries with AI — tell it your destination, dates, and preferences
 - Chat with the AI to adjust plans ("make it cheaper", "add museums", "more outdoorsy")
 - Upload trip photos and auto-generate travel journals
-- Share trips via link, Twitter, Facebook, or export as print/download
+- Share trips through revocable public links, Twitter, Facebook, or export as print/download
 - Dark/light theme — baby pink and white in light mode, deep navy with rose accents in dark mode
 
 ## Stack
@@ -54,6 +54,12 @@ Backend vars (set in Render dashboard):
 | `REDIS_HOST` | From Redis Cloud dashboard |
 | `REDIS_PORT` | Usually 6379 |
 | `REDIS_PASSWORD` | From Redis Cloud dashboard |
+| `PHOTO_STORAGE_PROVIDER` | `r2` in production after configuring R2; `local` for local development |
+| `R2_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` |
+| `R2_ACCESS_KEY_ID` | Cloudflare R2 S3 API token access key |
+| `R2_SECRET_ACCESS_KEY` | Cloudflare R2 S3 API token secret |
+| `R2_BUCKET` | Private R2 bucket name |
+| `R2_REGION` | `auto` for Cloudflare R2 |
 
 Frontend vars (set in Vercel dashboard):
 
@@ -62,6 +68,12 @@ Frontend vars (set in Vercel dashboard):
 | `VITE_API_URL` | `https://your-backend.onrender.com/api` |
 
 Optional: `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` for Google sign-in, `SMTP_*` vars for email verification/password reset.
+
+### Persistent photo storage
+
+Render free web services have an ephemeral filesystem, so local photo files disappear on restarts, spin-downs, and redeploys. For durable production uploads, create a **private Cloudflare R2 Standard bucket**, create an S3 API token scoped to that bucket, and set the R2 variables above in Render. Set `PHOTO_STORAGE_PROVIDER=r2` and `R2_REGION=auto`. Do not enable public bucket access and do not commit any R2 credentials. Local development defaults to `PHOTO_STORAGE_PROVIDER=local`.
+
+New uploads are stored in R2 once the provider is enabled. Existing photo rows that point to Render's old local filesystem are not automatically migrated; download any existing photos before redeploying if you need to preserve them.
 
 ## Running locally
 
