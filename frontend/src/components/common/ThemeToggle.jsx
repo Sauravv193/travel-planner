@@ -3,14 +3,19 @@ import { Sun, Moon } from 'lucide-react';
 
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
+  const nextTheme = theme === 'light' ? 'dark' : 'light';
 
   return (
     <button
+      type="button"
       onClick={toggleTheme}
-      className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
-      aria-label="Toggle theme"
+      className="wg-theme-toggle"
+      aria-label={`Switch to ${nextTheme} mode`}
+      aria-pressed={theme === 'dark'}
+      title={`Switch to ${nextTheme} mode`}
     >
-      {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+      {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
+      <span>{theme === 'light' ? 'Dark' : 'Light'}</span>
     </button>
   );
 };
