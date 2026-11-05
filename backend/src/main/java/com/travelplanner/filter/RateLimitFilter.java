@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -70,7 +71,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
                 (probe.getNanosToWaitForRefill() + 999_999_999L) / 1_000_000_000L);
         response.addHeader("X-Rate-Limit-Retry-After-Seconds",
                 String.valueOf(retryAfterSeconds));
-        response.sendError(HttpServletResponse.SC_TOO_MANY_REQUESTS,
+        response.sendError(HttpStatus.TOO_MANY_REQUESTS.value(),
                 "Too many requests. Please try again later.");
     }
 
