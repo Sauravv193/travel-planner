@@ -123,7 +123,7 @@ const ShareTripDialog = ({ isOpen, onClose, trip, itinerary }) => {
 
         {/* Public link controls */}
         <div className="mb-3 flex gap-2">
-          <button onClick={handleCreateShare} disabled={sharing} className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">{sharing ? 'Please wait...' : shareUrl ? 'Refresh share link' : 'Create public link'}</button>
+          <button onClick={handleCreateShare} disabled={sharing} className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">{sharing ? 'Please wait...' : shareUrl ? 'Public link ready' : 'Create public link'}</button>
           {shareUrl && <button onClick={handleRevokeShare} disabled={sharing} className="rounded-xl border border-red-300 px-3 py-3 text-sm text-red-600 disabled:opacity-50">Revoke</button>}
         </div>
         {/* Copy Link */}
