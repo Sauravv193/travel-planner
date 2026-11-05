@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getTripById, regenerateItinerary, deleteTrip, adaptItinerary } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -6,10 +6,9 @@ import ItineraryView from '../components/itinerary/ItineraryView';
 import AIChatInterface from '../components/ai/AIChatInterface';
 import ShareTripDialog from '../components/common/ShareTripDialog';
 import ConfirmDialog from '../components/common/ConfirmDialog';
-import MapView from '../components/common/MapView';
 import { useToast } from '../components/common/Toast';
 import useKeyboardShortcuts from '../components/common/KeyboardShortcuts';
-import { MessageSquare, Share2, MapPin, AlertCircle, RefreshCw } from 'lucide-react';
+import { MessageSquare, Share2, AlertCircle, RefreshCw } from 'lucide-react';
 import { printItinerary } from '../utils/export';
 
 const Trip = () => {
@@ -23,7 +22,6 @@ const Trip = () => {
   const [showAIChat, setShowAIChat] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showMap, setShowMap] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -127,26 +125,6 @@ const Trip = () => {
     }
   };
 
-  // Extract locations from itinerary for map view
-  const itineraryLocations = useMemo(() => {
-    if (!trip?.itinerary?.content) return [];
-    const days = trip.itinerary.content.days || trip.itinerary.content.itinerary || [];
-    const locations = [];
-    days.forEach(day => {
-      (day.activities || []).forEach(act => {
-        if (act.location) {
-          locations.push({
-            name: act.location,
-            address: act.location_address || act.location,
-            lat: act.lat || 0,
-            lng: act.lng || 0,
-          });
-        }
-      });
-    });
-    return locations;
-  }, [trip]);
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -190,13 +168,6 @@ const Trip = () => {
             <Link to={`/journal/${tripId}`} className="btn-secondary py-2 px-3 text-sm">
               Journal
             </Link>
-            <button
-              onClick={() => setShowMap(!showMap)}
-              className={`btn-secondary py-2 px-3 text-sm flex items-center space-x-1 ${showMap ? 'bg-maroon-50 dark:bg-maroon-900/30 border-maroon-300' : ''}`}
-            >
-              <MapPin className="w-4 h-4" />
-              <span>Map</span>
-            </button>
             <button
               onClick={() => setShowShareDialog(true)}
               className="btn-secondary py-2 px-3 text-sm flex items-center space-x-1"
@@ -248,16 +219,6 @@ const Trip = () => {
             </button>
           </div>
         </div>
-
-        {/* Map Section */}
-        {showMap && itineraryLocations.length > 0 && (
-          <div className="mb-6 animate-slideDown">
-            <MapView
-              locations={itineraryLocations}
-              destination={trip.destination}
-            />
-          </div>
-        )}
 
         {isUpdating && (
           <div className="text-center p-4 my-4">
