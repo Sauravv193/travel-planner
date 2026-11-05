@@ -17,10 +17,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     @Query("SELECT r FROM RefreshToken r JOIN FETCH r.user WHERE r.token = :token")
     Optional<RefreshToken> findByToken(@Param("token") String token);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT r FROM RefreshToken r JOIN FETCH r.user WHERE r.token = :token")
-    Optional<RefreshToken> findByTokenForUpdate(@Param("token") String token);
-
     // List rather than Optional: older/concurrent deployments may already contain duplicates.
     List<RefreshToken> findAllByUserAndRevokedFalse(User user);
 
