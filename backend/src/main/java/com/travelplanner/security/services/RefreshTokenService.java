@@ -86,7 +86,7 @@ public class RefreshTokenService {
                 .orElseThrow(() -> new BadRequestException("User not found"));
 
         // Re-read under lock: another request may have rotated/revoked this token while waiting.
-        RefreshToken oldRefreshToken = refreshTokenRepository.findByTokenForUpdate(refreshTokenValue)
+        RefreshToken oldRefreshToken = refreshTokenRepository.findByToken(refreshTokenValue)
                 .orElseThrow(() -> new TokenRefreshException(refreshTokenValue,
                         "Refresh token not found"));
 
