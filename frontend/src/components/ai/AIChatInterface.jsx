@@ -81,33 +81,9 @@ const AIChatInterface = ({ tripId, onAdaptItinerary, isVisible, onClose }) => {
       const adaptationCompleted = await onAdaptItinerary(userMessage);
       if (adaptationCompleted === false) throw new Error('The itinerary update did not complete.');
       
-      // Generate AI-like response based on the adaptation context
-      const responses = {
-        'adventure': "I've updated your itinerary with more adventure activities! The changes include: adding outdoor excursions, adventure sports, and nature trails. Check out the updated schedule above.",
-        'budget': "I've adjusted the itinerary to be more budget-friendly! The changes include: more free activities, budget dining options, and cost-effective transportation suggestions.",
-        'rain': "I've added indoor alternatives throughout your itinerary! The changes include: indoor attractions, rainy-day activities, and covered dining options. Your trip is now weather-proof!",
-        'food': "I've enhanced the food experiences in your itinerary! The changes include: local cuisine recommendations, food tours, and top-rated restaurants for each meal time.",
-        'family': "I've made your itinerary more family-friendly! The changes include: kid-friendly activities, family restaurants, and age-appropriate suggestions for everyone."
-      };
-      
-      let responseText = "I've updated your itinerary based on your request. The changes have been applied to optimize your travel experience. You can view the updated itinerary above. Is there anything else you'd like to adjust?";
-      
-      const lowerMsg = userMessage.toLowerCase();
-      if (lowerMsg.includes('adventure') || lowerMsg.includes('outdoor') || lowerMsg.includes('active')) {
-        responseText = responses.adventure;
-      } else if (lowerMsg.includes('budget') || lowerMsg.includes('cheap') || lowerMsg.includes('cheaper') || lowerMsg.includes('free') || lowerMsg.includes('cost')) {
-        responseText = responses.budget;
-      } else if (lowerMsg.includes('rain') || lowerMsg.includes('indoor') || lowerMsg.includes('weather')) {
-        responseText = responses.rain;
-      } else if (lowerMsg.includes('food') || lowerMsg.includes('restaurant') || lowerMsg.includes('cuisine') || lowerMsg.includes('eat') || lowerMsg.includes('dining') || lowerMsg.includes('vegetarian')) {
-        responseText = responses.food;
-      } else if (lowerMsg.includes('family') || lowerMsg.includes('kid') || lowerMsg.includes('children')) {
-        responseText = responses.family;
-      }
-      
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: responseText }
+        { role: 'assistant', content: 'Your itinerary has been updated and saved. The refreshed plan is displayed above.' }
       ]);
     } catch (error) {
       setMessages(prev => [
