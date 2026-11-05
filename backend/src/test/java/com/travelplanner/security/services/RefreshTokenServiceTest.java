@@ -126,7 +126,7 @@ class RefreshTokenServiceTest {
         when(refreshTokenRepository.findUserIdByToken("test-token")).thenReturn(Optional.of(1L));
         when(refreshTokenRepository.findByToken("test-token")).thenReturn(Optional.of(testRefreshToken));
         when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(testUser));
-        when(refreshTokenRepository.findAllByUserAndRevokedFalse(testUser)).thenReturn(List.of());
+        when(refreshTokenRepository.findAllByUserAndRevokedFalse(testUser)).thenReturn(List.of(testRefreshToken));
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(testRefreshToken);
 
         RefreshToken result = refreshTokenService.rotateRefreshToken("test-token");
