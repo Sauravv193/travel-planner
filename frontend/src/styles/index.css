@@ -536,8 +536,8 @@ body { background-color: var(--wg-page); color: var(--wg-text); }
 
 
 /* Raise contrast for legacy utility text across the remaining pages. */
-.text-cream-400, .text-cream-500 { color:#6e5d50; }
-.dark .text-cream-400, .dark .text-cream-500 { color:#b4c7bf; }
+[class~="text-cream-400"], [class~="text-cream-500"] { color:#6e5d50; }
+.dark [class~="text-cream-400"], .dark [class~="text-cream-500"] { color:#b4c7bf; }
 .input-field::placeholder { color:#6e5d50; opacity:1; }
 .dark .input-field::placeholder { color:#b4c7bf; opacity:1; }
 .text-beige-600, .text-beige-700 { color:#70563f; }
@@ -759,9 +759,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .btn-secondary:hover, .btn-ghost:hover { color:var(--wg-accent-strong)!important; background:var(--wg-accent-soft)!important; }
 .btn-ghost { color:var(--wg-muted)!important; }
 .card { color:var(--wg-text); border-color:var(--wg-border)!important; background:var(--wg-surface)!important; box-shadow:var(--wg-shadow); }
-.text-warm-dark { color:var(--wg-text)!important; }
-.text-brown-600, .text-brown-700, .text-brown-500 { color:var(--wg-muted)!important; }
-.text-maroon-500, .text-maroon-600, .text-maroon-700 { color:var(--wg-accent)!important; }
+[class~="text-warm-dark"] { color:var(--wg-text)!important; }
+[class~="text-brown-600"], [class~="text-brown-700"], [class~="text-brown-500"] { color:var(--wg-muted)!important; }
+[class~="text-maroon-500"], [class~="text-maroon-600"], [class~="text-maroon-700"] { color:var(--wg-accent)!important; }
 .dark [class~="text-night-muted"] { color:var(--wg-muted)!important; }
 .dark [class~="text-night-text"] { color:var(--wg-text)!important; }
 .dark [class~="bg-night-bg"] { background-color:var(--wg-page)!important; }
@@ -846,8 +846,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 
 /* Legacy Tailwind surfaces mapped onto the same semantic palette. */
-.bg-cream-50, .bg-white { background-color:var(--wg-surface)!important; }
-.bg-cream-100, .bg-beige-50 { background-color:var(--wg-surface-soft)!important; }
+[class~="bg-cream-50"], .bg-white { background-color:var(--wg-surface)!important; }
+[class~="bg-cream-100"], [class~="bg-beige-50"] { background-color:var(--wg-surface-soft)!important; }
 .dark [class~="bg-white"], .dark [class~="bg-white/80"], .dark [class~="bg-white/90"] { background-color:var(--wg-surface)!important; }
 .dark [class~="bg-cream-50"], .dark [class~="bg-cream-100"], .dark [class~="bg-beige-50"] { background-color:var(--wg-surface-soft)!important; }
 .dark [class~="border-cream-100"], .dark [class~="border-cream-200"] { border-color:var(--wg-border)!important; }
