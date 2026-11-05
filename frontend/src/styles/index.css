@@ -542,3 +542,6 @@ body { background-color: var(--wg-page); color: var(--wg-text); }
 .dark .input-field::placeholder { color:#b4c7bf; opacity:1; }
 .text-beige-600, .text-beige-700 { color:#70563f; }
 .dark .text-beige-600, .dark .text-beige-700 { color:#dfc8ad; }
+
+.wg-alert-link { display:inline-flex; align-items:center; gap:.25rem; margin-left:auto; color:inherit; font-size:.82rem; font-weight:800; white-space:nowrap; text-decoration:underline; text-underline-offset:3px; }
+@media(max-width:640px) { .wg-alert { align-items:flex-start; flex-wrap:wrap; } .wg-alert-link { margin-left:2rem; } }
