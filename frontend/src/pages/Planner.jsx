@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { AlertCircle, Compass } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ItineraryGenerator from '../components/itinerary/ItineraryGenerator';
 import ItineraryView from '../components/itinerary/ItineraryView';
@@ -175,12 +176,10 @@ const Planner = () => {
   };
 
   return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-10">            <h1 className="text-3xl font-bold text-warm-dark dark:text-white mb-2">Plan Your Next Adventure</h1>
-          <p className="text-lg text-brown-600 dark:text-night-muted">
-            Describe your trip, and our AI will create a personalized itinerary.
-          </p>
+    <div className="wg-page">
+      <div className="wg-container max-w-5xl mx-auto">
+        <div className="wg-page-heading wg-planner-heading">
+          <div><span className="wg-eyebrow"><Compass size={15} /> PLAN SOMETHING MEMORABLE</span><h1>Where to next?</h1><p>Tell us what kind of trip you have in mind. We’ll shape it into a day-by-day plan.</p></div>
         </div>
 
         {!itinerary && !isGenerating && <ItineraryGenerator onGenerate={handleGenerate} />}
@@ -191,7 +190,7 @@ const Planner = () => {
           </div>
         )}
 
-        {error && <p className="text-center text-red-500 mt-4">{error}</p>}
+        {error && <div className="wg-alert" role="alert"><AlertCircle size={18} /><span>{error}</span></div>}
         
         {itinerary && !isGenerating && (
           <div className="mt-12">
