@@ -5,7 +5,6 @@ import com.travelplanner.model.Trip;
 import com.travelplanner.repository.PhotoRepository;
 import com.travelplanner.repository.TripRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,9 +24,6 @@ public class PhotoService {
     @Autowired private PhotoRepository photoRepository;
     @Autowired private TripRepository tripRepository;
     @Autowired private PhotoStorageService photoStorageService;
-
-    @Value("${app.photo.upload.dir:./uploads/photos}")
-    private String uploadDir;
 
     @Transactional
     public List<Photo> uploadPhotos(Long tripId, MultipartFile[] files, Long userId) throws IOException {
