@@ -762,11 +762,11 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .text-warm-dark { color:var(--wg-text)!important; }
 .text-brown-600, .text-brown-700, .text-brown-500 { color:var(--wg-muted)!important; }
 .text-maroon-500, .text-maroon-600, .text-maroon-700 { color:var(--wg-accent)!important; }
-.dark .text-night-muted { color:var(--wg-muted)!important; }
-.dark .text-night-text { color:var(--wg-text)!important; }
-.dark .bg-night-bg { background-color:var(--wg-page)!important; }
-.dark .bg-night-surface, .dark .bg-night-card { background-color:var(--wg-surface)!important; }
-.dark .border-night-border { border-color:var(--wg-border)!important; }
+.dark [class~="text-night-muted"] { color:var(--wg-muted)!important; }
+.dark [class~="text-night-text"] { color:var(--wg-text)!important; }
+.dark [class~="bg-night-bg"] { background-color:var(--wg-page)!important; }
+.dark [class~="bg-night-surface"], .dark [class~="bg-night-card"] { background-color:var(--wg-surface)!important; }
+.dark [class~="border-night-border"] { border-color:var(--wg-border)!important; }
 .text-cream-400, .text-cream-500 { color:var(--wg-muted)!important; }
 .dark .text-cream-400, .dark .text-cream-500 { color:var(--wg-muted)!important; }
 
