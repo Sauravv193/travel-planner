@@ -533,3 +533,12 @@ body { background-color: var(--wg-page); color: var(--wg-text); }
 .wg-trip-page .wg-adapt-panel h3 { color:var(--wg-text); }
 @media(max-width:800px) { .wg-dashboard-stats { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:640px) { .wg-dashboard-hero { padding:1.25rem; } .wg-dashboard-mark { display:none; } .wg-dashboard-stat { padding:.7rem; } .wg-trip-page .wg-trip-header { flex-direction:column; } }
+
+
+/* Raise contrast for legacy utility text across the remaining pages. */
+.text-cream-400, .text-cream-500 { color:#6e5d50; }
+.dark .text-cream-400, .dark .text-cream-500 { color:#b4c7bf; }
+.placeholder-cream-400::placeholder { color:#6e5d50; opacity:1; }
+.dark .placeholder-cream-400::placeholder { color:#b4c7bf; opacity:1; }
+.text-beige-600, .text-beige-700 { color:#70563f; }
+.dark .text-beige-600, .dark .text-beige-700 { color:#dfc8ad; }
