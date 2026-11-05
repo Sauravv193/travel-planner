@@ -208,14 +208,6 @@ export const deletePhoto = (photoId) => {
   return api.delete(`/v1/photos/${photoId}`);
 };
 
-export const getPhotoUrl = (photoId) => {
-  const token = getToken();
-  if (token) {
-    return `${API_URL}/v1/photos/serve/${photoId}?token=${encodeURIComponent(token)}`;
-  }
-  return `${API_URL}/v1/photos/serve/${photoId}`;
-};
-
 export const fetchPhotoBlob = async (photoId) => {
   try {
     const response = await api.get(`/v1/photos/serve/${photoId}`, {
@@ -223,7 +215,7 @@ export const fetchPhotoBlob = async (photoId) => {
     });
     return URL.createObjectURL(response.data);
   } catch (error) {
-    console.error('Failed to fetch photo:', error);
+    console.error('Failed to fetch photo.');
     throw error;
   }
 };
