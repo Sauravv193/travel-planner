@@ -24,7 +24,7 @@ const Planner = () => {
         const cleaned = generatedText.replace(/```json/g, '').replace(/```/g, '').trim();
         return JSON.parse(cleaned);
       }
-    } catch (error) {
+    } catch {
       // Try parsing the saved content directly below.
     }
     try {
