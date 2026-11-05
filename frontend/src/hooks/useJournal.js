@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { getJournal, deleteJournal as deleteJournalAPI, getPhotosForTrip, uploadPhotos, deletePhoto, getPhotoUrl, generateJournal as generateJournalAPI } from '../services/api';
+import { getJournal, deleteJournal as deleteJournalAPI, getPhotosForTrip, uploadPhotos, deletePhoto, fetchPhotoBlob, generateJournal as generateJournalAPI } from '../services/api';
 
 // Removed fileToGenerativePart as journal generation now happens on backend
 
@@ -32,7 +32,7 @@ export const useJournal = (trip) => {
               photosResponse.data.map(async (photo) => {
                 try {
                   // For now, use direct URL - auth headers will be handled by axios interceptor
-                  const photoUrl = getPhotoUrl(photo.id);
+                  const photoUrl = await fetchPhotoBlob(photo.id);
                   return {
                     id: photo.id,
                     name: photo.originalName,
@@ -80,7 +80,7 @@ export const useJournal = (trip) => {
           const serverPhotos = response.data.map(photo => ({
             id: photo.id,
             name: photo.originalName,
-            url: getPhotoUrl(photo.id),
+            url: await fetchPhotoBlob(photo.id),
             timestamp: photo.uploadTime,
             size: photo.fileSize,
             type: photo.mimeType,
@@ -97,7 +97,7 @@ export const useJournal = (trip) => {
       }
     } catch (err) {
       setError('Failed to upload photos. Please try again.');
-      console.error('Photo upload error:', err);
+      console.error('Photo upload failed.');
     } finally {
       setLoading(false);
     }
@@ -120,7 +120,7 @@ export const useJournal = (trip) => {
       }
     } catch (err) {
       setError('Failed to delete photo. Please try again.');
-      console.error('Photo deletion error:', err);
+      console.error('Photo deletion failed.');
     }
   };
 
