@@ -23,6 +23,7 @@ public class Photo {
     private String fileName;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String filePath;
 
     @Column(nullable = false)

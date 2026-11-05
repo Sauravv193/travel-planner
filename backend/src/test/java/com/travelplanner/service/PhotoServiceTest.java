@@ -13,9 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -30,6 +28,7 @@ class PhotoServiceTest {
 
     @Mock private PhotoRepository photoRepository;
     @Mock private TripRepository tripRepository;
+    @Mock private PhotoStorageService photoStorageService;
     @InjectMocks private PhotoService photoService;
 
     private Trip ownedTrip;
@@ -37,7 +36,6 @@ class PhotoServiceTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(photoService, "uploadDir", tempDir.resolve("photos").toString());
         User owner = new User("owner", "owner@example.com", "password");
         owner.setId(userId);
         ownedTrip = new Trip();
@@ -56,6 +54,8 @@ class PhotoServiceTest {
 
     @Test
     void uploadPhotosAcceptsRecognizedImageAndUsesGeneratedFilename() throws Exception {
+        when(photoStorageService.store(anyString(), any(byte[].class), anyString()))
+                .thenReturn(tempDir.resolve("photos").resolve("stored.png").toString());
         when(photoRepository.save(any(Photo.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         var result = photoService.uploadPhotos(42L,
@@ -67,7 +67,8 @@ class PhotoServiceTest {
         assertEquals("holiday.png", saved.getOriginalName());
         assertTrue(saved.getFileName().endsWith(".png"));
         assertNotEquals("holiday.png", saved.getFileName());
-        assertTrue(Files.isRegularFile(Path.of(saved.getFilePath())));
+        assertTrue(saved.getFilePath().endsWith("stored.png"));
+        verify(photoStorageService).store(anyString(), any(byte[].class), eq("image/png"));
         assertEquals("image/png", saved.getMimeType());
     }
 
@@ -106,17 +107,15 @@ class PhotoServiceTest {
 
     @Test
     void uploadPhotosRemovesFilesIfDatabaseSaveFails() throws Exception {
+        when(photoStorageService.store(anyString(), any(byte[].class), anyString()))
+                .thenReturn(tempDir.resolve("photos").resolve("stored.png").toString());
         when(photoRepository.save(any(Photo.class))).thenThrow(new IllegalStateException("database unavailable"));
 
         assertThrows(IllegalStateException.class,
                 () -> photoService.uploadPhotos(42L,
                         new org.springframework.web.multipart.MultipartFile[] { png("photo.png") }, userId));
 
-        Path uploadDirectory = tempDir.resolve("photos");
-        assertTrue(Files.exists(uploadDirectory));
-        try (var files = Files.list(uploadDirectory)) {
-            assertEquals(0, files.count());
-        }
+        verify(photoStorageService).delete(tempDir.resolve("photos").resolve("stored.png").toString());
     }
 
     @Test
