@@ -6,7 +6,7 @@ import com.travelplanner.security.services.UserDetailsImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -23,9 +23,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -66,7 +63,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             // OAuth-only accounts still need a valid password hash to satisfy User
             // validation. The random value is never exposed or used for authentication.
             String unusableRandomPassword = UUID.randomUUID() + UUID.randomUUID().toString();
-            user.setPassword(passwordEncoder.encode(unusableRandomPassword));
+            user.setPassword(new BCryptPasswordEncoder().encode(unusableRandomPassword));
 
             user.setVerified(true);
             user.setCreatedBy("oauth2");
