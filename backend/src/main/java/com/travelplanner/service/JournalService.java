@@ -13,9 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.Base64;
 
@@ -33,6 +30,9 @@ public class JournalService {
 
     @Autowired
     private GeminiService geminiService;
+
+    @Autowired
+    private PhotoStorageService photoStorageService;
 
     @Transactional
     public JournalEntry saveJournal(Long tripId, JournalEntry journalData, Long userId) {
@@ -139,22 +139,16 @@ public class JournalService {
         
         // Add image parts
         for (Photo photo : photos) {
-            try {
-                Path filePath = Paths.get(photo.getFilePath());
-                byte[] imageBytes = Files.readAllBytes(filePath);
-                String base64Image = Base64.getEncoder().encodeToString(imageBytes);
-                
-                Map<String, Object> inlineData = new HashMap<>();
-                inlineData.put("mimeType", photo.getMimeType());
-                inlineData.put("data", base64Image);
-                
-                Map<String, Object> imagePart = new HashMap<>();
-                imagePart.put("inlineData", inlineData);
-                parts.add(imagePart);
-            } catch (IOException e) {
-                // Log the error but continue with other photos
-                System.err.println("Failed to process photo: " + photo.getOriginalName());
-            }
+            byte[] imageBytes = photoStorageService.read(photo.getFilePath());
+            String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+
+            Map<String, Object> inlineData = new HashMap<>();
+            inlineData.put("mimeType", photo.getMimeType());
+            inlineData.put("data", base64Image);
+
+            Map<String, Object> imagePart = new HashMap<>();
+            imagePart.put("inlineData", inlineData);
+            parts.add(imagePart);
         }
         
         Map<String, Object> content = new HashMap<>();
