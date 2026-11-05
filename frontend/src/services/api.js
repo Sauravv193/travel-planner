@@ -253,6 +253,20 @@ export const getJobStatus = (jobId) => {
   return api.get(`/v1/jobs/${jobId}`);
 };
 
+export const waitForJobCompletion = async (jobId, { pollIntervalMs = 2000, timeoutMs = 120000 } = {}) => {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const response = await getJobStatus(jobId);
+    const status = response.data?.status;
+    if (status === 'COMPLETED') return response.data;
+    if (status === 'FAILED') {
+      throw new Error(response.data?.errorMessage || 'The itinerary job failed. Please try again.');
+    }
+    await new Promise(resolve => setTimeout(resolve, pollIntervalMs));
+  }
+  throw new Error('The itinerary update is taking too long. Check the trip again shortly.');
+};
+
 // Conversation API
 export const createConversation = (tripId) => {
   return api.post('/v1/conversations', { tripId });
