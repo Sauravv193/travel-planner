@@ -76,7 +76,7 @@ const Trip = () => {
     } catch (error) {
       const status = error.response?.status;
       setLoadError(status === 404 ? 'This trip could not be found for your account.' : 'We could not load this trip from the server. Check your connection and try again.');
-      toast.error(status === 404 ? 'Trip not found.' : 'Could not load trip. Please try again.');
+      if (showSpinner) toast.error(status === 404 ? 'Trip not found.' : 'Could not load trip. Please try again.');
       return false;
     } finally {
       if (showSpinner) setLoading(false);
