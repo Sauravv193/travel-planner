@@ -538,7 +538,7 @@ body { background-color: var(--wg-page); color: var(--wg-text); }
 /* Raise contrast for legacy utility text across the remaining pages. */
 .text-cream-400, .text-cream-500 { color:#6e5d50; }
 .dark .text-cream-400, .dark .text-cream-500 { color:#b4c7bf; }
-.placeholder-cream-400::placeholder { color:#6e5d50; opacity:1; }
-.dark .placeholder-cream-400::placeholder { color:#b4c7bf; opacity:1; }
+.input-field::placeholder { color:#6e5d50; opacity:1; }
+.dark .input-field::placeholder { color:#b4c7bf; opacity:1; }
 .text-beige-600, .text-beige-700 { color:#70563f; }
 .dark .text-beige-600, .dark .text-beige-700 { color:#dfc8ad; }
