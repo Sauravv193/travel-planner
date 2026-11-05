@@ -99,9 +99,7 @@ public class RefreshTokenService {
                     "Refresh token has been revoked due to suspicious activity");
         }
 
-        oldRefreshToken.setRevoked(true);
-        refreshTokenRepository.save(oldRefreshToken);
-
+        // createRefreshTokenForLockedUser revokes the old token and any legacy duplicates.
         RefreshToken newRefreshToken = createRefreshTokenForLockedUser(lockedUser);
         oldRefreshToken.setReplacedByToken(newRefreshToken.getToken());
         refreshTokenRepository.save(oldRefreshToken);
