@@ -7,7 +7,6 @@ A travel planner that uses Google Gemini to generate itineraries. Spring Boot ba
 - Generate day-by-day trip itineraries with AI — tell it your destination, dates, and preferences
 - Chat with the AI to adjust plans ("make it cheaper", "add museums", "more outdoorsy")
 - Upload trip photos and auto-generate travel journals
-- View trip locations on a map (OpenStreetMap)
 - Share trips via link, Twitter, Facebook, or export as print/download
 - Dark/light theme — baby pink and white in light mode, deep navy with rose accents in dark mode
 
@@ -30,7 +29,7 @@ travel-planner/
 │   └── src/test/             unit and integration tests
 ├── frontend/                 React app
 │   └── src/
-│       ├── components/       UI components (AI chat, itinerary, dashboard, journal, map)
+│       ├── components/       UI components (AI chat, itinerary, dashboard, journal)
 │       ├── pages/            Home, Planner, Trip, Journal, Profile, SignIn, SignUp
 │       ├── hooks/            useAuth, useItinerary, useJournal
 │       ├── services/         API client
