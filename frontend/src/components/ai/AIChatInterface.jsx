@@ -78,7 +78,8 @@ const AIChatInterface = ({ tripId, onAdaptItinerary, isVisible, onClose }) => {
       }
 
       // Apply the itinerary adaptation (this is the main action)
-      await onAdaptItinerary(userMessage);
+      const adaptationCompleted = await onAdaptItinerary(userMessage);
+      if (adaptationCompleted === false) throw new Error('The itinerary update did not complete.');
       
       // Generate AI-like response based on the adaptation context
       const responses = {
