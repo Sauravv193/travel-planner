@@ -157,10 +157,10 @@ const Trip = () => {
   }
 
   return (
-    <div className="py-6 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="wg-page wg-trip-page">
+      <div className="wg-container">
         {/* Trip Header with Actions */}
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="wg-trip-header mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-warm-dark dark:text-white">
               Trip to {trip.destination}
@@ -208,7 +208,7 @@ const Trip = () => {
         </div>
 
         {/* Quick Adaptation Input */}
-        <div className="bg-cream-50/80 dark:bg-night-surface/50 backdrop-blur-sm rounded-xl p-4 mb-6 border border-cream-100 dark:border-night-border">
+        <div className="wg-adapt-panel bg-cream-50/80 dark:bg-night-surface/50 backdrop-blur-sm rounded-xl p-4 mb-6 border border-cream-100 dark:border-night-border">
           <div className="flex items-center space-x-2 mb-2">
             <MessageSquare className="w-4 h-4 text-maroon-500" />
             <h3 className="text-sm font-semibold text-warm-dark dark:text-white">Quick Adaptation</h3>
