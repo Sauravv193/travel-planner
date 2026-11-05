@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createElement, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, ArrowUpRight, Camera, Check, ChevronDown, Compass,
@@ -93,10 +93,10 @@ function Home() {
       <section className="wg-feature-section">
         <div className="wg-feature-heading"><Eyebrow>THE WANDERGEN DIFFERENCE</Eyebrow><h2>Everything you need.<br /><em>Nothing you don’t.</em></h2><p>Useful detail, exactly when you need it. The rest stays out of your way.</p></div>
         <div className="wg-feature-grid">
-          {features.map(({ icon: Icon, title, text }, index) => (
+          {features.map(({ icon, title, text }, index) => (
             <article className="wg-feature-card" key={title}>
               <span className="wg-feature-number">0{index + 1}</span>
-              <span className="wg-feature-icon"><Icon size={21} strokeWidth={1.7} /></span>
+              <span className="wg-feature-icon">{createElement(icon, { size: 21, strokeWidth: 1.7 })}</span>
               <h3>{title}</h3><p>{text}</p>
             </article>
           ))}
