@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CalendarDays, ChevronDown, Clock3, MapPin, Utensils, Wallet, Lightbulb, Sparkles, Users } from 'lucide-react';
+import { CalendarDays, ChevronDown, Clock3, MapPin, Utensils, Wallet, Lightbulb, Sparkles } from 'lucide-react';
 
 const cleanText = (value) => {
   if (value === null || value === undefined) return '';
