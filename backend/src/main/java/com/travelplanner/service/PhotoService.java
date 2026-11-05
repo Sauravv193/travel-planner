@@ -11,10 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +24,7 @@ public class PhotoService {
 
     @Autowired private PhotoRepository photoRepository;
     @Autowired private TripRepository tripRepository;
+    @Autowired private PhotoStorageService photoStorageService;
 
     @Value("${app.photo.upload.dir:./uploads/photos}")
     private String uploadDir;
@@ -42,8 +39,6 @@ public class PhotoService {
             throw new IllegalArgumentException("Upload between 1 and " + MAX_PHOTOS_PER_REQUEST + " photos per request.");
         }
 
-        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-        Files.createDirectories(uploadPath);
         List<Photo> uploadedPhotos = new ArrayList<>();
 
         // Validate every file before writing any of them.
@@ -73,25 +68,20 @@ public class PhotoService {
             extensions.add(extensionFor(detectedType));
         }
 
-        List<Path> createdFiles = new ArrayList<>();
+        List<String> storedReferences = new ArrayList<>();
         try {
             for (int i = 0; i < files.length; i++) {
                 MultipartFile file = files[i];
                 String uniqueFilename = UUID.randomUUID() + extensions.get(i);
-                Path filePath = uploadPath.resolve(uniqueFilename).normalize();
-                if (!filePath.startsWith(uploadPath)) {
-                    throw new IllegalArgumentException("Invalid upload path.");
-                }
-
-                Files.createFile(filePath);
-                createdFiles.add(filePath);
-                Files.write(filePath, contents.get(i), StandardOpenOption.WRITE);
+                String storageReference = photoStorageService.store(
+                        uniqueFilename, contents.get(i), mimeTypes.get(i));
+                storedReferences.add(storageReference);
 
                 Photo photo = new Photo();
                 photo.setTrip(trip);
                 photo.setOriginalName(safeOriginalName(file.getOriginalFilename()));
                 photo.setFileName(uniqueFilename);
-                photo.setFilePath(filePath.toString());
+                photo.setFilePath(storageReference);
                 photo.setFileSize((long) contents.get(i).length);
                 photo.setMimeType(mimeTypes.get(i));
                 photo.setUploadTime(LocalDateTime.now());
@@ -100,9 +90,9 @@ public class PhotoService {
             return uploadedPhotos;
         } catch (IOException | RuntimeException e) {
             // A database failure after writing one or more files must not leave orphaned uploads.
-            for (Path createdFile : createdFiles) {
+            for (String storedReference : storedReferences) {
                 try {
-                    Files.deleteIfExists(createdFile);
+                    photoStorageService.delete(storedReference);
                 } catch (IOException cleanupException) {
                     e.addSuppressed(cleanupException);
                 }
@@ -160,7 +150,7 @@ public class PhotoService {
     public void deletePhoto(Long photoId, Long userId) {
         Photo photo = getPhotoById(photoId, userId);
         try {
-            Files.deleteIfExists(Paths.get(photo.getFilePath()).toAbsolutePath().normalize());
+            photoStorageService.delete(photo.getFilePath());
         } catch (IOException e) {
             throw new IllegalStateException("Could not remove stored photo file.", e);
         }
@@ -177,10 +167,6 @@ public class PhotoService {
     @Transactional(readOnly = true)
     public byte[] getPhotoData(Long photoId, Long userId) throws IOException {
         Photo photo = getPhotoById(photoId, userId);
-        Path filePath = Paths.get(photo.getFilePath()).toAbsolutePath().normalize();
-        if (!Files.isRegularFile(filePath)) {
-            throw new RuntimeException("Photo file is unavailable.");
-        }
-        return Files.readAllBytes(filePath);
+        return photoStorageService.read(photo.getFilePath());
     }
 }
