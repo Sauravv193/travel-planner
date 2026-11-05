@@ -21,10 +21,12 @@ public class R2PhotoStorageConfig {
             @Value("${app.photo.storage.endpoint:}") String endpoint,
             @Value("${app.photo.storage.access-key:}") String accessKey,
             @Value("${app.photo.storage.secret-key:}") String secretKey,
+            @Value("${app.photo.storage.bucket:}") String bucket,
             @Value("${app.photo.storage.region:auto}") String region) {
         Assert.hasText(endpoint, "R2 endpoint is required when PHOTO_STORAGE_PROVIDER=r2");
         Assert.hasText(accessKey, "R2 access key is required when PHOTO_STORAGE_PROVIDER=r2");
         Assert.hasText(secretKey, "R2 secret key is required when PHOTO_STORAGE_PROVIDER=r2");
+        Assert.hasText(bucket, "R2 bucket is required when PHOTO_STORAGE_PROVIDER=r2");
         return S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
                 .region(Region.of(region))
