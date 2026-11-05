@@ -8,7 +8,7 @@ A travel planner that uses Google Gemini to generate itineraries. Spring Boot ba
 - Chat with the AI to adjust plans ("make it cheaper", "add museums", "more outdoorsy")
 - Upload trip photos and auto-generate travel journals
 - Share trips through revocable public links, Twitter, Facebook, or export as print/download
-- Dark/light theme — baby pink and white in light mode, deep navy with rose accents in dark mode
+- Dark/light theme — warm neutral light mode and midnight-indigo with cyan/lavender accents in dark mode
 
 ## Stack
 
@@ -105,12 +105,16 @@ npm run dev
 When running, Swagger UI is at `http://localhost:8080/swagger-ui/index.html`.
 
 Main endpoints:
-- `POST /api/auth/signup` and `/api/auth/signin` — register/login
-- `GET/POST /api/trips` — list and create trips
-- `POST /api/itineraries/generate/{tripId}` — generate an AI itinerary
-- `POST /api/itineraries/adapt/{tripId}` — modify an existing itinerary
-- `POST /api/photos/upload/{tripId}` — upload photos
-- `POST /api/journal/generate/{tripId}` — generate AI journal from photos
+
+- `POST /api/v1/auth/signup` and `POST /api/v1/auth/signin` — register/login
+- `GET /api/v1/trips` and `POST /api/v1/trips` — list and create trips
+- `POST /api/v1/itineraries/generate/{tripId}` — start asynchronous itinerary generation
+- `PUT /api/v1/itineraries/regenerate/{tripId}` and `POST /api/v1/itineraries/adapt/{tripId}` — start asynchronous updates
+- `GET /api/v1/jobs/{jobId}` — check an asynchronous job's status
+- `POST /api/v1/photos/upload/{tripId}`, `GET /api/v1/photos/trip/{tripId}`, `GET /api/v1/photos/serve/{photoId}` — authenticated photo operations
+- `POST /api/v1/journal/generate/{tripId}` — generate an AI journal from trip photos
+- `POST /api/v1/trips/{tripId}/share` and `DELETE /api/v1/trips/{tripId}/share` — create/revoke a public share link
+- `GET /api/v1/public/trips/{shareToken}` — read a shared trip without signing in
 - `GET /api/health` — health check
 
 ## Tests
