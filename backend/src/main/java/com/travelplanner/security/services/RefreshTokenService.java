@@ -78,11 +78,11 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken rotateRefreshToken(String refreshTokenValue) {
         // Resolve the owner first, then lock in a consistent order (user -> token).
-        RefreshToken tokenReference = refreshTokenRepository.findByToken(refreshTokenValue)
+        Long userId = refreshTokenRepository.findUserIdByToken(refreshTokenValue)
                 .orElseThrow(() -> new TokenRefreshException(refreshTokenValue,
                         "Refresh token not found"));
 
-        User lockedUser = userRepository.findByIdForUpdate(tokenReference.getUser().getId())
+        User lockedUser = userRepository.findByIdForUpdate(userId)
                 .orElseThrow(() -> new BadRequestException("User not found"));
 
         // Re-read under lock: another request may have rotated/revoked this token while waiting.
