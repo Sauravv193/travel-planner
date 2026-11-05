@@ -121,6 +121,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/status").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/public/trips/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/oauth2/**").permitAll()
                                 .requestMatchers("/login/**").permitAll()
