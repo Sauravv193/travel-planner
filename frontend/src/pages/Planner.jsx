@@ -1,13 +1,11 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { AlertCircle, Compass, ArrowUpRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import ItineraryGenerator from '../components/itinerary/ItineraryGenerator';
-import ItineraryView from '../components/itinerary/ItineraryView';
 import { createTrip, generateItinerary, getTripById, getJobStatus } from '../services/api';
-import LoadingSpinner from '../components/common/LoadingSpinner';
 import ItineraryGenerationProgress from '../components/loading/ItineraryGenerationProgress';
 
 const Planner = () => {
-  const [itinerary, setItinerary] = useState(null);
   const [newTripId, setNewTripId] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState('');
@@ -17,60 +15,47 @@ const Planner = () => {
   const isMountedRef = useRef(true);
 
   const parseItineraryContent = (rawContent) => {
-    if (!rawContent) {
-      throw new Error("No itinerary content found.");
-    }
-    
+    if (!rawContent) throw new Error('No itinerary content found.');
+    if (typeof rawContent === 'object') return rawContent;
     try {
-      if (typeof rawContent === 'object') {
-        return rawContent;
+      const outerResponse = JSON.parse(rawContent);
+      const generatedText = outerResponse.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (generatedText) {
+        const cleaned = generatedText.replace(/```json/g, '').replace(/```/g, '').trim();
+        return JSON.parse(cleaned);
       }
-      
-      try {
-        const outerResponse = JSON.parse(rawContent);
-        if (outerResponse.candidates && outerResponse.candidates[0] && outerResponse.candidates[0].content) {
-          let itineraryString = outerResponse.candidates[0].content.parts[0].text;
-          itineraryString = itineraryString.replace(/```json/g, '').replace(/```/g, '').trim();
-          return JSON.parse(itineraryString);
-        }
-      } catch (geminiError) {
-        // Continue to direct parse
-      }
-      
+    } catch {
+      // Try parsing the saved content directly below.
+    }
+    try {
       return JSON.parse(rawContent);
-      
-    } catch (e) {
-      throw new Error("The AI returned a plan in an unexpected format.");
+    } catch {
+      throw new Error('The AI returned a plan in an unexpected format.');
     }
   };
 
-  // Poll job status until completed, then fetch trip for itinerary content
   const pollJobAndFetchTrip = useCallback(async (jobId, tripId) => {
-    const pollInterval = 2000; // poll every 2 seconds
-    const maxAttempts = 60; // max 2 minutes of polling
+    const pollInterval = 2000;
+    const maxAttempts = 60;
     let attempts = 0;
 
     return new Promise((resolve, reject) => {
       const poll = async () => {
-        attempts++;
+        attempts += 1;
         try {
           const jobResponse = await getJobStatus(jobId);
           const jobStatus = jobResponse.data.status;
-
           if (jobStatus === 'COMPLETED') {
-            // Job completed — fetch the trip to get the generated itinerary
-            const tripResponse = await getTripById(tripId);
-            resolve(tripResponse);
+            resolve(await getTripById(tripId));
           } else if (jobStatus === 'FAILED') {
             reject(new Error(jobResponse.data.errorMessage || 'Itinerary generation failed.'));
           } else if (attempts >= maxAttempts) {
-            reject(new Error('Itinerary generation timed out. Please try again.'));
+            reject(new Error('Itinerary generation timed out. Your trip is saved, but its itinerary may need to be generated again.'));
           } else {
-            // Still processing — poll again
             pollingRef.current = setTimeout(poll, pollInterval);
           }
         } catch (err) {
-          reject(new Error('Failed to check generation status: ' + (err.message || 'Unknown error')));
+          reject(new Error('Could not check itinerary generation: ' + (err.message || 'Unknown error')));
         }
       };
       poll();
@@ -80,10 +65,11 @@ const Planner = () => {
   const handleGenerate = async (planDetails) => {
     setIsGenerating(true);
     setError('');
-    setItinerary(null);
+    setNewTripId(null);
     setCurrentDestination(planDetails.destination);
+
     try {
-      // Step 1: Create the trip
+      // The trip record is saved first; the itinerary is generated against that saved record.
       const tripResponse = await createTrip({
         destination: planDetails.destination,
         startDate: planDetails.startDate,
@@ -97,111 +83,72 @@ const Planner = () => {
         dietaryNeeds: planDetails.dietaryNeeds,
         mustTryFoods: planDetails.mustTryFoods,
       });
+
       const generatedTripId = tripResponse.data.id;
       setNewTripId(generatedTripId);
 
-      // Step 2: Start async itinerary generation (returns jobId)
-      const genResponse = await generateItinerary(generatedTripId);
-      const jobId = genResponse.data.jobId;
+      const generationResponse = await generateItinerary(generatedTripId);
+      const jobId = generationResponse.data.jobId;
+      if (!jobId) throw new Error('The server did not return an itinerary job ID.');
 
-      if (!jobId) {
-        throw new Error('No job ID returned from itinerary generation.');
-      }
+      const completedTripResponse = await pollJobAndFetchTrip(jobId, generatedTripId);
+      let savedContent = completedTripResponse.data?.itinerary?.content;
 
-      // Step 3: Poll job status until completed, then fetch trip
-      const tripDataResponse = await pollJobAndFetchTrip(jobId, generatedTripId);
-
-      // Step 4: Parse and display the itinerary from the trip data
-      const tripData = tripDataResponse.data;
-      if (tripData.itinerary && tripData.itinerary.content) {
-        const parsedItinerary = parseItineraryContent(tripData.itinerary.content);
-        setItinerary(parsedItinerary);
-      } else {
-        // Itinerary content wasn't in the trip response yet — fetch again
+      if (!savedContent) {
         const retryResponse = await getTripById(generatedTripId);
-        if (retryResponse.data.itinerary && retryResponse.data.itinerary.content) {
-          const parsedItinerary = parseItineraryContent(retryResponse.data.itinerary.content);
-          setItinerary(parsedItinerary);
-        } else {
-          throw new Error('Itinerary was generated but content could not be retrieved.');
-        }
+        savedContent = retryResponse.data?.itinerary?.content;
       }
+      if (!savedContent) throw new Error('Your trip was saved, but its itinerary could not be loaded yet.');
 
+      // Validate the generated payload, then open the database-backed trip route.
+      parseItineraryContent(savedContent);
+      navigate(`/trip/${generatedTripId}`);
     } catch (err) {
       const status = err.response?.status;
       const backendMessage = err.response?.data?.message;
-
-      if (status === 400) {
-        setError(backendMessage || 'Invalid trip details. Please check your inputs and try again.');
-      } else if (status === 401 || status === 403) {
-        setError('Your session has expired. Please sign in again.');
-      } else if (status === 429) {
-        setError('Too many requests. Please wait a moment and try again.');
-      } else if (status === 500 && backendMessage) {
-        setError(backendMessage);
-      } else if (status >= 500) {
-        setError('Something went wrong on the server. Please try again in a moment.');
-      } else {
-        setError(err.message || 'Sorry, something went wrong while planning your trip. Please try again.');
-      }
+      if (status === 400) setError(backendMessage || 'Invalid trip details. Check your inputs and try again.');
+      else if (status === 401 || status === 403) setError('Your session has expired. Sign in again to continue.');
+      else if (status === 429) setError('Too many requests. Wait a moment and try again.');
+      else if (status >= 500 && backendMessage) setError(backendMessage);
+      else if (status >= 500) setError('The server had a problem. Your trip may already be saved; check My Trips before creating it again.');
+      else setError(err.message || 'Something went wrong while planning your trip.');
     } finally {
-      if (isMountedRef.current) {
-        setIsGenerating(false);
-      }
+      if (isMountedRef.current) setIsGenerating(false);
     }
   };
-  
-  // Cleanup polling and mark unmounted on unmount
-  React.useEffect(() => {
+
+  useEffect(() => {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
-      if (pollingRef.current) {
-        clearTimeout(pollingRef.current);
-      }
+      if (pollingRef.current) clearTimeout(pollingRef.current);
     };
   }, []);
-  
-  const handleSaveAndNavigate = async () => {
-    if (newTripId) {
-      // Add a small delay to ensure the database transaction is complete
-      try {
-        await getTripById(newTripId);
-        navigate(`/trip/${newTripId}`);
-      } catch (error) {
-        navigate(`/trip/${newTripId}`);
-      }
-    }
-  };
 
   return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-10">            <h1 className="text-3xl font-bold text-warm-dark dark:text-white mb-2">Plan Your Next Adventure</h1>
-          <p className="text-lg text-brown-600 dark:text-night-muted">
-            Describe your trip, and our AI will create a personalized itinerary.
-          </p>
+    <div className="wg-page">
+      <div className="wg-container max-w-5xl mx-auto">
+        <div className="wg-page-heading wg-planner-heading">
+          <div>
+            <span className="wg-eyebrow"><Compass size={15} /> PLAN SOMETHING MEMORABLE</span>
+            <h1>Where to next?</h1>
+            <p>Tell us what kind of trip you have in mind. We’ll shape it into a day-by-day plan.</p>
+          </div>
         </div>
 
-        {!itinerary && !isGenerating && <ItineraryGenerator onGenerate={handleGenerate} />}
+        {!isGenerating && <ItineraryGenerator onGenerate={handleGenerate} />}
 
         {isGenerating && (
-          <div className="mt-12">
+          <div className="mt-8">
             <ItineraryGenerationProgress destination={currentDestination} />
           </div>
         )}
 
-        {error && <p className="text-center text-red-500 mt-4">{error}</p>}
-        
-        {itinerary && !isGenerating && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold text-center text-warm-dark dark:text-white mb-4">Here's Your Plan!</h2>
-            <ItineraryView itinerary={itinerary} />
-            <div className="mt-6 text-center">
-              <button onClick={handleSaveAndNavigate} className="btn-primary py-3 px-6 text-lg">
-                Save & View Trip
-              </button>
-            </div>
+        {error && (
+          <div className="wg-alert mt-5" role="alert">
+            <AlertCircle size={18} />
+            <span>{error}</span>
+            {newTripId && <Link to={`/trip/${newTripId}`} className="wg-alert-link">Open saved trip <ArrowUpRight size={15} /></Link>}
           </div>
         )}
       </div>

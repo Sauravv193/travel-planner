@@ -9,7 +9,7 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 import MapView from '../components/common/MapView';
 import { useToast } from '../components/common/Toast';
 import useKeyboardShortcuts from '../components/common/KeyboardShortcuts';
-import { MessageSquare, Share2, MapPin } from 'lucide-react';
+import { MessageSquare, Share2, MapPin, AlertCircle, RefreshCw } from 'lucide-react';
 import { printItinerary } from '../utils/export';
 
 const Trip = () => {
@@ -18,6 +18,7 @@ const Trip = () => {
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [parseError, setParseError] = useState(null);
+  const [loadError, setLoadError] = useState('');
   const [adaptationContext, setAdaptationContext] = useState('');
   const [showAIChat, setShowAIChat] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
@@ -58,6 +59,7 @@ const Trip = () => {
   const fetchTrip = async () => {
     setLoading(true);
     setParseError(null);
+    setLoadError('');
     try {
       const response = await getTripById(tripId);
       let parsedContent = null;
@@ -73,8 +75,9 @@ const Trip = () => {
         itinerary: parsedContent ? { ...response.data.itinerary, content: parsedContent } : null
       });
     } catch (error) {
-      setParseError("Failed to fetch trip data from the server.");
-      toast.error("Could not load trip. Please try again.");
+      const status = error.response?.status;
+      setLoadError(status === 404 ? 'This trip could not be found for your account.' : 'We could not load this trip from the server. Check your connection and try again.');
+      toast.error(status === 404 ? 'Trip not found.' : 'Could not load trip. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -153,14 +156,28 @@ const Trip = () => {
   }
 
   if (!trip) {
-    return <div className="text-center py-10">Trip not found.</div>;
+    return (
+      <div className="wg-page">
+        <div className="wg-container">
+          <div className="wg-empty">
+            <div className="wg-empty-icon"><AlertCircle size={25} /></div>
+            <h3>{loadError.includes('not be found') ? 'Trip not found' : 'Trip could not be loaded'}</h3>
+            <p>{loadError || 'We could not retrieve this trip. Try again in a moment.'}</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              <button className="wg-button wg-button-primary" onClick={fetchTrip}><RefreshCw size={16} /> Retry</button>
+              <Link to="/profile" className="wg-button wg-button-secondary">Back to My Trips</Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="py-6 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="wg-page wg-trip-page">
+      <div className="wg-container">
         {/* Trip Header with Actions */}
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="wg-trip-header mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-warm-dark dark:text-white">
               Trip to {trip.destination}
@@ -208,7 +225,7 @@ const Trip = () => {
         </div>
 
         {/* Quick Adaptation Input */}
-        <div className="bg-cream-50/80 dark:bg-night-surface/50 backdrop-blur-sm rounded-xl p-4 mb-6 border border-cream-100 dark:border-night-border">
+        <div className="wg-adapt-panel bg-cream-50/80 dark:bg-night-surface/50 backdrop-blur-sm rounded-xl p-4 mb-6 border border-cream-100 dark:border-night-border">
           <div className="flex items-center space-x-2 mb-2">
             <MessageSquare className="w-4 h-4 text-maroon-500" />
             <h3 className="text-sm font-semibold text-warm-dark dark:text-white">Quick Adaptation</h3>

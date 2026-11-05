@@ -16,6 +16,8 @@ export const ThemeProvider = ({ children }) => {
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
+    const themeColor = window.document.querySelector('meta[name="theme-color"]');
+    themeColor?.setAttribute('content', theme === 'dark' ? '#0b1020' : '#f5f2eb');
     localStorage.setItem('theme', theme);
   }, [theme]);
 
